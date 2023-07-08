@@ -1,23 +1,19 @@
-import androidx.compose.material.MaterialTheme
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import screens.LoginUser
-
-@Composable
-@Preview
-fun App() {
-    MaterialTheme {
-        val loginUser = LoginUser()
-        loginUser.LoginUser()
-    }
-}
+import androidx.compose.ui.window.rememberWindowState
+import app.App
 
 fun main() = application {
+    val windowState = rememberWindowState(
+        size = DpSize(width = 1200.dp, height = 740.dp)
+    )
+
     Window(
         onCloseRequest = ::exitApplication,
-        title = "CreepTenuous",
+        state = windowState,
+        title = "CreepTenuous"
     ) {
         App()
     }
