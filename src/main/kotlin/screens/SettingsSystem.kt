@@ -11,12 +11,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import core.navigation.NavigationController
+import enums.Screen
 import enums.SizeComponents
 
 class SettingsSystem {
 
     @Composable
-    fun SettingsSystem() {
+    fun SettingsSystem(
+        navigationController: NavigationController
+    ) {
         val scaffoldState: ScaffoldState = rememberScaffoldState()
 
         var textFieldHost by remember {
@@ -72,7 +76,7 @@ class SettingsSystem {
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-
+                        navigationController.navigate(Screen.LOGIN_SCREEN.name)
                     },
                     modifier = Modifier.size(SizeComponents.WIDTH_BUTTON.size, 46.dp)
                 ) {
