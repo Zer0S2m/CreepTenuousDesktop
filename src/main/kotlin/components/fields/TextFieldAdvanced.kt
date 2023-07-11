@@ -9,9 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.*
 import components.base.BaseField
 import components.forms.FormState
 import core.validation.Validator
@@ -22,11 +20,15 @@ import enums.SizeComponents
  *
  * @param textField Value used in the field
  * @param labelField Value to use when throwing a validation error
+ * @param keyboardOptions The keyboard configuration options for TextFields [TextField]
+ * @param visualTransformation Visual output of the input field.
  * @param validators Validators used to validate a field when calling a method from form state [FormState] or directly
  */
 class TextFieldAdvanced(
     val textField: String = "",
     val labelField: String = "",
+    val keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    val visualTransformation: VisualTransformation = VisualTransformation.None,
     override val validators: List<Validator> = listOf()
 ) : BaseField {
 
@@ -60,15 +62,11 @@ class TextFieldAdvanced(
                 hideError()
                 text = value
             },
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.None,
-                autoCorrect = false,
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            ),
+            keyboardOptions = keyboardOptions,
             singleLine = true,
             minLines = 1,
-            modifier = Modifier.width(SizeComponents.WIDTH_FIELD.size)
+            modifier = Modifier.width(SizeComponents.WIDTH_FIELD.size),
+            visualTransformation = visualTransformation
         )
     }
 
