@@ -22,8 +22,7 @@ import enums.SizeComponents
  *
  * @param textField Value used in the field
  * @param labelField Value to use when throwing a validation error
- * @param validators Validators used to validate a field when
- * calling a method from form state [FormState] or directly
+ * @param validators Validators used to validate a field when calling a method from form state [FormState] or directly
  */
 class TextFieldAdvanced(
     val textField: String = "",

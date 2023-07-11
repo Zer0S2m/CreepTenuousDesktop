@@ -2,6 +2,7 @@ package components.base
 
 import androidx.compose.runtime.Composable
 import core.validation.Validator
+import components.forms.FormState
 
 /**
  * Basic interface for implementing simple fields
@@ -23,6 +24,9 @@ interface BaseField {
      */
     var hasError: Boolean
 
+    /**
+     * Validators used to validate a field when calling a method from form state [FormState] or directly
+     */
     val validators: List<Validator>
         get() = listOf()
 
