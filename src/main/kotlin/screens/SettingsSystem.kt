@@ -1,19 +1,19 @@
 package screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import components.fields.TextFieldAdvanced
+import components.forms.Form
+import components.forms.FormState
 import core.navigation.NavigationController
+import core.validation.NotEmptyValidator
 import enums.Screen
 import enums.SizeComponents
+import kotlinx.coroutines.launch
 
 class SettingsSystem {
 
@@ -22,12 +22,16 @@ class SettingsSystem {
         navigationController: NavigationController
     ) {
         val scaffoldState: ScaffoldState = rememberScaffoldState()
+        val scope = rememberCoroutineScope()
 
-        var textFieldHost by remember {
+        val textFieldHost by remember {
             mutableStateOf("")
         }
-        var textFieldPort by remember {
+        val textFieldPort by remember {
             mutableStateOf("80")
+        }
+        val stateForm by remember {
+            mutableStateOf(FormState())
         }
 
         Scaffold(
@@ -38,45 +42,33 @@ class SettingsSystem {
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp)
             ) {
-                TextField(
-                    value = textFieldHost,
-                    label = {
-                        Text("Main system host")
-                    },
-                    onValueChange = {
-                        textFieldHost = it
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.None,
-                        autoCorrect = false,
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
+                Form(
+                    state = stateForm,
+                    fields = listOf(
+                        TextFieldAdvanced(
+                            labelField = "Main system host",
+                            textField = textFieldHost,
+                            validators = listOf(NotEmptyValidator())
+                        ),
+                        TextFieldAdvanced(
+                            labelField = "Main system port",
+                            textField = textFieldPort,
+                            validators = listOf(NotEmptyValidator())
+                        )
                     ),
-                    singleLine = true,
-                    modifier = Modifier.width(SizeComponents.WIDTH_FIELD.size)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                TextField(
-                    value = textFieldPort,
-                    label = {
-                        Text("Main system port")
-                    },
-                    onValueChange = {
-                        textFieldPort = it
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.None,
-                        autoCorrect = false,
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
-                    ),
-                    singleLine = true,
-                    modifier = Modifier.width(SizeComponents.WIDTH_FIELD.size)
+                    modifierSpacer = Modifier.height(16.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        navigationController.navigate(Screen.LOGIN_SCREEN.name)
+                        if (!stateForm.validateForm()) {
+                            scope.launch {
+                                scaffoldState.snackbarHostState
+                                    .showSnackbar("Please fill in all required fields")
+                            }
+                        } else {
+                            navigationController.navigate(Screen.LOGIN_SCREEN.name)
+                        }
                     },
                     modifier = Modifier.size(SizeComponents.WIDTH_BUTTON.size, 46.dp)
                 ) {

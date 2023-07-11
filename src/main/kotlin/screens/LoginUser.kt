@@ -1,13 +1,15 @@
 package screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
+import components.fields.TextFieldAdvanced
+import components.forms.Form
+import components.forms.FormState
+import core.validation.NotEmptyValidator
 import enums.SizeComponents
 import kotlinx.coroutines.launch
 
@@ -16,14 +18,17 @@ class LoginUser {
     @Composable
     fun LoginUser() {
         val scaffoldState: ScaffoldState = rememberScaffoldState()
-
-        var textFieldLogin by remember {
-            mutableStateOf("")
-        }
-        var textFieldPassword by remember {
-            mutableStateOf("")
-        }
         val scope = rememberCoroutineScope()
+
+        val textFieldLogin by remember {
+            mutableStateOf("")
+        }
+        val textFieldPassword by remember {
+            mutableStateOf("")
+        }
+        val stateForm by remember {
+            mutableStateOf(FormState())
+        }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(), scaffoldState = scaffoldState
@@ -33,47 +38,30 @@ class LoginUser {
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp)
             ) {
-                TextField(
-                    value = textFieldLogin,
-                    label = {
-                        Text("Enter your Email")
-                    },
-                    onValueChange = {
-                        textFieldLogin = it
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.None,
-                        autoCorrect = false,
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
+                Form(
+                    state = stateForm,
+                    fields = listOf(
+                        TextFieldAdvanced(
+                            labelField = "Enter your login",
+                            textField = textFieldLogin,
+                            validators = listOf(NotEmptyValidator())
+                        ),
+                        TextFieldAdvanced(
+                            labelField = "Enter your password",
+                            textField = textFieldPassword,
+                            validators = listOf(NotEmptyValidator())
+                        )
                     ),
-                    singleLine = true,
-                    modifier = Modifier.width(SizeComponents.WIDTH_FIELD.size)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                TextField(
-                    value = textFieldPassword,
-                    label = {
-                        Text("Enter your password")
-                    },
-                    onValueChange = {
-                        textFieldPassword = it
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.None,
-                        autoCorrect = false,
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Next
-                    ),
-                    visualTransformation = PasswordVisualTransformation(),
-                    singleLine = true,
-                    modifier = Modifier.width(SizeComponents.WIDTH_FIELD.size)
+                    modifierSpacer = Modifier.height(16.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        scope.launch {
-                            scaffoldState.snackbarHostState.showSnackbar("Button Clicked $textFieldLogin")
+                        if (!stateForm.validateForm()) {
+                            scope.launch {
+                                scaffoldState.snackbarHostState
+                                    .showSnackbar("Please fill in all required fields")
+                            }
                         }
                     },
                     modifier = Modifier.size(SizeComponents.WIDTH_BUTTON.size, 46.dp)
