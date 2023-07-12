@@ -18,6 +18,7 @@ import enums.SizeComponents
 /**
  * Text field. Renders the component [TextField]
  *
+ * @param nameField Unique field name
  * @param textField Value used in the field
  * @param labelField Value to use when throwing a validation error
  * @param keyboardOptions The keyboard configuration options for TextFields [TextField]
@@ -25,12 +26,18 @@ import enums.SizeComponents
  * @param validators Validators used to validate a field when calling a method from form state [FormState] or directly
  */
 class TextFieldAdvanced(
+    nameField: String,
     val textField: String = "",
     val labelField: String = "",
     val keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     val visualTransformation: VisualTransformation = VisualTransformation.None,
     override val validators: List<Validator> = listOf()
 ) : BaseField {
+
+    /**
+     * Unique field name
+     */
+    override val name: String = nameField
 
     /**
      * Value used in the field

@@ -25,12 +25,6 @@ class LoginUser {
         val scaffoldState: ScaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
 
-        val textFieldLogin by remember {
-            mutableStateOf("")
-        }
-        val textFieldPassword by remember {
-            mutableStateOf("")
-        }
         val stateForm by remember {
             mutableStateOf(FormState())
         }
@@ -47,8 +41,8 @@ class LoginUser {
                     state = stateForm,
                     fields = listOf(
                         TextFieldAdvanced(
+                            nameField = "login",
                             labelField = "Enter your login",
-                            textField = textFieldLogin,
                             keyboardOptions = KeyboardOptions(
                                 capitalization = KeyboardCapitalization.None,
                                 autoCorrect = false,
@@ -58,8 +52,8 @@ class LoginUser {
                             validators = listOf(NotEmptyValidator())
                         ),
                         TextFieldAdvanced(
+                            nameField = "password",
                             labelField = "Enter your password",
-                            textField = textFieldPassword,
                             keyboardOptions = KeyboardOptions(
                                 capitalization = KeyboardCapitalization.None,
                                 autoCorrect = false,

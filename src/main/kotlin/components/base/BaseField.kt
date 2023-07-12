@@ -10,6 +10,12 @@ import components.forms.FormState
 interface BaseField {
 
     /**
+     * Unique field name
+     */
+    val name: String
+        get() = ""
+
+    /**
      * Value used in the field
      */
     var text: String

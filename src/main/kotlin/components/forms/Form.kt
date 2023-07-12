@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import components.base.BaseField
+import components.fields.TextFieldAdvanced
 
 /**
  * Basic form for drawing components and their subsequent validation
@@ -77,6 +78,17 @@ class FormState {
             }
         }
         return valid
+    }
+
+    /**
+     * Get data from a form. Format: [TextFieldAdvanced.name] -> [TextFieldAdvanced.text]
+     *
+     * @return data from fields
+     */
+    fun getData(): Map<String, Any> {
+        return fields.associate {
+            it.name to it.text
+        }
     }
 
 }

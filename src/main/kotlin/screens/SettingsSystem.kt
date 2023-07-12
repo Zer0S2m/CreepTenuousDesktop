@@ -26,12 +26,6 @@ class SettingsSystem {
         val scaffoldState: ScaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
 
-        val textFieldHost by remember {
-            mutableStateOf("")
-        }
-        val textFieldPort by remember {
-            mutableStateOf("80")
-        }
         val stateForm by remember {
             mutableStateOf(FormState())
         }
@@ -48,13 +42,14 @@ class SettingsSystem {
                     state = stateForm,
                     fields = listOf(
                         TextFieldAdvanced(
+                            nameField = "host",
                             labelField = "Main system host",
-                            textField = textFieldHost,
                             validators = listOf(NotEmptyValidator())
                         ),
                         TextFieldAdvanced(
+                            nameField = "port",
                             labelField = "Main system port",
-                            textField = textFieldPort,
+                            textField = "80",
                             validators = listOf(
                                 NotEmptyValidator(),
                                 PositiveNumberValidator(),
