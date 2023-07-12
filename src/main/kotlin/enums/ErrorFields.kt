@@ -5,8 +5,14 @@ package enums
  *
  * @param msg Error message
  */
-enum class ErrorFields(var msg: String) {
+enum class ErrorFields(val msg: String) {
 
-    REQUIRED_MESSAGE("This field is required")
+    REQUIRED_MESSAGE("This field is required"),
+
+    IS_INT("This field must be filled with a number"),
+
+    POSITIVE_INT("This field must be greater than a number"),
+
+    MAX_NUMBER("The number does not match the maximum allowed number")
 
 }

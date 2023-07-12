@@ -10,7 +10,9 @@ import components.fields.TextFieldAdvanced
 import components.forms.Form
 import components.forms.FormState
 import core.navigation.NavigationController
+import core.validation.MaxNumberValidator
 import core.validation.NotEmptyValidator
+import core.validation.PositiveNumberValidator
 import enums.Screen
 import enums.SizeComponents
 import kotlinx.coroutines.launch
@@ -53,7 +55,11 @@ class SettingsSystem {
                         TextFieldAdvanced(
                             labelField = "Main system port",
                             textField = textFieldPort,
-                            validators = listOf(NotEmptyValidator())
+                            validators = listOf(
+                                NotEmptyValidator(),
+                                PositiveNumberValidator(),
+                                MaxNumberValidator(maxNumber = 65535)
+                            )
                         )
                     ),
                     modifierSpacer = Modifier.height(16.dp)
