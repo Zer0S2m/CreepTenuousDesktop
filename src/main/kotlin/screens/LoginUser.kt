@@ -15,6 +15,7 @@ import components.fields.TextFieldAdvanced
 import components.forms.Form
 import components.forms.FormState
 import core.validation.NotEmptyValidator
+import dto.LoginUserModel
 import enums.SizeComponents
 import kotlinx.coroutines.launch
 
@@ -74,6 +75,12 @@ class LoginUser {
                                 scaffoldState.snackbarHostState
                                     .showSnackbar("Please fill in all required fields")
                             }
+                        } else {
+                            val data = stateForm.getData()
+                            val dataClass = LoginUserModel(
+                                data["login"].toString(),
+                                data["password"].toString()
+                            )
                         }
                     },
                     modifier = Modifier.size(SizeComponents.WIDTH_BUTTON.size, 46.dp)

@@ -13,6 +13,7 @@ import core.navigation.NavigationController
 import core.validation.MaxNumberValidator
 import core.validation.NotEmptyValidator
 import core.validation.PositiveNumberValidator
+import dto.SettingsSystemModel
 import enums.Screen
 import enums.SizeComponents
 import kotlinx.coroutines.launch
@@ -68,6 +69,11 @@ class SettingsSystem {
                                     .showSnackbar("Please fill in all required fields")
                             }
                         } else {
+                            val data = stateForm.getData()
+                            val dataClass = SettingsSystemModel(
+                                data["host"].toString(),
+                                data["port"].toString().toInt()
+                            )
                             navigationController.navigate(Screen.LOGIN_SCREEN.name)
                         }
                     },

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import components.base.BaseField
+import components.base.BaseFormState
 import components.fields.TextFieldAdvanced
 
 /**
@@ -18,7 +19,7 @@ import components.fields.TextFieldAdvanced
  */
 @Composable
 fun Form(
-    state: FormState,
+    state: BaseFormState,
     fields: List<BaseField>,
     modifierSpacer: Modifier = Modifier.height(0.dp)
 ) {
@@ -40,7 +41,7 @@ fun Form(
 /**
  * Form state for data validation
  */
-class FormState {
+class FormState : BaseFormState {
 
     /**
      * Field storage
@@ -52,7 +53,7 @@ class FormState {
      *
      * @param fields Form fields
      */
-    fun setFields(fields: List<BaseField>) {
+    override fun setFields(fields: List<BaseField>) {
         this.fields = fields
     }
 
@@ -61,7 +62,7 @@ class FormState {
      *
      * @return Form fields
      */
-    fun getFields(): List<BaseField> {
+    override fun getFields(): List<BaseField> {
         return fields
     }
 
@@ -70,7 +71,7 @@ class FormState {
      *
      * @return Is validated form
      */
-    fun validateForm(): Boolean {
+    override fun validateForm(): Boolean {
         var valid = true
         for (field in getFields()) {
             if (!field.validate()) {
@@ -85,7 +86,7 @@ class FormState {
      *
      * @return data from fields
      */
-    fun getData(): Map<String, Any> {
+    override fun getData(): Map<String, Any> {
         return fields.associate {
             it.name to it.text
         }
