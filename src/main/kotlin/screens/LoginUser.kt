@@ -14,15 +14,19 @@ import androidx.compose.ui.unit.dp
 import components.fields.TextFieldAdvanced
 import components.forms.Form
 import components.forms.FormState
+import core.navigation.NavigationController
 import core.validation.NotEmptyValidator
 import dto.LoginUserModel
+import enums.Screen
 import enums.SizeComponents
 import kotlinx.coroutines.launch
 
 class LoginUser {
 
     @Composable
-    fun LoginUser() {
+    fun LoginUser(
+        navigationController: NavigationController
+    ) {
         val scaffoldState: ScaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
 
@@ -81,6 +85,7 @@ class LoginUser {
                                 data["login"].toString(),
                                 data["password"].toString()
                             )
+                            navigationController.navigate(Screen.DASHBOARD_SCREEN.name)
                         }
                     },
                     modifier = Modifier.size(SizeComponents.WIDTH_BUTTON.size, 46.dp)

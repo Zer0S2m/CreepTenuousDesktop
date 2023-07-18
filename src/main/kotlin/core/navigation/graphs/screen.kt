@@ -5,23 +5,45 @@ import core.navigation.NavigationController
 import core.navigation.NavigationHost
 import core.navigation.foundation.composable
 import enums.Screen
+import screens.Dashboard
 import screens.LoginUser
 import screens.SettingsSystem
 
+/**
+ * Building a screen and passing it to the navigation host where the context is changed and rendered
+ * @param navigationController Controller to change the current state of the screen
+ */
 @Composable
 fun CollectScreenLoginUser(navigationController: NavigationController) {
     NavigationHost(navigationController) {
         composable(Screen.LOGIN_SCREEN.name) {
-            LoginUser().LoginUser()
+            LoginUser().LoginUser(navigationController)
         }
     }.build()
 }
 
+/**
+ * Building a screen and passing it to the navigation host where the context is changed and rendered
+ * @param navigationController Controller to change the current state of the screen
+ */
 @Composable
 fun CollectScreenSettingsSystem(navigationController: NavigationController) {
     NavigationHost(navigationController) {
         composable(Screen.SETTINGS_SYSTEM_SCREEN.name) {
             SettingsSystem().SettingsSystem(navigationController)
+        }
+    }.build()
+}
+
+/**
+ * Building a screen and passing it to the navigation host where the context is changed and rendered
+ * @param navigationController Controller to change the current state of the screen
+ */
+@Composable
+fun CollectScreenDashboard(navigationController: NavigationController) {
+    NavigationHost(navigationController) {
+        composable(Screen.DASHBOARD_SCREEN.name) {
+            Dashboard().Dashboard(navigationController)
         }
     }.build()
 }

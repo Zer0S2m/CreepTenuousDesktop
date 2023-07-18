@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import core.navigation.graphs.CollectScreenDashboard
 import core.navigation.graphs.CollectScreenLoginUser
 import core.navigation.graphs.CollectScreenSettingsSystem
 import core.navigation.runtime.rememberNavigationController
@@ -34,6 +35,7 @@ fun App() {
                     ) {
                         CollectScreenLoginUser(navigationController)
                         CollectScreenSettingsSystem(navigationController)
+                        CollectScreenDashboard(navigationController)
                     }
                 }
             }
