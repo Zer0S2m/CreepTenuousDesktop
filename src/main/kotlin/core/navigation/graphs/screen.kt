@@ -43,7 +43,7 @@ fun CollectScreenSettingsSystem(navigationController: NavigationController) {
 fun CollectScreenDashboard(navigationController: NavigationController) {
     NavigationHost(navigationController) {
         composable(Screen.DASHBOARD_SCREEN.name) {
-            Dashboard().Dashboard(navigationController)
+            Dashboard().Dashboard()
         }
     }.build()
 }
