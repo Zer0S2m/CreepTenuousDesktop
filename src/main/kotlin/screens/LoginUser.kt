@@ -6,6 +6,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -88,7 +90,9 @@ class LoginUser {
                             navigationController.navigate(Screen.DASHBOARD_SCREEN.name)
                         }
                     },
-                    modifier = Modifier.size(SizeComponents.WIDTH_BUTTON.size, 46.dp)
+                    modifier = Modifier
+                        .size(SizeComponents.WIDTH_BUTTON.size, 46.dp)
+                        .pointerHoverIcon(icon = PointerIcon.Hand),
                 ) {
                     Text("Login")
                 }

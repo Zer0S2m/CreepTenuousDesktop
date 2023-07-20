@@ -7,14 +7,13 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.graphics.Color.Companion.LightGray
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
+import components.cards.CartAdvanced
 
 class Dashboard {
 
@@ -156,13 +155,12 @@ class Dashboard {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Yellow)
+                    .background(White)
             ) {
-                val list = (1..10).map { it.toString() }
+                val list = (1..10).map { "Folder $it" }
 
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(176.dp),
-
                     contentPadding = PaddingValues(
                         start = 16.dp,
                         top = 16.dp,
@@ -171,19 +169,11 @@ class Dashboard {
                     ),
                     content = {
                         items(list.size) { index ->
-                            Card(
-                                backgroundColor = Blue,
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .fillMaxWidth(),
-                                elevation = 8.dp,
-                            ) {
-                                Text(
-                                    text = list[index],
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(24.dp)
-                                )
-                            }
+                            CartAdvanced(
+                                isDirectory = true,
+                                isFile = false,
+                                text = list[index]
+                            ).render()
                         }
                     }
                 )
