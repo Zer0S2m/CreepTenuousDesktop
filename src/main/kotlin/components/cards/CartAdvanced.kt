@@ -15,12 +15,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import components.base.BaseCard
+import core.errors.ComponentException
 import enums.Colors
 import enums.Resources
 
 /**
  * Base class for implementing work with file objects.
- * Support types: directories and files
+ * Main storage support types: directories and files
  *
  * @param isDirectory File object type designation - directory
  * @param isFile File object type designation - file
@@ -50,7 +51,12 @@ class CartAdvanced(
     /**
      * Text used by accessibility services to describe what this image represents
      */
-    private val contentDescription: String = "Storage object - directory"
+    private val contentDescriptionFolder: String = "Storage object - directory"
+
+    /**
+     * Text used by accessibility services to describe what this image represents
+     */
+    private val contentDescriptionFile: String = "Storage object - file"
 
     /**
      * Component rendering
@@ -61,14 +67,19 @@ class CartAdvanced(
             renderDirectory()
         } else if (isFileComp) {
             renderFile()
+        } else {
+            throw ComponentException("The component is built from two types of main storage objects. " +
+                    "Specify a directory or file")
         }
     }
 
     /**
-     * Rendering a component with the main system storage object type - [isDirectory]
+     * Renders the foundation of the component
+     *
+     * @param content Main component block
      */
     @Composable
-    private fun renderDirectory() {
+    private fun renderBase(content: @Composable () -> Unit) {
         Card(
             backgroundColor = Colors.CARD_BASE.color,
             modifier = Modifier
@@ -86,9 +97,19 @@ class CartAdvanced(
                     modifier = Modifier
                         .padding(16.dp, 16.dp)
                 ) {
-                    renderDirectoryContent()
+                    content()
                 }
             }
+        }
+    }
+
+    /**
+     * Rendering a component with the main system storage object type - [isDirectory]
+     */
+    @Composable
+    private fun renderDirectory() {
+        renderBase {
+            renderDirectoryContent()
         }
     }
 
@@ -99,7 +120,7 @@ class CartAdvanced(
     private fun renderDirectoryContent() {
         Image(
             painter = painterResource(resourcePath = Resources.ICON_FOLDER.path),
-            contentDescription = contentDescription
+            contentDescription = contentDescriptionFolder
         )
         Text(
             text = textComp,
@@ -115,8 +136,27 @@ class CartAdvanced(
      */
     @Composable
     private fun renderFile() {
-
+        renderBase {
+            renderFileContent()
+        }
     }
 
+    /**
+     * Renders the main content of a [isFile]
+     */
+    @Composable
+    private fun renderFileContent() {
+        Image(
+            painter = painterResource(resourcePath = Resources.ICON_FILE.path),
+            contentDescription = contentDescriptionFile
+        )
+        Text(
+            text = textComp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(12.dp, 0.dp),
+            color = Colors.TEXT.color,
+            fontWeight = FontWeight.Bold
+        )
+    }
 
 }

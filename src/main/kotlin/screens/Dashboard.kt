@@ -157,7 +157,7 @@ class Dashboard {
                     .fillMaxSize()
                     .background(White)
             ) {
-                val list = (1..10).map { "Folder $it" }
+                val list = (1..10).map { "Object $it" }
 
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(176.dp),
@@ -169,11 +169,19 @@ class Dashboard {
                     ),
                     content = {
                         items(list.size) { index ->
-                            CartAdvanced(
-                                isDirectory = true,
-                                isFile = false,
-                                text = list[index]
-                            ).render()
+                            if (index < 5) {
+                                CartAdvanced(
+                                    isDirectory = true,
+                                    isFile = false,
+                                    text = list[index]
+                                ).render()
+                            } else {
+                                CartAdvanced(
+                                    isDirectory = false,
+                                    isFile = true,
+                                    text = list[index]
+                                ).render()
+                            }
                         }
                     }
                 )

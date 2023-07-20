@@ -1,8 +1,8 @@
 package components.base
 
 /**
- * The base interface for implementing work with file objects.
- * Support types: catalogs and files
+ * Base class for implementing work with file objects.
+ * Main storage support types: directories and files
  */
 interface BaseCard : BaseComponent {
 

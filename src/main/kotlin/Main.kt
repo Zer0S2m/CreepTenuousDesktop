@@ -7,7 +7,7 @@ import app.App
 
 fun main() = application {
     val windowState = rememberWindowState(
-        size = DpSize(width = 1200.dp, height = 740.dp)
+        size = DpSize(width = 1280.dp, height = 740.dp)
     )
 
     Window(
