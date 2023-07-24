@@ -1,8 +1,11 @@
 package components.base
 
+import androidx.compose.material.Card
+
 /**
  * Base class for implementing work with file objects.
- * Main storage support types: directories and files
+ * Main storage support types: directories and files.
+ * Extending components [Card]
  */
 interface BaseCard : BaseComponent {
 

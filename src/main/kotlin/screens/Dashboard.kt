@@ -160,7 +160,7 @@ class Dashboard {
                 val list = (1..10).map { "Object $it" }
 
                 LazyVerticalGrid(
-                    columns = GridCells.Adaptive(176.dp),
+                    columns = GridCells.Adaptive(200.dp),
                     contentPadding = PaddingValues(
                         start = 16.dp,
                         top = 16.dp,
