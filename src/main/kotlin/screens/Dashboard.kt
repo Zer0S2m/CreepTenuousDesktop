@@ -7,13 +7,13 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
 import components.cards.CartAdvanced
 import components.fields.FieldSearch
+import components.misc.Avatar
 
 class Dashboard {
 
@@ -140,11 +140,7 @@ class Dashboard {
                             .fillMaxSize()
                             .padding(0.dp, 12.dp, 12.dp, 12.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Gray)
-                        )
+                        Avatar().render()
                     }
                 }
             }
