@@ -8,12 +8,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Gray
-import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
 import components.cards.CartAdvanced
+import components.fields.FieldSearch
 
 class Dashboard {
 
@@ -133,11 +133,7 @@ class Dashboard {
                             .fillMaxWidth(0.94f)
                             .padding(12.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Green)
-                        )
+                        FieldSearch().render()
                     }
                     Column(
                         modifier = Modifier

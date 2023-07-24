@@ -6,7 +6,7 @@ import components.forms.FormState
 /**
  * Basic interface for implementing simple fields
  */
-interface BaseField: BaseComponent {
+interface BaseField : BaseComponent {
 
     /**
      * Unique field name
