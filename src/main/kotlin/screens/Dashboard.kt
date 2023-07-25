@@ -11,13 +11,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import components.cards.CardModalSheet
 import components.cards.CartAdvanced
 import components.fields.FieldSearch
 import components.misc.Avatar
 import components.modals.ModalRightSheetLayout
+import enums.Colors
 
 class Dashboard {
+
+    /**
+     * List of map names for drawing components for user interaction
+     */
+    private val titleCardsProfile: List<String> = listOf(
+        "File object distribution settings",
+        "Settings",
+        "Viewing granted rights"
+    )
+
+    /**
+     * List of map names for drawing components for user interaction
+     */
+    private val titleCardsUserControl: List<String> = listOf(
+        "List of users",
+        "User management"
+    )
 
     @Composable
     fun Dashboard() {
@@ -122,9 +145,21 @@ class Dashboard {
         val scaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
 
-        val modalRightSheetLayout = ModalRightSheetLayout(state = scaffoldState)
+        val modalRightSheetLayout = ModalRightSheetLayout(
+            state = scaffoldState,
+            modifier = Modifier
+                .fillMaxSize(),
+            modifierDrawerInternal = Modifier
+                .fillMaxSize()
+                .padding(12.dp)
+                .background(White)
+        )
 
-        modalRightSheetLayout.render {
+        modalRightSheetLayout.render(
+            drawerContent = {
+                renderContentModalRightSheet()
+            }
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -185,6 +220,70 @@ class Dashboard {
                     )
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun renderContentModalRightSheet() {
+        val baseModifierCard: Modifier = Modifier
+            .height(80.dp)
+            .fillMaxWidth()
+            .padding(6.dp, 12.dp)
+            .pointerHoverIcon(icon = PointerIcon.Hand)
+
+        Column {
+            Text(
+                text = "Profile",
+                modifier = Modifier.padding(bottom = 8.dp),
+                color = Colors.TEXT.color,
+                fontWeight = FontWeight.Bold
+            )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4),
+                content = {
+                    items(titleCardsProfile.size) { index ->
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ).render {
+                            Text(
+                                text = titleCardsProfile[index],
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+            )
+        }
+
+        Divider(
+            modifier = Modifier.padding(bottom = 12.dp),
+            thickness = 0.dp
+        )
+
+        Column {
+            Text(
+                text = "User control",
+                modifier = Modifier.padding(bottom = 8.dp),
+                color = Colors.TEXT.color,
+                fontWeight = FontWeight.Bold
+            )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4),
+                content = {
+                    items(titleCardsUserControl.size) { index ->
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ).render {
+                            Text(
+                                text = titleCardsUserControl[index],
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+            )
         }
     }
 

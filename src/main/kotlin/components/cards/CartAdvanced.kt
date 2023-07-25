@@ -1,6 +1,7 @@
 package components.cards
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -96,7 +97,7 @@ class CartAdvanced(
         Card(
             backgroundColor = Colors.CARD_BASE.color,
             modifier = Modifier
-                .padding(6.dp, 6.dp, 6.dp, 6.dp)
+                .padding(6.dp)
                 .fillMaxWidth()
                 .pointerHoverIcon(icon = PointerIcon.Hand),
             elevation = 0.dp,
@@ -212,14 +213,38 @@ class CartAdvanced(
      */
     @Composable
     private fun renderDropDownMenu(expanded: MutableState<Boolean>) {
+        val modifierMenu: Modifier = Modifier
+            .pointerHoverIcon(icon = PointerIcon.Hand)
+        val contentPaddingMenu = PaddingValues(12.dp, 4.dp)
+
         val items: Iterable<DropdownMenuItemAdvanced> = listOf(
             DropdownMenuItemAdvanced(
-                text = "Menu item 1",
-                expanded = expanded
+                text = "Download",
+                expanded = expanded,
+                colorText = Color.Black,
+                modifierMenu = modifierMenu,
+                contentPadding = contentPaddingMenu
             ),
             DropdownMenuItemAdvanced(
-                text = "Menu item 2",
-                expanded = expanded
+                text = "Rename",
+                expanded = expanded,
+                colorText = Color.Black,
+                modifierMenu = modifierMenu,
+                contentPadding = contentPaddingMenu
+            ),
+            DropdownMenuItemAdvanced(
+                text = "Copy",
+                expanded = expanded,
+                colorText = Color.Black,
+                modifierMenu = modifierMenu,
+                contentPadding = contentPaddingMenu
+            ),
+            DropdownMenuItemAdvanced(
+                text = "Move",
+                expanded = expanded,
+                colorText = Color.Black,
+                modifierMenu = modifierMenu,
+                contentPadding = contentPaddingMenu
             )
         )
 
@@ -227,7 +252,8 @@ class CartAdvanced(
             itemsComp = items,
             expanded = expanded,
             modifier = Modifier
-                .width(240.dp),
+                .width(240.dp)
+                .background(Color.White)
         ).render()
     }
 
