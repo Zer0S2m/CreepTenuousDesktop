@@ -1,8 +1,7 @@
 package components.misc
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -12,11 +11,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import components.base.BaseComponent
 import enums.Resources
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * Base class for creating a component - user avatar
+ *
+ * @param stateScaffold State of this scaffold widget
+ * @param scope Defines a scope for new coroutines
  */
-class Avatar : BaseComponent {
+class Avatar(
+    private val stateScaffold: ScaffoldState? = null,
+    private val scope: CoroutineScope? = null
+) : BaseComponent {
 
     /**
      * Text used by accessibility services to describe what this image represents
@@ -30,7 +37,13 @@ class Avatar : BaseComponent {
     override fun render() {
         IconButton(
             onClick = {
-                println(true)
+                if (stateScaffold != null && scope != null) {
+                    if (stateScaffold.drawerState.isClosed) {
+                        scope.launch {
+                            stateScaffold.drawerState.open()
+                        }
+                    }
+                }
             },
             modifier = Modifier
                 .padding(0.dp)

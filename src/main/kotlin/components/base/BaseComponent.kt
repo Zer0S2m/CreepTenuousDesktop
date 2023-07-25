@@ -9,8 +9,18 @@ interface BaseComponent {
 
     /**
      * Component rendering
+     *
+     * @param content Content of your screen
      */
     @Composable
-    fun render()
+    fun render(content: @Composable () -> Unit = {}) {
+        content()
+    }
+
+    /**
+     * Component rendering
+     */
+    @Composable
+    fun render() {}
 
 }

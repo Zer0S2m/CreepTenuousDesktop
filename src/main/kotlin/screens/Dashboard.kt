@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.LightGray
@@ -14,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import components.cards.CartAdvanced
 import components.fields.FieldSearch
 import components.misc.Avatar
+import components.modals.ModalRightSheetLayout
 
 class Dashboard {
 
@@ -117,66 +119,71 @@ class Dashboard {
      */
     @Composable
     private fun createRightContent() {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            Column (
-                modifier = Modifier
-                    .fillMaxHeight(0.09f)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(0.94f)
-                            .padding(12.dp)
-                    ) {
-                        FieldSearch().render()
-                    }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(0.dp, 12.dp, 12.dp, 12.dp)
-                    ) {
-                        Avatar().render()
-                    }
-                }
-            }
+        val scaffoldState = rememberScaffoldState()
+        val scope = rememberCoroutineScope()
+
+        val modalRightSheetLayout = ModalRightSheetLayout(state = scaffoldState)
+
+        modalRightSheetLayout.render {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(White)
             ) {
-                val list = (1..10).map { "Object $it" }
-
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(200.dp),
-                    contentPadding = PaddingValues(
-                        start = 16.dp,
-                        top = 16.dp,
-                        end = 16.dp,
-                        bottom = 16.dp
-                    ),
-                    content = {
-                        items(list.size) { index ->
-                            if (index < 5) {
-                                CartAdvanced(
-                                    isDirectory = true,
-                                    isFile = false,
-                                    text = list[index]
-                                ).render()
-                            } else {
-                                CartAdvanced(
-                                    isDirectory = false,
-                                    isFile = true,
-                                    text = list[index]
-                                ).render()
-                            }
+                Column (
+                    modifier = Modifier
+                        .fillMaxHeight(0.09f)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(0.94f)
+                                .padding(12.dp)
+                        ) {
+                            FieldSearch().render()
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(0.dp, 12.dp, 12.dp, 12.dp)
+                        ) {
+                            Avatar(
+                                stateScaffold = scaffoldState,
+                                scope = scope
+                            ).render()
                         }
                     }
-                )
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(White)
+                ) {
+                    val list = (1..10).map { "Object $it" }
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(200.dp),
+                        contentPadding = PaddingValues(16.dp),
+                        content = {
+                            items(list.size) { index ->
+                                if (index < 5) {
+                                    CartAdvanced(
+                                        isDirectory = true,
+                                        isFile = false,
+                                        text = list[index]
+                                    ).render()
+                                } else {
+                                    CartAdvanced(
+                                        isDirectory = false,
+                                        isFile = true,
+                                        text = list[index]
+                                    ).render()
+                                }
+                            }
+                        }
+                    )
+                }
             }
         }
     }
