@@ -15,6 +15,8 @@ enum class Resources(val path: String) {
 
     ICON_SEARCH("drawable/base_search.svg"),
 
-    ICON_USER_AVATAR("drawable/base_avatar.svg")
+    ICON_USER_AVATAR("drawable/base_avatar.svg"),
+
+    ICON_ARROW("drawable/base_arrow.svg")
 
 }

@@ -8,8 +8,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -17,9 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import components.cards.CardModalSheet
+import components.cards.CardPanelBaseFolderUser
 import components.cards.CartAdvanced
 import components.fields.FieldSearch
 import components.misc.Avatar
+import components.misc.SwitchPanelDashboard
 import components.modals.ModalRightSheetLayout
 import enums.Colors
 
@@ -40,6 +40,16 @@ class Dashboard {
     private val titleCardsUserControl: List<String> = listOf(
         "List of users",
         "User management"
+    )
+
+    /**
+     * Base directories for system user
+     */
+    private val baseFolderForUser: List<String> = listOf(
+        "Videos",
+        "Documents",
+        "Images",
+        "Musics"
     )
 
     @Composable
@@ -72,67 +82,12 @@ class Dashboard {
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(0.25f)
-                .background(Red)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.09f)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp, 12.dp, 12.dp, 6.dp)
-                        .background(LightGray)
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp, 6.dp)
-                        .background(LightGray)
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp, 6.dp)
-                        .background(LightGray)
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp, 6.dp)
-                        .background(LightGray)
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp, 6.dp)
-                        .background(LightGray)
-                )
+            SwitchPanelDashboard()
+                .render()
+
+            baseFolderForUser.forEach { itemFolder ->
+                CardPanelBaseFolderUser(text = itemFolder).render()
             }
         }
     }
@@ -174,7 +129,7 @@ class Dashboard {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth(0.94f)
-                                .padding(12.dp)
+                                .padding(0.dp, 12.dp, 12.dp, 12.dp)
                         ) {
                             FieldSearch().render()
                         }
