@@ -19,6 +19,8 @@ import components.cards.CardPanelBaseFolderUser
 import components.cards.CartAdvanced
 import components.fields.FieldSearch
 import components.misc.Avatar
+import components.misc.BreadCrumbs
+import components.misc.BreadCrumbsItem
 import components.misc.SwitchPanelDashboard
 import components.modals.ModalRightSheetLayout
 import enums.Colors
@@ -156,7 +158,8 @@ class Dashboard {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(White)
+                        .background(White),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     val list = (1..10).map { "Object $it" }
 
@@ -181,6 +184,19 @@ class Dashboard {
                             }
                         }
                     )
+
+                    BreadCrumbs(
+                        items = listOf(
+                            BreadCrumbsItem(text = "Folder 1"),
+                            BreadCrumbsItem(text = "Folder 2"),
+                            BreadCrumbsItem(text = "Folder 3")
+                        ),
+                        modifier = Modifier
+                            .height(40.dp)
+                            .background(Colors.BREAD_CRUMBS_BASE.color)
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                    ).render()
                 }
             }
         }
