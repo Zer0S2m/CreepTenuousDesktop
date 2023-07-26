@@ -7,7 +7,7 @@ import androidx.compose.material.Card
  * Main storage support types: directories and files.
  * Extending components [Card]
  */
-interface BaseCard : BaseComponent {
+interface BaseCard : BaseComponent, BaseAnimation {
 
     /**
      * File object type designation - directory

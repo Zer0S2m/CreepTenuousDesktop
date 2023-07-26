@@ -5,7 +5,7 @@ import androidx.compose.material.DropdownMenuItem
 /**
  * Base interface for implementing an extended component [DropdownMenuItem]
  */
-interface BaseDropdownMenuItem : BaseComponent {
+interface BaseDropdownMenuItem : BaseComponent, BaseAnimation {
 
     /**
      * Display text in a component

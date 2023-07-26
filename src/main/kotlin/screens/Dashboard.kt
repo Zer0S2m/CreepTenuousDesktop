@@ -43,6 +43,14 @@ class Dashboard {
     )
 
     /**
+     * List of map names for drawing components for user interaction
+     */
+    private val titleCardsUserCustomization: List<String> = listOf(
+        "Categories",
+        "Colors"
+    )
+
+    /**
      * Base directories for system user
      */
     private val baseFolderForUser: List<String> = listOf(
@@ -232,6 +240,36 @@ class Dashboard {
                         ).render {
                             Text(
                                 text = titleCardsUserControl[index],
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+            )
+        }
+
+        Divider(
+            modifier = Modifier.padding(bottom = 12.dp),
+            thickness = 0.dp
+        )
+
+        Column {
+            Text(
+                text = "Customization",
+                modifier = Modifier.padding(bottom = 8.dp),
+                color = Colors.TEXT.color,
+                fontWeight = FontWeight.Bold
+            )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4),
+                content = {
+                    items(titleCardsUserCustomization.size) { index ->
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ).render {
+                            Text(
+                                text = titleCardsUserCustomization[index],
                                 textAlign = TextAlign.Center,
                                 fontWeight = FontWeight.Medium
                             )

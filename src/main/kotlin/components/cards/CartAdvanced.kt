@@ -2,6 +2,8 @@ package components.cards
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -15,6 +17,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import components.animations.setAnimateColorAsStateInCard
+import components.animations.setHoverInCard
 import components.base.BaseCard
 import components.menu.DropdownMenuAdvanced
 import components.menu.DropdownMenuItemAdvanced
@@ -30,11 +34,13 @@ import enums.Resources
  * @param isDirectory File object type designation - directory
  * @param isFile File object type designation - file
  * @param text Display text when rendering
+ * @param isAnimation Set background change animation for a component
  */
 class CartAdvanced(
     override val isDirectory: Boolean,
     override val isFile: Boolean,
     override val text: String = "",
+    override val isAnimation: Boolean = true
 ) : BaseCard {
 
     /**
@@ -94,11 +100,23 @@ class CartAdvanced(
      */
     @Composable
     private fun renderBase(content: @Composable () -> Unit) {
+        val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+        val isHover: MutableState<Boolean> = remember { mutableStateOf(false) }
+        val animatedCardColor = setAnimateColorAsStateInCard(isHover = isHover)
+
+        if (isAnimation) {
+            setHoverInCard(
+                interactionSource = interactionSource,
+                isHover = isHover
+            )
+        }
+
         Card(
-            backgroundColor = Colors.CARD_BASE.color,
+            backgroundColor = animatedCardColor.value,
             modifier = Modifier
                 .padding(6.dp)
                 .fillMaxWidth()
+                .hoverable(interactionSource = interactionSource)
                 .pointerHoverIcon(icon = PointerIcon.Hand),
             elevation = 0.dp,
             shape = RoundedCornerShape(8.dp)
