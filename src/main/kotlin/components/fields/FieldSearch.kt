@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import components.base.BaseFieldSearch
 import enums.Resources
 
@@ -62,6 +63,8 @@ class FieldSearch(
                     contentDescription = contentDescriptionIconSearch,
                     modifier = Modifier
                         .padding(0.dp)
+                        .width(28.dp)
+                        .height(28.dp)
                 )
             }
             BasicTextField(
@@ -77,7 +80,10 @@ class FieldSearch(
                 ),
                 textStyle = LocalTextStyle
                     .current
-                    .merge(TextStyle(color = colors.textColor(true).value)),
+                    .merge(TextStyle(
+                        color = colors.textColor(true).value,
+                        fontSize = 14.sp
+                    )),
                 cursorBrush = SolidColor(TextFieldDefaults
                     .textFieldColors()
                     .cursorColor(false).value),

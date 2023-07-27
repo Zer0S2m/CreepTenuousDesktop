@@ -22,7 +22,7 @@ import enums.Resources
  */
 class SwitchPanelDashboard(
     private val modifier: Modifier = Modifier
-        .fillMaxHeight(0.09f)
+        .fillMaxHeight(0.075f)
         .fillMaxWidth()
         .padding(12.dp, 0.dp)
 ) : BaseComponent {
@@ -37,8 +37,8 @@ class SwitchPanelDashboard(
      */
     private val baseModifierIcon: Modifier = Modifier
         .padding(0.dp)
-        .width(32.dp)
-        .height(32.dp)
+        .width(28.dp)
+        .height(28.dp)
 
     /**
      * Component rendering

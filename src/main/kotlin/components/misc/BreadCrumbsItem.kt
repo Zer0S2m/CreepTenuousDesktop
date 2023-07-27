@@ -13,6 +13,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import components.base.BaseBreadCrumbs
 import components.base.BaseBreadCrumbsItem
 import enums.Colors
@@ -51,7 +52,8 @@ class BreadCrumbsItem(
                     .background(Color.White),
                 color = Colors.TEXT.color,
                 fontWeight = FontWeight.SemiBold,
-                maxLines = 1
+                maxLines = 1,
+                fontSize = 12.sp
             )
         }
     }

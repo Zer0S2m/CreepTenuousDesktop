@@ -14,6 +14,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import components.cards.CardModalSheet
 import components.cards.CardPanelBaseFolderUser
 import components.cards.CartAdvanced
@@ -24,6 +25,7 @@ import components.misc.BreadCrumbsItem
 import components.misc.SwitchPanelDashboard
 import components.modals.ModalRightSheetLayout
 import enums.Colors
+import enums.Resources
 
 class Dashboard {
 
@@ -55,11 +57,11 @@ class Dashboard {
     /**
      * Base directories for system user
      */
-    private val baseFolderForUser: List<String> = listOf(
-        "Videos",
-        "Documents",
-        "Images",
-        "Musics"
+    private val baseFolderForUser: Map<String, String> = mapOf(
+        "Videos" to Resources.ICON_VIDEO.path,
+        "Documents" to Resources.ICON_DOCUMENT.path,
+        "Images" to Resources.ICON_IMAGE.path,
+        "Musics" to Resources.ICON_MUSIC.path
     )
 
     @Composable
@@ -91,13 +93,17 @@ class Dashboard {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(0.25f)
+                .fillMaxWidth(0.225f)
         ) {
             SwitchPanelDashboard()
                 .render()
 
-            baseFolderForUser.forEach { itemFolder ->
-                CardPanelBaseFolderUser(text = itemFolder).render()
+            baseFolderForUser.forEach { (folder, icon) ->
+                CardPanelBaseFolderUser(
+                    text = folder,
+                    isIcon = true,
+                    iconPath = icon
+                ).render()
             }
         }
     }
@@ -131,7 +137,7 @@ class Dashboard {
             ) {
                 Column (
                     modifier = Modifier
-                        .fillMaxHeight(0.09f)
+                        .fillMaxHeight(0.075f)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize()
@@ -164,7 +170,7 @@ class Dashboard {
                     val list = (1..10).map { "Object $it" }
 
                     LazyVerticalGrid(
-                        columns = GridCells.Adaptive(200.dp),
+                        columns = GridCells.Adaptive(160.dp),
                         contentPadding = PaddingValues(16.dp),
                         content = {
                             items(list.size) { index ->
@@ -195,7 +201,7 @@ class Dashboard {
                             .height(40.dp)
                             .background(Colors.BREAD_CRUMBS_BASE.color)
                             .fillMaxWidth()
-                            .padding(4.dp)
+                            .padding(4.dp, 8.dp)
                     ).render()
                 }
             }
@@ -205,30 +211,21 @@ class Dashboard {
     @Composable
     private fun renderContentModalRightSheet() {
         val baseModifierCard: Modifier = Modifier
-            .height(80.dp)
+            .height(60.dp)
             .fillMaxWidth()
-            .padding(6.dp, 12.dp)
+            .padding(4.dp,)
             .pointerHoverIcon(icon = PointerIcon.Hand)
 
         Column {
-            Text(
-                text = "Profile",
-                modifier = Modifier.padding(bottom = 8.dp),
-                color = Colors.TEXT.color,
-                fontWeight = FontWeight.Bold
-            )
+            renderTitleInSectionForCardsModalSheet("Profile")
             LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
+                columns = GridCells.Fixed(5),
                 content = {
                     items(titleCardsProfile.size) { index ->
                         CardModalSheet(
                             modifier = baseModifierCard
                         ).render {
-                            Text(
-                                text = titleCardsProfile[index],
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Medium
-                            )
+                            renderTextInCardModalSheet(titleCardsProfile[index])
                         }
                     }
                 }
@@ -241,24 +238,15 @@ class Dashboard {
         )
 
         Column {
-            Text(
-                text = "User control",
-                modifier = Modifier.padding(bottom = 8.dp),
-                color = Colors.TEXT.color,
-                fontWeight = FontWeight.Bold
-            )
+            renderTitleInSectionForCardsModalSheet("User control")
             LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
+                columns = GridCells.Fixed(5),
                 content = {
                     items(titleCardsUserControl.size) { index ->
                         CardModalSheet(
                             modifier = baseModifierCard
                         ).render {
-                            Text(
-                                text = titleCardsUserControl[index],
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Medium
-                            )
+                            renderTextInCardModalSheet(titleCardsUserControl[index])
                         }
                     }
                 }
@@ -271,29 +259,41 @@ class Dashboard {
         )
 
         Column {
-            Text(
-                text = "Customization",
-                modifier = Modifier.padding(bottom = 8.dp),
-                color = Colors.TEXT.color,
-                fontWeight = FontWeight.Bold
-            )
+            renderTitleInSectionForCardsModalSheet("Customization")
             LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
+                columns = GridCells.Fixed(5),
                 content = {
                     items(titleCardsUserCustomization.size) { index ->
                         CardModalSheet(
                             modifier = baseModifierCard
                         ).render {
-                            Text(
-                                text = titleCardsUserCustomization[index],
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Medium
-                            )
+                            renderTextInCardModalSheet(titleCardsUserCustomization[index])
                         }
                     }
                 }
             )
         }
+    }
+
+    @Composable
+    private fun renderTextInCardModalSheet(text: String = "") {
+        Text(
+            text = text,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp
+        )
+    }
+
+    @Composable
+    private fun renderTitleInSectionForCardsModalSheet(text: String = "") {
+        Text(
+            text = text,
+            modifier = Modifier
+                .padding(4.dp, 0.dp),
+            color = Colors.TEXT.color,
+            fontWeight = FontWeight.Bold
+        )
     }
 
 }

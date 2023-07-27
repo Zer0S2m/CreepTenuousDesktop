@@ -17,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import components.animations.setAnimateColorAsStateInCard
 import components.animations.setHoverInCard
 import components.base.BaseCard
@@ -128,7 +129,7 @@ class CartAdvanced(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .padding(16.dp, 12.dp)
+                        .padding(12.dp, 8.dp)
                         .fillMaxWidth()
                 ) {
                     content()
@@ -161,7 +162,8 @@ class CartAdvanced(
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(12.dp, 0.dp),
             color = Colors.TEXT.color,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp
         )
         renderIconMenu()
     }
@@ -190,7 +192,8 @@ class CartAdvanced(
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(12.dp, 0.dp),
             color = Colors.TEXT.color,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp
         )
         renderIconMenu()
     }
