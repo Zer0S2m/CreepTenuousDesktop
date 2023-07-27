@@ -1,6 +1,7 @@
 package components.fields
 
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -9,7 +10,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.input.*
+import androidx.compose.ui.unit.dp
 import components.base.BaseField
 import components.forms.FormState
 import core.validation.Validator
@@ -24,6 +27,8 @@ import enums.SizeComponents
  * @param keyboardOptions The keyboard configuration options for TextFields [TextField]
  * @param visualTransformation Visual output of the input field.
  * @param validators Validators used to validate a field when calling a method from form state [FormState] or directly
+ * @param modifier Modifiers to decorate or add behavior to elements
+ * @param shape The shape of the text field's container
  */
 class TextFieldAdvanced(
     nameField: String,
@@ -31,7 +36,10 @@ class TextFieldAdvanced(
     val labelField: String = "",
     val keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     val visualTransformation: VisualTransformation = VisualTransformation.None,
-    override val validators: List<Validator> = listOf()
+    override val validators: List<Validator> = listOf(),
+    private val modifier: Modifier = Modifier
+        .width(SizeComponents.WIDTH_FIELD.size),
+    private val shape: Shape = RoundedCornerShape(4.dp)
 ) : BaseField {
 
     /**
@@ -59,22 +67,40 @@ class TextFieldAdvanced(
      */
     @Composable
     override fun render() {
-        TextField(
-            value = text,
-            isError = hasError,
-            label = {
-                Text(text = label)
-            },
-            onValueChange = { value ->
-                hideError()
-                text = value
-            },
-            keyboardOptions = keyboardOptions,
-            singleLine = true,
-            minLines = 1,
-            modifier = Modifier.width(SizeComponents.WIDTH_FIELD.size),
-            visualTransformation = visualTransformation
-        )
+        if (label.isNotEmpty()) {
+            TextField(
+                value = text,
+                isError = hasError,
+                label = {
+                    Text(text = label)
+                },
+                onValueChange = { value ->
+                    hideError()
+                    text = value
+                },
+                keyboardOptions = keyboardOptions,
+                singleLine = true,
+                minLines = 1,
+                modifier = modifier,
+                visualTransformation = visualTransformation,
+                shape = shape
+            )
+        } else {
+            TextField(
+                value = text,
+                isError = hasError,
+                onValueChange = { value ->
+                    hideError()
+                    text = value
+                },
+                keyboardOptions = keyboardOptions,
+                singleLine = true,
+                minLines = 1,
+                modifier = modifier,
+                visualTransformation = visualTransformation,
+                shape = shape
+            )
+        }
     }
 
     private fun showError(error: String) {

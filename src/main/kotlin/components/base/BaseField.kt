@@ -1,13 +1,12 @@
 package components.base
 
-import androidx.compose.runtime.Composable
 import core.validation.Validator
 import components.forms.FormState
 
 /**
  * Basic interface for implementing simple fields
  */
-interface BaseField {
+interface BaseField : BaseComponent {
 
     /**
      * Unique field name
@@ -35,12 +34,6 @@ interface BaseField {
      */
     val validators: List<Validator>
         get() = listOf()
-
-    /**
-     * Component rendering
-     */
-    @Composable
-    fun render()
 
     /**
      * Validate the field. Used validator [Validator]

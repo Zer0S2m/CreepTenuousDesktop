@@ -6,17 +6,63 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Blue
-import androidx.compose.ui.graphics.Color.Companion.Gray
-import androidx.compose.ui.graphics.Color.Companion.Green
-import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.graphics.Color.Companion.Yellow
-import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import components.cards.CardModalSheet
+import components.cards.CardPanelBaseFolderUser
+import components.cards.CartAdvanced
+import components.fields.FieldSearch
+import components.misc.Avatar
+import components.misc.BreadCrumbs
+import components.misc.BreadCrumbsItem
+import components.misc.SwitchPanelDashboard
+import components.modals.ModalRightSheetLayout
+import enums.Colors
+import enums.Resources
 
 class Dashboard {
+
+    /**
+     * List of map names for drawing components for user interaction
+     */
+    private val titleCardsProfile: List<String> = listOf(
+        "File object distribution settings",
+        "Settings",
+        "Viewing granted rights"
+    )
+
+    /**
+     * List of map names for drawing components for user interaction
+     */
+    private val titleCardsUserControl: List<String> = listOf(
+        "List of users",
+        "User management"
+    )
+
+    /**
+     * List of map names for drawing components for user interaction
+     */
+    private val titleCardsUserCustomization: List<String> = listOf(
+        "Categories",
+        "Colors"
+    )
+
+    /**
+     * Base directories for system user
+     */
+    private val baseFolderForUser: Map<String, String> = mapOf(
+        "Videos" to Resources.ICON_VIDEO.path,
+        "Documents" to Resources.ICON_DOCUMENT.path,
+        "Images" to Resources.ICON_IMAGE.path,
+        "Musics" to Resources.ICON_MUSIC.path
+    )
 
     @Composable
     fun Dashboard() {
@@ -47,68 +93,17 @@ class Dashboard {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(0.25f)
-                .background(Red)
+                .fillMaxWidth(0.225f)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.09f)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp, 12.dp, 12.dp, 6.dp)
-                        .background(LightGray)
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp, 6.dp)
-                        .background(LightGray)
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp, 6.dp)
-                        .background(LightGray)
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp, 6.dp)
-                        .background(LightGray)
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp, 6.dp)
-                        .background(LightGray)
-                )
+            SwitchPanelDashboard()
+                .render()
+
+            baseFolderForUser.forEach { (folder, icon) ->
+                CardPanelBaseFolderUser(
+                    text = folder,
+                    isIcon = true,
+                    iconPath = icon
+                ).render()
             }
         }
     }
@@ -118,77 +113,187 @@ class Dashboard {
      */
     @Composable
     private fun createRightContent() {
-        Column(
+        val scaffoldState = rememberScaffoldState()
+        val scope = rememberCoroutineScope()
+
+        val modalRightSheetLayout = ModalRightSheetLayout(
+            state = scaffoldState,
             modifier = Modifier
+                .fillMaxSize(),
+            modifierDrawerInternal = Modifier
                 .fillMaxSize()
-        ) {
-            Column (
-                modifier = Modifier
-                    .fillMaxHeight(0.09f)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(0.94f)
-                            .padding(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Green)
-                        )
-                    }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(0.dp, 12.dp, 12.dp, 12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Gray)
-                        )
-                    }
-                }
+                .padding(12.dp)
+                .background(White)
+        )
+
+        modalRightSheetLayout.render(
+            drawerContent = {
+                renderContentModalRightSheet()
             }
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Yellow)
             ) {
-                val list = (1..10).map { it.toString() }
-
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(176.dp),
-
-                    contentPadding = PaddingValues(
-                        start = 16.dp,
-                        top = 16.dp,
-                        end = 16.dp,
-                        bottom = 16.dp
-                    ),
-                    content = {
-                        items(list.size) { index ->
-                            Card(
-                                backgroundColor = Blue,
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .fillMaxWidth(),
-                                elevation = 8.dp,
-                            ) {
-                                Text(
-                                    text = list[index],
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(24.dp)
-                                )
-                            }
+                Column (
+                    modifier = Modifier
+                        .fillMaxHeight(0.075f)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(0.94f)
+                                .padding(0.dp, 12.dp, 12.dp, 12.dp)
+                        ) {
+                            FieldSearch().render()
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(0.dp, 12.dp, 12.dp, 12.dp)
+                        ) {
+                            Avatar(
+                                stateScaffold = scaffoldState,
+                                scope = scope
+                            ).render()
                         }
                     }
-                )
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(White),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    val list = (1..10).map { "Object $it" }
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(160.dp),
+                        contentPadding = PaddingValues(16.dp),
+                        content = {
+                            items(list.size) { index ->
+                                if (index < 5) {
+                                    CartAdvanced(
+                                        isDirectory = true,
+                                        isFile = false,
+                                        text = list[index]
+                                    ).render()
+                                } else {
+                                    CartAdvanced(
+                                        isDirectory = false,
+                                        isFile = true,
+                                        text = list[index]
+                                    ).render()
+                                }
+                            }
+                        }
+                    )
+
+                    BreadCrumbs(
+                        items = listOf(
+                            BreadCrumbsItem(text = "Folder 1"),
+                            BreadCrumbsItem(text = "Folder 2"),
+                            BreadCrumbsItem(text = "Folder 3")
+                        ),
+                        modifier = Modifier
+                            .height(40.dp)
+                            .background(Colors.BREAD_CRUMBS_BASE.color)
+                            .fillMaxWidth()
+                            .padding(4.dp, 8.dp)
+                    ).render()
+                }
             }
         }
+    }
+
+    @Composable
+    private fun renderContentModalRightSheet() {
+        val baseModifierCard: Modifier = Modifier
+            .height(60.dp)
+            .fillMaxWidth()
+            .padding(4.dp,)
+            .pointerHoverIcon(icon = PointerIcon.Hand)
+
+        Column {
+            renderTitleInSectionForCardsModalSheet("Profile")
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(5),
+                content = {
+                    items(titleCardsProfile.size) { index ->
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ).render {
+                            renderTextInCardModalSheet(titleCardsProfile[index])
+                        }
+                    }
+                }
+            )
+        }
+
+        Divider(
+            modifier = Modifier.padding(bottom = 12.dp),
+            thickness = 0.dp
+        )
+
+        Column {
+            renderTitleInSectionForCardsModalSheet("User control")
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(5),
+                content = {
+                    items(titleCardsUserControl.size) { index ->
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ).render {
+                            renderTextInCardModalSheet(titleCardsUserControl[index])
+                        }
+                    }
+                }
+            )
+        }
+
+        Divider(
+            modifier = Modifier.padding(bottom = 12.dp),
+            thickness = 0.dp
+        )
+
+        Column {
+            renderTitleInSectionForCardsModalSheet("Customization")
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(5),
+                content = {
+                    items(titleCardsUserCustomization.size) { index ->
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ).render {
+                            renderTextInCardModalSheet(titleCardsUserCustomization[index])
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun renderTextInCardModalSheet(text: String = "") {
+        Text(
+            text = text,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp
+        )
+    }
+
+    @Composable
+    private fun renderTitleInSectionForCardsModalSheet(text: String = "") {
+        Text(
+            text = text,
+            modifier = Modifier
+                .padding(4.dp, 0.dp),
+            color = Colors.TEXT.color,
+            fontWeight = FontWeight.Bold
+        )
     }
 
 }

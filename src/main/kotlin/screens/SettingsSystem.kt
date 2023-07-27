@@ -5,6 +5,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import components.fields.TextFieldAdvanced
 import components.forms.Form
@@ -77,7 +79,9 @@ class SettingsSystem {
                             navigationController.navigate(Screen.LOGIN_SCREEN.name)
                         }
                     },
-                    modifier = Modifier.size(SizeComponents.WIDTH_BUTTON.size, 46.dp)
+                    modifier = Modifier
+                        .size(SizeComponents.WIDTH_BUTTON.size, 46.dp)
+                        .pointerHoverIcon(icon = PointerIcon.Hand),
                 ) {
                     Text("Connection")
                 }
