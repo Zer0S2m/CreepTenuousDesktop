@@ -21,6 +21,7 @@ import core.validation.NotEmptyValidator
 import dto.LoginUserModel
 import enums.Screen
 import enums.SizeComponents
+import enums.dp
 import kotlinx.coroutines.launch
 
 class LoginUser {
@@ -87,11 +88,12 @@ class LoginUser {
                                 data["login"].toString(),
                                 data["password"].toString()
                             )
+                            println(dataClass)
                             navigationController.navigate(Screen.DASHBOARD_SCREEN.name)
                         }
                     },
                     modifier = Modifier
-                        .size(SizeComponents.WIDTH_BUTTON.size, 46.dp)
+                        .size(SizeComponents.WIDTH_BUTTON.dp, 46.dp)
                         .pointerHoverIcon(icon = PointerIcon.Hand),
                 ) {
                     Text("Login")

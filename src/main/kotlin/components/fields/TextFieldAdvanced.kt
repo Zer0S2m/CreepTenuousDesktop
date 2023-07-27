@@ -17,6 +17,7 @@ import components.base.BaseField
 import components.forms.FormState
 import core.validation.Validator
 import enums.SizeComponents
+import enums.dp
 
 /**
  * Text field. Renders the component [TextField]
@@ -38,7 +39,7 @@ class TextFieldAdvanced(
     val visualTransformation: VisualTransformation = VisualTransformation.None,
     override val validators: List<Validator> = listOf(),
     private val modifier: Modifier = Modifier
-        .width(SizeComponents.WIDTH_FIELD.size),
+        .width(SizeComponents.WIDTH_FIELD.dp),
     private val shape: Shape = RoundedCornerShape(4.dp)
 ) : BaseField {
 

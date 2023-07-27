@@ -26,6 +26,8 @@ import components.misc.SwitchPanelDashboard
 import components.modals.ModalRightSheetLayout
 import enums.Colors
 import enums.Resources
+import enums.SizeComponents
+import enums.float
 
 class Dashboard {
 
@@ -93,7 +95,7 @@ class Dashboard {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(0.225f)
+                .fillMaxWidth(SizeComponents.LEFT_PANEL_DASHBOARD.float)
         ) {
             SwitchPanelDashboard()
                 .render()

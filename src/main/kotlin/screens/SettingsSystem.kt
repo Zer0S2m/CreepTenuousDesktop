@@ -18,6 +18,7 @@ import core.validation.PositiveNumberValidator
 import dto.SettingsSystemModel
 import enums.Screen
 import enums.SizeComponents
+import enums.dp
 import kotlinx.coroutines.launch
 
 class SettingsSystem {
@@ -76,11 +77,12 @@ class SettingsSystem {
                                 data["host"].toString(),
                                 data["port"].toString().toInt()
                             )
+                            println(dataClass)
                             navigationController.navigate(Screen.LOGIN_SCREEN.name)
                         }
                     },
                     modifier = Modifier
-                        .size(SizeComponents.WIDTH_BUTTON.size, 46.dp)
+                        .size(SizeComponents.WIDTH_BUTTON.dp, 46.dp)
                         .pointerHoverIcon(icon = PointerIcon.Hand),
                 ) {
                     Text("Connection")
