@@ -1,12 +1,18 @@
 package screens
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import components.screen.BaseDashboard
 import core.navigation.NavigationController
 
 /**
  * User profile screen
  */
-class ProfileUser {
+class ProfileUser : BaseDashboard {
 
     /**
      * Render user profile screen
@@ -14,17 +20,17 @@ class ProfileUser {
      * @param navigationController Handler for the navigation host for changing the current screen state
      */
     @Composable
-    fun ProfileUser(
+    fun render(
         navigationController: NavigationController
     ) {
-
+        render()
     }
 
     /**
      * Rendering the left side of the content
      */
     @Composable
-    private fun renderLeftContent() {
+    override fun renderLeftContent() {
 
     }
 
@@ -32,7 +38,7 @@ class ProfileUser {
      * Render the right side of the content
      */
     @Composable
-    private fun renderRightContent() {
+    override fun renderRightContent() {
 
     }
 

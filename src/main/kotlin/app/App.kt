@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import core.navigation.graphs.CollectScreenDashboard
 import core.navigation.graphs.CollectScreenLoginUser
+import core.navigation.graphs.CollectScreenProfileUser
 import core.navigation.graphs.CollectScreenSettingsSystem
 import core.navigation.runtime.rememberNavigationController
 import enums.Screen
@@ -18,7 +19,7 @@ import enums.Screen
 @Composable
 @Preview
 fun App() {
-    val navigationController by rememberNavigationController(Screen.SETTINGS_SYSTEM_SCREEN.name)
+    val navigationController by rememberNavigationController(Screen.DASHBOARD_SCREEN.name)
 
     MaterialTheme(
         colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
@@ -36,6 +37,7 @@ fun App() {
                         CollectScreenLoginUser(navigationController)
                         CollectScreenSettingsSystem(navigationController)
                         CollectScreenDashboard(navigationController)
+                        CollectScreenProfileUser(navigationController)
                     }
                 }
             }

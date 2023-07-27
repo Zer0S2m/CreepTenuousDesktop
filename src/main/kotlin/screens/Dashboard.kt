@@ -24,12 +24,13 @@ import components.misc.BreadCrumbs
 import components.misc.BreadCrumbsItem
 import components.misc.SwitchPanelDashboard
 import components.modals.ModalRightSheetLayout
+import components.screen.BaseDashboard
 import enums.Colors
 import enums.Resources
 import enums.SizeComponents
 import enums.float
 
-class Dashboard {
+class Dashboard : BaseDashboard {
 
     /**
      * List of map names for drawing components for user interaction
@@ -66,32 +67,11 @@ class Dashboard {
         "Musics" to Resources.ICON_MUSIC.path
     )
 
-    @Composable
-    fun Dashboard() {
-        val scaffoldState: ScaffoldState = rememberScaffoldState()
-
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            scaffoldState = scaffoldState
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    createLeftContent()
-                    createRightContent()
-                }
-            }
-        }
-    }
-
     /**
      * Rendering content on the left side of the dashboard
      */
     @Composable
-    private fun createLeftContent() {
+    override fun renderLeftContent() {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
@@ -114,7 +94,7 @@ class Dashboard {
      * Rendering content on the right side of the dashboard
      */
     @Composable
-    private fun createRightContent() {
+    override fun renderRightContent() {
         val scaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
 

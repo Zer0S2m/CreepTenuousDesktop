@@ -44,7 +44,7 @@ fun CollectScreenSettingsSystem(navigationController: NavigationController) {
 fun CollectScreenDashboard(navigationController: NavigationController) {
     NavigationHost(navigationController) {
         composable(Screen.DASHBOARD_SCREEN.name) {
-            Dashboard().Dashboard()
+            Dashboard().render()
         }
     }.build()
 }
@@ -57,7 +57,7 @@ fun CollectScreenDashboard(navigationController: NavigationController) {
 fun CollectScreenProfileUser(navigationController: NavigationController) {
     NavigationHost(navigationController) {
         composable(Screen.PROFILE_SCREEN.name) {
-            ProfileUser().ProfileUser(navigationController)
+            ProfileUser().render(navigationController)
         }
     }.build()
 }
