@@ -15,6 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import components.base.BaseComponent
 import enums.Resources
+import enums.SizeComponents
+import enums.float
 
 /**
  * The modifier to be applied to the [Row]
@@ -22,7 +24,7 @@ import enums.Resources
  */
 class SwitchPanelDashboard(
     private val modifier: Modifier = Modifier
-        .fillMaxHeight(0.075f)
+        .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
         .fillMaxWidth()
         .padding(12.dp, 0.dp)
 ) : BaseComponent {

@@ -19,10 +19,14 @@ import kotlinx.coroutines.launch
  *
  * @param stateScaffold State of this scaffold widget
  * @param scope Defines a scope for new coroutines
+ * @param modifierIcon Optional Modifier for this Icon
  */
 class Avatar(
     private val stateScaffold: ScaffoldState? = null,
-    private val scope: CoroutineScope? = null
+    private val scope: CoroutineScope? = null,
+    private val modifierIcon: Modifier = Modifier
+        .padding(0.dp)
+        .pointerHoverIcon(icon = PointerIcon.Hand)
 ) : BaseComponent {
 
     /**
@@ -52,9 +56,7 @@ class Avatar(
                 painter = painterResource(resourcePath = Resources.ICON_USER_AVATAR.path),
                 contentDescription = contentDescriptionAvatar,
                 tint = Color.Gray,
-                modifier = Modifier
-                    .padding(0.dp)
-                    .pointerHoverIcon(icon = PointerIcon.Hand)
+                modifier = modifierIcon
             )
         }
     }

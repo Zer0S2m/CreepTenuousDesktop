@@ -25,37 +25,16 @@ import components.misc.BreadCrumbsItem
 import components.misc.SwitchPanelDashboard
 import components.modals.ModalRightSheetLayout
 import components.screen.BaseDashboard
+import core.navigation.NavigationController
+import enums.*
 import enums.Colors
-import enums.Resources
-import enums.SizeComponents
-import enums.float
 
-class Dashboard : BaseDashboard {
-
-    /**
-     * List of map names for drawing components for user interaction
-     */
-    private val titleCardsProfile: List<String> = listOf(
-        "File object distribution settings",
-        "Settings",
-        "Viewing granted rights"
-    )
-
-    /**
-     * List of map names for drawing components for user interaction
-     */
-    private val titleCardsUserControl: List<String> = listOf(
-        "List of users",
-        "User management"
-    )
-
-    /**
-     * List of map names for drawing components for user interaction
-     */
-    private val titleCardsUserCustomization: List<String> = listOf(
-        "Categories",
-        "Colors"
-    )
+/**
+ * The main dashboard for interacting with system file objects
+ *
+ * @param navigation Handler for the navigation host for changing the current screen state
+ */
+class Dashboard(override var navigation: NavigationController?) : BaseDashboard {
 
     /**
      * Base directories for system user
@@ -119,7 +98,7 @@ class Dashboard : BaseDashboard {
             ) {
                 Column (
                     modifier = Modifier
-                        .fillMaxHeight(0.075f)
+                        .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize()
@@ -195,7 +174,7 @@ class Dashboard : BaseDashboard {
         val baseModifierCard: Modifier = Modifier
             .height(60.dp)
             .fillMaxWidth()
-            .padding(4.dp,)
+            .padding(4.dp)
             .pointerHoverIcon(icon = PointerIcon.Hand)
 
         Column {
@@ -203,11 +182,11 @@ class Dashboard : BaseDashboard {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(5),
                 content = {
-                    items(titleCardsProfile.size) { index ->
+                    items(Sections.MAIN_PROFILE.sections.size) { index ->
                         CardModalSheet(
                             modifier = baseModifierCard
                         ).render {
-                            renderTextInCardModalSheet(titleCardsProfile[index])
+                            renderTextInCardModalSheet(Sections.MAIN_PROFILE.sections[index])
                         }
                     }
                 }
@@ -224,11 +203,11 @@ class Dashboard : BaseDashboard {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(5),
                 content = {
-                    items(titleCardsUserControl.size) { index ->
+                    items(Sections.USER_CONTROL.sections.size) { index ->
                         CardModalSheet(
                             modifier = baseModifierCard
                         ).render {
-                            renderTextInCardModalSheet(titleCardsUserControl[index])
+                            renderTextInCardModalSheet(Sections.USER_CONTROL.sections[index])
                         }
                     }
                 }
@@ -245,11 +224,11 @@ class Dashboard : BaseDashboard {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(5),
                 content = {
-                    items(titleCardsUserCustomization.size) { index ->
+                    items(Sections.USER_CUSTOMIZATION.sections.size) { index ->
                         CardModalSheet(
                             modifier = baseModifierCard
                         ).render {
-                            renderTextInCardModalSheet(titleCardsUserCustomization[index])
+                            renderTextInCardModalSheet(Sections.USER_CUSTOMIZATION.sections[index])
                         }
                     }
                 }

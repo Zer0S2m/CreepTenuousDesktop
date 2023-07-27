@@ -8,12 +8,18 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import core.navigation.NavigationController
 
 /**
  * The base interface for implementing a dashboard that is divided into
  * two parts by a component [Row]
  */
 interface BaseDashboard {
+
+    /**
+     * Navigation handler for changing the state of the current screen
+     */
+    var navigation: NavigationController?
 
     /**
      * Rendering the left side of the content
@@ -51,6 +57,21 @@ interface BaseDashboard {
                 }
             }
         }
+    }
+
+    /**
+     * Splitter render for splitting the screen into two parts
+     *
+     * @param navigationController Navigation handler for changing the state of the current screen
+     * @param scaffoldState State of this scaffold widget.
+     */
+    @Composable
+    fun render(
+        navigationController: NavigationController? = null,
+        scaffoldState: ScaffoldState = rememberScaffoldState()
+    ) {
+        navigation = navigationController
+        render(scaffoldState = scaffoldState)
     }
 
 }

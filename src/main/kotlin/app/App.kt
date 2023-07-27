@@ -19,7 +19,7 @@ import enums.Screen
 @Composable
 @Preview
 fun App() {
-    val navigationController by rememberNavigationController(Screen.DASHBOARD_SCREEN.name)
+    val navigationController by rememberNavigationController(Screen.PROFILE_SCREEN.name)
 
     MaterialTheme(
         colors = if (isSystemInDarkTheme()) darkColors() else lightColors()

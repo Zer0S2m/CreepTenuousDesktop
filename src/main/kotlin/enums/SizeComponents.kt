@@ -16,6 +16,7 @@ enum class SizeComponents(val size: Number) {
 
     LEFT_PANEL_DASHBOARD(0.225),
 
+    UPPER_BLOCK_LEFT_PANEL(0.075)
 }
 
 /**

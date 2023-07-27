@@ -1,5 +1,6 @@
 package core.navigation.graphs
 
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import core.navigation.NavigationController
 import core.navigation.NavigationHost
@@ -44,7 +45,7 @@ fun CollectScreenSettingsSystem(navigationController: NavigationController) {
 fun CollectScreenDashboard(navigationController: NavigationController) {
     NavigationHost(navigationController) {
         composable(Screen.DASHBOARD_SCREEN.name) {
-            Dashboard().render()
+            Dashboard(navigationController).render()
         }
     }.build()
 }
@@ -57,7 +58,9 @@ fun CollectScreenDashboard(navigationController: NavigationController) {
 fun CollectScreenProfileUser(navigationController: NavigationController) {
     NavigationHost(navigationController) {
         composable(Screen.PROFILE_SCREEN.name) {
-            ProfileUser().render(navigationController)
+            ProfileUser(navigationController).render(
+                scaffoldState = rememberScaffoldState()
+            )
         }
     }.build()
 }
