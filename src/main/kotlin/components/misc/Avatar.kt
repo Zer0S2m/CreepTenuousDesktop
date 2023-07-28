@@ -20,13 +20,15 @@ import kotlinx.coroutines.launch
  * @param stateScaffold State of this scaffold widget
  * @param scope Defines a scope for new coroutines
  * @param modifierIcon Optional Modifier for this Icon
+ * @param enabled whether this [IconButton] will handle input events and appear enabled for semantics purposes
  */
 class Avatar(
     private val stateScaffold: ScaffoldState? = null,
     private val scope: CoroutineScope? = null,
-    private val modifierIcon: Modifier = Modifier
+    private var modifierIcon: Modifier = Modifier
         .padding(0.dp)
-        .pointerHoverIcon(icon = PointerIcon.Hand)
+        .pointerHoverIcon(icon = PointerIcon.Hand),
+    private val enabled: Boolean = true
 ) : BaseComponent {
 
     /**
@@ -39,6 +41,11 @@ class Avatar(
      */
     @Composable
     override fun render() {
+        if (!enabled) {
+            modifierIcon = modifierIcon
+                .pointerHoverIcon(icon = PointerIcon.Default)
+        }
+
         IconButton(
             onClick = {
                 if (stateScaffold != null && scope != null) {
@@ -50,7 +57,8 @@ class Avatar(
                 }
             },
             modifier = Modifier
-                .padding(0.dp)
+                .padding(0.dp),
+            enabled = enabled
         ) {
             Icon(
                 painter = painterResource(resourcePath = Resources.ICON_USER_AVATAR.path),

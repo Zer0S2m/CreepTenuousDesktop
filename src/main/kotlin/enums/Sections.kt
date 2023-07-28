@@ -5,31 +5,40 @@ package enums
  *
  * @param sections Basic name blocks
  */
-enum class Sections(val sections: List<String>) {
+enum class Sections(val title: String, val sections: List<String>) {
 
     /**
      * Main sections for storing user settings for system regulation
      */
-    MAIN_PROFILE(sections = listOf(
-        "File object distribution settings",
-        "Settings",
-        "Viewing granted rights"
-    )),
+    MAIN_PROFILE(
+        title = "Main",
+        sections = listOf(
+            "File object distribution settings",
+            "Settings",
+            "Viewing granted rights"
+        )
+    ),
 
     /**
      * Basic blocks for user control
      */
-    USER_CONTROL(sections = listOf(
-        "List of users",
-        "User management"
-    )),
+    USER_CONTROL(
+        title = "User control",
+        sections = listOf(
+            "List of users",
+            "User management"
+        )
+    ),
 
     /**
      * Basic blocks for customizing file objects
      */
-    USER_CUSTOMIZATION(sections = listOf(
-        "Categories",
-        "Colors"
-    ))
+    USER_CUSTOMIZATION(
+        title = "Customization",
+        sections = listOf(
+                "Categories",
+                "Colors"
+        )
+    )
 
 }

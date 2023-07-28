@@ -178,7 +178,7 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
             .pointerHoverIcon(icon = PointerIcon.Hand)
 
         Column {
-            renderTitleInSectionForCardsModalSheet("Profile")
+            renderTitleInSectionForCardsModalSheet(Sections.MAIN_PROFILE.title)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(5),
                 content = {
@@ -199,7 +199,7 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
         )
 
         Column {
-            renderTitleInSectionForCardsModalSheet("User control")
+            renderTitleInSectionForCardsModalSheet(Sections.USER_CONTROL.title)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(5),
                 content = {
@@ -220,7 +220,7 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
         )
 
         Column {
-            renderTitleInSectionForCardsModalSheet("Customization")
+            renderTitleInSectionForCardsModalSheet(Sections.USER_CUSTOMIZATION.title)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(5),
                 content = {
