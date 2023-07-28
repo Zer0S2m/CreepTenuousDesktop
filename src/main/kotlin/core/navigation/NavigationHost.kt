@@ -13,11 +13,11 @@ class NavigationHost(
     }
 
     inner class NavigationGraphBuilder(
-        val navigationController: NavigationController = this@NavigationHost.navigationController
+        val navigationControllerGraph: NavigationController = navigationController
     ) {
         @Composable
         fun renderContents() {
-            this@NavigationHost.contents(this)
+            contents(this)
         }
     }
 

@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import components.fields.TextFieldAdvanced
 import components.forms.Form
 import components.forms.FormState
+import core.actions.navigationScreen
 import core.navigation.NavigationController
 import core.validation.NotEmptyValidator
 import dto.LoginUserModel
@@ -89,7 +90,10 @@ class LoginUser {
                                 data["password"].toString()
                             )
                             println(dataClass)
-                            navigationController.navigate(Screen.DASHBOARD_SCREEN.name)
+                            navigationScreen.action(
+                                state = mutableStateOf(navigationController),
+                                route = Screen.DASHBOARD_SCREEN
+                            )
                         }
                     },
                     modifier = Modifier

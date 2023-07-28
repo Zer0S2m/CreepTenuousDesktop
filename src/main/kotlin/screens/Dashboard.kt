@@ -46,6 +46,10 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
         "Musics" to Resources.ICON_MUSIC.path
     )
 
+    private val onClickCardSheet = {
+        navigation?.navigate(Screen.PROFILE_SCREEN.name)
+    }
+
     /**
      * Rendering content on the left side of the dashboard
      */
@@ -184,7 +188,8 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                 content = {
                     items(Sections.MAIN_PROFILE.sections.size) { index ->
                         CardModalSheet(
-                            modifier = baseModifierCard
+                            modifier = baseModifierCard,
+                            onClick = onClickCardSheet
                         ).render {
                             renderTextInCardModalSheet(Sections.MAIN_PROFILE.sections[index])
                         }
@@ -205,7 +210,8 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                 content = {
                     items(Sections.USER_CONTROL.sections.size) { index ->
                         CardModalSheet(
-                            modifier = baseModifierCard
+                            modifier = baseModifierCard,
+                            onClick = onClickCardSheet
                         ).render {
                             renderTextInCardModalSheet(Sections.USER_CONTROL.sections[index])
                         }
@@ -226,7 +232,8 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                 content = {
                     items(Sections.USER_CUSTOMIZATION.sections.size) { index ->
                         CardModalSheet(
-                            modifier = baseModifierCard
+                            modifier = baseModifierCard,
+                            onClick = onClickCardSheet
                         ).render {
                             renderTextInCardModalSheet(Sections.USER_CUSTOMIZATION.sections[index])
                         }

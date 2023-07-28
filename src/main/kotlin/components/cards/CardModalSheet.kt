@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -27,12 +28,14 @@ import enums.Colors
  * @param modifier Modifier to be applied to the layout of the card.
  * @param backgroundColor The background color.
  * @param isAnimation Set background change animation for a component.
+ * @param onClick Callback to be called when the [Card] is clicked.
  */
 class CardModalSheet(
     private var modifier: Modifier = Modifier
         .fillMaxSize(),
     private val backgroundColor: Color = Colors.CARD_BASE.color,
-    override val isAnimation: Boolean = true
+    override val isAnimation: Boolean = true,
+    override val onClick: (() -> Unit?)? = null
 ) : BaseCardModalSheet {
 
     /**
@@ -40,6 +43,7 @@ class CardModalSheet(
      *
      * @param content Content of your screen
      */
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun render(content: @Composable () -> Unit) {
         val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
@@ -56,6 +60,7 @@ class CardModalSheet(
         }
 
         Card(
+            onClick = { onClick?.let { it() } },
             modifier = modifier,
             elevation = 0.dp,
             shape = RoundedCornerShape(8.dp),

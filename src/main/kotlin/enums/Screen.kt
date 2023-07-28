@@ -21,7 +21,7 @@ enum class Screen {
     DASHBOARD_SCREEN,
 
     /**
-     * Main screen for adjusting settings by users
+     * Main screen to store all child screens
      */
     PROFILE_SCREEN,
 
@@ -29,6 +29,11 @@ enum class Screen {
      * Screen by interaction category for allocating file objects
      */
     PROFILE_CATEGORY_SCREEN,
+
+    /**
+     * Main screen for editing user settings
+     */
+    PROFILE_SETTINGS_SCREEN,
 
     /**
      * Screen for viewing granted rights for interacting with file objects
@@ -48,22 +53,29 @@ enum class Screen {
     /**
      * Screen for customizing file objects
      */
-    PROFILE_COLORS_SCREEN;
+    PROFILE_COLORS_SCREEN,
+
+    /**
+     * Main screen for viewing all users in the system
+     */
+    PROFILE_LIST_USERS_SCREEN;
 
     /**
      * List of child elements of parent
      */
-    val childs: Collection<Screen>
+    val childs: MutableSet<Screen>
         get() = when (this) {
-            PROFILE_SCREEN -> listOf(
+            PROFILE_SCREEN -> mutableSetOf(
                 PROFILE_CATEGORY_SCREEN,
                 PROFILE_GRANTED_RIGHTS_SCREEN,
                 PROFILE_USER_MANAGEMENT_SCREEN,
                 PROFILE_FILE_OBJECT_DISTRIBUTION,
-                PROFILE_COLORS_SCREEN
+                PROFILE_COLORS_SCREEN,
+                PROFILE_SETTINGS_SCREEN,
+                PROFILE_LIST_USERS_SCREEN
             )
 
-            else -> { listOf() }
+            else -> { mutableSetOf() }
         }
 
 }

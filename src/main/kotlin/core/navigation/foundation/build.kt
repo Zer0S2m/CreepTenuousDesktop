@@ -8,7 +8,7 @@ fun NavigationHost.NavigationGraphBuilder.composable(
     route: String,
     content: @Composable () -> Unit
 ) {
-    if (navigationController.currentScreen.value == route) {
+    if (navigationControllerGraph.currentScreen.value == route) {
         content()
     }
 }
