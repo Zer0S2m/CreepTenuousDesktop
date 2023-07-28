@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import components.misc.Avatar
 import components.screen.BaseDashboard
 import core.actions.navigationScreen
+import core.context.BaseContextScreen
 import core.errors.ComponentException
 import core.navigation.NavigationController
 import core.navigation.graphs.*
@@ -33,11 +34,39 @@ import enums.Colors
  */
 class ProfileUser(override var navigation: NavigationController?) : BaseDashboard {
 
+    companion object {
+
+        /**
+         * Base screen for initial user profile page
+         */
+        internal val baseScreen: Screen = Screen.PROFILE_SETTINGS_SCREEN
+
+        /**
+         * The new state of the applied screen from the transition from the previous screen
+         */
+        internal val appliedScreenFromTransitionFromPast: MutableState<Screen> = mutableStateOf(baseScreen)
+
+        /**
+         * Set new screen state from past transition
+         *
+         * @param context Context `illusion` to convey new screen state
+         */
+        fun setAppliedScreenFromTransitionFromPast(context: BaseContextScreen) {
+            appliedScreenFromTransitionFromPast.value = context.screen!!
+        }
+
+        /**
+         * Transition to a new screen state of a non-child parent screen [Screen.PROFILE_SCREEN.childs]
+         */
+        internal val fromPastScreen: MutableState<Boolean> = mutableStateOf(true)
+
+    }
+
     /**
      * Internal navigation host to change user profile screen
      */
     private val internalNavigation: State<NavigationController> = mutableStateOf(
-        NavigationController(startDestination = Screen.PROFILE_SETTINGS_SCREEN.name)
+        NavigationController(startDestination = baseScreen.name)
     )
 
     /**
@@ -53,6 +82,10 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
 
         if (navigation == null) {
             throw ComponentException(message = "To build a screen, you need a parameter [navigation]")
+        }
+        if (fromPastScreen.value) {
+            internalNavigation.value.navigate(appliedScreenFromTransitionFromPast.value.name)
+            fromPastScreen.value = false
         }
     }
 
@@ -296,39 +329,3 @@ internal fun itemSectionInMenu(
  * Basic horizontal padding for building the left side of the panel
  */
 internal val baseHorizontalPadding: Dp get() = 12.dp
-
-@Composable
-fun ProfileUser.ProfileFileObjectDistribution.render() {
-    Text("File object distribution settings", color = Color.Black)
-}
-
-@Composable
-fun ProfileUser.ProfileSettings.render() {
-    Text("Settings", color = Color.Black)
-}
-
-@Composable
-fun ProfileUser.ProfileGrantedRights.render() {
-    Text("Viewing granted rights", color = Color.Black)
-}
-
-@Composable
-fun ProfileUser.ProfileListUsers.render() {
-    Text("List of users", color = Color.Black)
-}
-
-@Composable
-fun ProfileUser.ProfileUserControl.render() {
-    Text("User management", color = Color.Black)
-}
-
-
-@Composable
-fun ProfileUser.ProfileCategories.render() {
-    Text("Categories", color = Color.Black)
-}
-
-@Composable
-fun ProfileUser.ProfileColors.render() {
-    Text("Colors", color = Color.Black)
-}

@@ -8,6 +8,7 @@ import core.navigation.foundation.composable
 import enums.Screen
 import screens.*
 import screens.ProfileUser
+import screens.user.*
 
 /**
  * Building a screen and passing it to the navigation host where the context is changed and rendered
@@ -84,7 +85,7 @@ fun CollectScreenProfileFileObjectDistribution(navigationController: NavigationC
 fun CollectScreenProfileSettings(navigationController: NavigationController) {
     NavigationHost(navigationController) {
         composable(Screen.PROFILE_SETTINGS_SCREEN.name) {
-            ProfileUser.ProfileSettings().render()
+            ProfileUser.ProfileFileObjectDistribution().render()
         }
     }.build()
 }

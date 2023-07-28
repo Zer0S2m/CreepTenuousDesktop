@@ -25,6 +25,7 @@ import components.misc.BreadCrumbsItem
 import components.misc.SwitchPanelDashboard
 import components.modals.ModalRightSheetLayout
 import components.screen.BaseDashboard
+import core.context.ContextScreen
 import core.navigation.NavigationController
 import enums.*
 import enums.Colors
@@ -46,8 +47,9 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
         "Musics" to Resources.ICON_MUSIC.path
     )
 
-    private val onClickCardSheet = {
+    private fun onClickCardSheet(screen: Screen) {
         navigation?.navigate(Screen.PROFILE_SCREEN.name)
+        ProfileUser.setAppliedScreenFromTransitionFromPast(ContextScreen(screen))
     }
 
     /**
@@ -189,7 +191,9 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                     items(Sections.MAIN_PROFILE.sections.size) { index ->
                         CardModalSheet(
                             modifier = baseModifierCard,
-                            onClick = onClickCardSheet
+                            onClick = {
+                                onClickCardSheet(screen = Sections.MAIN_PROFILE.routes[index])
+                            }
                         ).render {
                             renderTextInCardModalSheet(Sections.MAIN_PROFILE.sections[index])
                         }
@@ -211,7 +215,9 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                     items(Sections.USER_CONTROL.sections.size) { index ->
                         CardModalSheet(
                             modifier = baseModifierCard,
-                            onClick = onClickCardSheet
+                            onClick = {
+                                onClickCardSheet(screen = Sections.USER_CONTROL.routes[index])
+                            }
                         ).render {
                             renderTextInCardModalSheet(Sections.USER_CONTROL.sections[index])
                         }
@@ -233,7 +239,9 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                     items(Sections.USER_CUSTOMIZATION.sections.size) { index ->
                         CardModalSheet(
                             modifier = baseModifierCard,
-                            onClick = onClickCardSheet
+                            onClick = {
+                                onClickCardSheet(screen = Sections.USER_CUSTOMIZATION.routes[index])
+                            }
                         ).render {
                             renderTextInCardModalSheet(Sections.USER_CUSTOMIZATION.sections[index])
                         }
