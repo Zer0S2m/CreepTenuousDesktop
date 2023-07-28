@@ -20,7 +20,8 @@ import enums.float
 
 /**
  * The modifier to be applied to the [Row]
- * @param modifier
+ *
+ * @param modifier The modifier to be applied to the [Row].
  */
 class SwitchPanelDashboard(
     private val modifier: Modifier = Modifier

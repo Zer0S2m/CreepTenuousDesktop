@@ -10,7 +10,6 @@ import screens.ProfileUser
  * Rendering part of the user profile screen [Screen.PROFILE_CATEGORY_SCREEN]
  */
 @Composable
-
 fun ProfileUser.ProfileCategories.render() {
     Text("Categories", color = Color.Black)
 }

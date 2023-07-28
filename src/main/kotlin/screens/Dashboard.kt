@@ -65,12 +65,17 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
             SwitchPanelDashboard()
                 .render()
 
-            baseFolderForUser.forEach { (folder, icon) ->
-                CardPanelBaseFolderUser(
-                    text = folder,
-                    isIcon = true,
-                    iconPath = icon
-                ).render()
+            Column(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+            ) {
+                baseFolderForUser.forEach { (folder, icon) ->
+                    CardPanelBaseFolderUser(
+                        text = folder,
+                        isIcon = true,
+                        iconPath = icon
+                    ).render()
+                }
             }
         }
     }

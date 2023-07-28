@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -33,6 +34,11 @@ import enums.Colors
  * @param navigation Handler for the navigation host for changing the current screen state
  */
 class ProfileUser(override var navigation: NavigationController?) : BaseDashboard {
+
+    /**
+     * Text used by accessibility services to describe what this image represents
+     */
+    private val contentDescriptionIcon: String = "Go to main menu"
 
     companion object {
 
@@ -58,7 +64,7 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
         /**
          * Transition to a new screen state of a non-child parent screen [Screen.PROFILE_SCREEN.childs]
          */
-        internal val fromPastScreen: MutableState<Boolean> = mutableStateOf(true)
+        internal val isFromPastScreen: MutableState<Boolean> = mutableStateOf(true)
 
     }
 
@@ -83,9 +89,10 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
         if (navigation == null) {
             throw ComponentException(message = "To build a screen, you need a parameter [navigation]")
         }
-        if (fromPastScreen.value) {
+
+        if (isFromPastScreen.value) {
             internalNavigation.value.navigate(appliedScreenFromTransitionFromPast.value.name)
-            fromPastScreen.value = false
+            isFromPastScreen.value = false
         }
     }
 
@@ -102,6 +109,7 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
             Column(
                 modifier = Modifier
                     .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
+                    .fillMaxWidth()
                     .padding(baseHorizontalPadding, 0.dp)
             ) {
                 renderUserAvatar()
@@ -180,21 +188,47 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
         Row(
             modifier = Modifier
                 .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Avatar(
-                modifierIcon = Modifier
-                    .padding(0.dp)
-                    .pointerHoverIcon(icon = PointerIcon.Hand)
-                    .width(32.dp)
-                    .height(32.dp),
-                enabled = false
-            ).render()
-            Text(
-                text = "User name",
+            Row(
                 modifier = Modifier
-                    .padding(start = 8.dp)
-            )
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.75f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Avatar(
+                    modifierIcon = Modifier
+                        .padding(0.dp)
+                        .pointerHoverIcon(icon = PointerIcon.Hand)
+                        .width(32.dp)
+                        .height(32.dp),
+                    enabled = false
+                ).render()
+                Text(
+                    text = "User name",
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                )
+            }
+            IconButton(
+                onClick = {
+                    navigation?.navigate(Screen.DASHBOARD_SCREEN.name)
+                    isFromPastScreen.value = true
+                    appliedScreenFromTransitionFromPast.value = baseScreen
+                },
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(end = 8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(resourcePath = Resources.ICON_MAIN_DASHBOARD.path),
+                    contentDescription = contentDescriptionIcon,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pointerHoverIcon(icon = PointerIcon.Hand)
+                )
+            }
         }
     }
 

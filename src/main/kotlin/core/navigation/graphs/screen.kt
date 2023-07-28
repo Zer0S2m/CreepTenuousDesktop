@@ -85,7 +85,7 @@ fun CollectScreenProfileFileObjectDistribution(navigationController: NavigationC
 fun CollectScreenProfileSettings(navigationController: NavigationController) {
     NavigationHost(navigationController) {
         composable(Screen.PROFILE_SETTINGS_SCREEN.name) {
-            ProfileUser.ProfileFileObjectDistribution().render()
+            ProfileUser.ProfileSettings().render()
         }
     }.build()
 }
