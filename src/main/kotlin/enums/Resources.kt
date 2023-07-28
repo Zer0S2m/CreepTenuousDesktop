@@ -27,6 +27,10 @@ enum class Resources(val path: String) {
 
     ICON_IMAGE("drawable/base_image.svg"),
 
-    ICON_MAIN_DASHBOARD("drawable/base_dashboard.png")
+    ICON_MAIN_DASHBOARD("drawable/base_dashboard.png"),
+
+    ICON_DELETE("drawable/delete.png"),
+
+    ICON_BLOCK("drawable/block.png")
 
 }
