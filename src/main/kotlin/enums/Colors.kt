@@ -18,6 +18,8 @@ enum class Colors(val color: Color) {
 
     DROP_MENU_ITEM_HOVER(Color(red = 238, green = 240, blue = 244)),
 
-    TEXT(Color(red = 27, green = 31, blue = 31))
+    TEXT(Color(red = 27, green = 31, blue = 31)),
+
+    CARD_SECTION_PROFILE_HOVER(Color(red = 54,green = 54,blue = 54))
 
 }

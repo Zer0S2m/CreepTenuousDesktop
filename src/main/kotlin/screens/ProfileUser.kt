@@ -299,6 +299,8 @@ internal fun titleSectionInMenu(text: String = "") {
  *
  * @param text The text to be displayed [Text]
  * @param enabled Controls the enabled state of the surface [Surface]
+ * @param navigation Internal navigational user profile screen handler
+ * @param route Screen name for changing the current state
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -308,12 +310,16 @@ internal fun itemSectionInMenu(
     navigation: State<NavigationController>,
     route: Screen
 ) {
+    val isCurrentScreenRoute: Boolean = navigation.value.currentScreen.value == route.name
     val colors: ButtonColors = ButtonDefaults.outlinedButtonColors()
     val contentColor by colors.contentColor(enabled)
-    val modifier: Modifier = Modifier
+    var modifier: Modifier = Modifier
         .fillMaxWidth()
         .height(48.dp)
-        .pointerHoverIcon(icon = PointerIcon.Hand)
+    if (!isCurrentScreenRoute) {
+        modifier = modifier
+            .pointerHoverIcon(icon = PointerIcon.Hand)
+    }
 
     Surface(
         onClick = {
@@ -323,13 +329,14 @@ internal fun itemSectionInMenu(
             )
         },
         modifier = modifier.semantics { role = Role.Button },
-        enabled = enabled,
+        enabled = if (isCurrentScreenRoute) false else enabled,
         shape = RoundedCornerShape(0.dp),
-        color = colors.backgroundColor(enabled).value,
+        color = if (isCurrentScreenRoute)
+            Colors.CARD_SECTION_PROFILE_HOVER.color else colors.backgroundColor(enabled).value,
         contentColor = contentColor.copy(alpha = 1f),
         border = null,
         elevation = 0.dp,
-        interactionSource = remember { MutableInteractionSource() },
+        interactionSource = remember { MutableInteractionSource() }
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(
