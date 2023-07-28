@@ -132,6 +132,7 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
+                .padding(16.dp)
         ) {
             CollectScreenProfileFileObjectDistribution(internalNavigation.value)
             CollectScreenProfileSettings(internalNavigation.value)

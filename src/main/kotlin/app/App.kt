@@ -2,7 +2,6 @@ package app
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
@@ -22,7 +21,7 @@ fun App() {
     val navigationController by rememberNavigationController(Screen.DASHBOARD_SCREEN.name)
 
     MaterialTheme(
-        colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
+        colors = darkColors()
     ) {
         Surface(
             modifier = Modifier.background(color = MaterialTheme.colors.background)
