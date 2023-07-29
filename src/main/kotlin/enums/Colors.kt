@@ -20,6 +20,8 @@ enum class Colors(val color: Color) {
 
     TEXT(Color(red = 27, green = 31, blue = 31)),
 
-    CARD_SECTION_PROFILE_HOVER(Color(red = 54,green = 54,blue = 54))
+    CARD_SECTION_PROFILE_HOVER(Color(red = 54,green = 54,blue = 54)),
+
+    SECONDARY_VARIANT(Color(red = 219, green = 216, blue = 227))
 
 }

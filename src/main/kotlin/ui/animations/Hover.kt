@@ -47,6 +47,23 @@ fun setHoverInDropMenuItem(
 }
 
 /**
+ * Set hover event on component [BaseDropdownMenuItem] - listens for events [HoverInteraction]
+ *
+ * @param interactionSource [MutableInteractionSource] that will be used to emit [HoverInteraction]
+ * @param isHover Switch in the form of a state when hovering over a component
+ */
+@Composable
+fun setHoverInSelectUser(
+    interactionSource: MutableInteractionSource,
+    isHover: MutableState<Boolean>
+) {
+    setHoverInComponent(
+        interactionSource = interactionSource,
+        isHover = isHover
+    )
+}
+
+/**
  * Set hover event on component - listens for events [HoverInteraction]
  *
  * @param interactionSource [MutableInteractionSource] that will be used to emit [HoverInteraction]
@@ -79,6 +96,8 @@ private fun setHoverInComponent(
  * Set color change states for events [HoverInteraction] (used together with [setHoverInCard])
  *
  * @param isHover Switch in the form of a state when hovering over a component
+ * @param backgroundColor Component's initial background
+ * @param backgroundHover Background on element hover
  */
 @Composable
 fun setAnimateColorAsStateInCard(
@@ -92,12 +111,36 @@ fun setAnimateColorAsStateInCard(
     )
 }
 
+/**
+ * Set color change states for events [HoverInteraction] (used together with [setHoverInDropMenuItem])
+ *
+ * @param isHover Switch in the form of a state when hovering over a component
+ */
 @Composable
 fun setAnimateColorAsStateInDropMenuItem(
     isHover: MutableState<Boolean>
 ): State<Color> {
     return animateColorAsState(
         targetValue = if (isHover.value) Colors.DROP_MENU_ITEM_HOVER.color else Color.White,
+        animationSpec = tween(0, 0, LinearEasing)
+    )
+}
+
+/**
+ * Set color change states for events [HoverInteraction] (used together with [setHoverInSelectUser])
+ *
+ * @param isHover Switch in the form of a state when hovering over a component
+ * @param backgroundColor Component's initial background
+ * @param backgroundHover Background on element hover
+ */
+@Composable
+fun setAnimateColorAsStateInSelectUser(
+    isHover: MutableState<Boolean>,
+    backgroundColor: Color = Color.White,
+    backgroundHover: Color = Colors.CARD_BASE_HOVER.color
+): State<Color> {
+    return animateColorAsState(
+        targetValue = if (isHover.value) backgroundHover else backgroundColor,
         animationSpec = tween(0, 0, LinearEasing)
     )
 }
