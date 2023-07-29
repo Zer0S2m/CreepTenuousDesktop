@@ -4,7 +4,9 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.NavigationRail
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -14,11 +16,12 @@ import core.navigation.graphs.CollectScreenProfileUser
 import core.navigation.graphs.CollectScreenSettingsSystem
 import core.navigation.runtime.rememberNavigationController
 import enums.Screen
+import ui.theme.darkColors
 
 @Composable
 @Preview
 fun App() {
-    val navigationController by rememberNavigationController(Screen.DASHBOARD_SCREEN.name)
+    val navigationController by rememberNavigationController(Screen.SETTINGS_SYSTEM_SCREEN.name)
 
     MaterialTheme(
         colors = darkColors()
