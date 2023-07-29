@@ -1,8 +1,6 @@
 package screens.user
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +13,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import enums.Colors
@@ -57,7 +56,7 @@ fun ProfileUser.ProfileFileObjectDistribution.render() {
                     .fillMaxSize()
             ) {
                 baseTitle("Passing objects to an assigned user")
-                selectUserDropMenu()
+                SelectUserDropMenu()
             }
         }
     }
@@ -94,13 +93,21 @@ internal fun ProfileUser.ProfileFileObjectDistribution.switch() {
  * Selecting a user to set up a distribution
  */
 @Composable
-internal fun ProfileUser.ProfileFileObjectDistribution.selectUserDropMenu() {
+internal fun ProfileUser.ProfileFileObjectDistribution.SelectUserDropMenu() {
+    val selectedUserItem: MutableState<Int> = remember { mutableStateOf(-1) }
+    val textState: MutableState<String> = remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
-            .width(200.dp)
+            .width(baseWidthColumnSelectUser)
             .padding(top = 12.dp)
     ) {
-        UserLoginTextField(text = "User name 1")
+        if (selectedUserItem.value != -1) {
+            textState.value = selectUseItems[selectedUserItem.value]
+            UserLoginTextField(text = textState, selectedUserItem = selectedUserItem)
+        } else {
+            UserLoginTextField(text = textState, selectedUserItem = selectedUserItem)
+        }
     }
 }
 
@@ -108,10 +115,15 @@ internal fun ProfileUser.ProfileFileObjectDistribution.selectUserDropMenu() {
  * Base field for displaying the user's login when its value is selected
  *
  * @param text the input [String] text to be shown in the text field
+ * @param selectedUserItem State of the selected user from the list by his index
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun UserLoginTextField(text: String) {
-    val textState by remember { mutableStateOf(text) }
+private fun UserLoginTextField(
+    text: MutableState<String>,
+    selectedUserItem: MutableState<Int>
+) {
+    val expandedStates: MutableState<Boolean> = remember { mutableStateOf(false) }
 
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isHover: MutableState<Boolean> = remember { mutableStateOf(false) }
@@ -129,6 +141,9 @@ private fun UserLoginTextField(text: String) {
         modifier = Modifier
             .pointerHoverIcon(PointerIcon.Hand)
             .fillMaxWidth()
+            .onClick {
+                expandedStates.value = true
+            }
             .border(0.5.dp, MaterialTheme.colors.secondary, RoundedCornerShape(4.dp))
             .hoverable(interactionSource = interactionSource)
             .background(animatedCardColor.value)
@@ -142,7 +157,7 @@ private fun UserLoginTextField(text: String) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = textState,
+                text = text.value,
                 color = Colors.TEXT.color
             )
 
@@ -154,11 +169,87 @@ private fun UserLoginTextField(text: String) {
                     .size(16.dp)
             )
         }
+
+        DropdownMenuSelectUser(expandedStates = expandedStates, selectedUserItem = selectedUserItem)
     }
 }
 
 /**
- * ext used by accessibility services to describe what this image represents
+ * User select dropdown
+ *
+ * @param expandedStates Whether the menu is currently open and visible to the user
+ * @param selectedUserItem State of the selected user from the list by his index
+ */
+@Composable
+private fun DropdownMenuSelectUser(
+    expandedStates: MutableState<Boolean>,
+    selectedUserItem: MutableState<Int>,
+) {
+    DropdownMenu(
+        expanded = expandedStates.value,
+        onDismissRequest = {
+            expandedStates.value = false
+            println(selectedUserItem)
+        },
+        modifier = Modifier
+            .width(baseWidthColumnSelectUser)
+            .padding(0.dp)
+            .background(Colors.SECONDARY.color)
+    ) {
+        selectUseItems.forEachIndexed { index, item ->
+            DropdownMenuItemSelectUser(expandedStates, selectedUserItem, index) {
+                Text(item, color = Color.White)
+            }
+        }
+    }
+}
+
+/**
+ * The base element for selecting a user from a drop-down list
+ *
+ * @param expandedStates Whether the menu is currently open and visible to the user
+ * @param selectedUserItem State of the selected user from the list by his index
+ * @param index Index of an element from a list [selectUseItems]
+ * @param content Internal block content
+ */
+@Composable
+private fun DropdownMenuItemSelectUser(
+    expandedStates: MutableState<Boolean>,
+    selectedUserItem: MutableState<Int>,
+    index: Int,
+    content: @Composable () -> Unit
+) {
+    DropdownMenuItem(
+        onClick = {
+            selectedUserItem.value = index
+            expandedStates.value = false
+        },
+        modifier = Modifier
+            .pointerHoverIcon(PointerIcon.Hand),
+        contentPadding = PaddingValues(12.dp)
+    ) {
+        content()
+    }
+}
+
+/**
+ * Text used by accessibility services to describe what this image represents
  */
 @get:ReadOnlyComposable
 private val contentDescriptionIconArrow: String get() = "Open user list"
+
+/**
+ * Width of user selection area from list
+ */
+@get:ReadOnlyComposable
+private val baseWidthColumnSelectUser: Dp get() = 200.dp
+
+/**
+ * User choice list
+ */
+@get:ReadOnlyComposable
+private val selectUseItems: List<String> get() = listOf(
+    "User name 1",
+    "User name 2",
+    "User name 3"
+)

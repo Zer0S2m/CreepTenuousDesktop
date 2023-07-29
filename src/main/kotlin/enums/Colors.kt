@@ -22,6 +22,8 @@ enum class Colors(val color: Color) {
 
     CARD_SECTION_PROFILE_HOVER(Color(red = 54,green = 54,blue = 54)),
 
+    SECONDARY(Color(0xff5c5470)),
+
     SECONDARY_VARIANT(Color(red = 219, green = 216, blue = 227))
 
 }
