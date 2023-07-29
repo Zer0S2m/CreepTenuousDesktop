@@ -18,8 +18,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
-import components.misc.Avatar
-import components.screen.BaseDashboard
+import ui.components.misc.Avatar
+import ui.components.base.BaseDashboard
 import core.actions.navigationScreen
 import core.context.BaseContextScreen
 import core.errors.ComponentException
@@ -87,7 +87,7 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
         super.render(scaffoldState = scaffoldState)
 
         if (navigation == null) {
-            throw ComponentException(message = "To build a screen, you need a parameter [navigation]")
+            throw ComponentException(message = "To build a screen [ProfileUser], you need a parameter [navigation]")
         }
 
         if (isFromPastScreen.value) {
@@ -114,10 +114,7 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
             ) {
                 renderUserAvatar()
             }
-            Column(
-                modifier = Modifier
-                    .padding(top = 8.dp)
-            ) {
+            Column {
                 renderMenu()
             }
         }

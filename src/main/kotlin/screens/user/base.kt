@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import components.misc.Avatar
+import ui.components.misc.Avatar
 
 /**
  * Basic card for user interaction in the system. Extends a component [Card]
