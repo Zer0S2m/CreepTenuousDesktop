@@ -19,7 +19,8 @@ import kotlinx.coroutines.launch
  *
  * @param stateScaffold State of this scaffold widget
  * @param scope Defines a scope for new coroutines
- * @param modifierIcon Optional Modifier for this Icon
+ * @param modifierIcon Optional [Modifier] for this [Icon]
+ * @param modifierIconButton Optional [Modifier] for this [IconButton]
  * @param enabled whether this [IconButton] will handle input events and appear enabled for semantics purposes
  */
 class Avatar(
@@ -28,6 +29,8 @@ class Avatar(
     private var modifierIcon: Modifier = Modifier
         .padding(0.dp)
         .pointerHoverIcon(icon = PointerIcon.Hand),
+    private val modifierIconButton: Modifier = Modifier
+        .padding(0.dp),
     private val enabled: Boolean = true
 ) : BaseComponent {
 
@@ -56,8 +59,7 @@ class Avatar(
                     }
                 }
             },
-            modifier = Modifier
-                .padding(0.dp),
+            modifier = modifierIconButton,
             enabled = enabled
         ) {
             Icon(

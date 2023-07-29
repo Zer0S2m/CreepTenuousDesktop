@@ -55,7 +55,7 @@ private val contentDescriptionBlock: String get() = "User lock icon"
  */
 @Stable
 private val baseModifierIcon: Modifier get() = Modifier
-    .size(24.dp)
+    .size(20.dp)
     .pointerHoverIcon(icon = PointerIcon.Hand)
 
 /**

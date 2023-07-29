@@ -235,30 +235,30 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
      */
     @Composable
     private fun renderMenu() {
-        titleSectionInMenu(text = Sections.MAIN_PROFILE.title)
+        TitleSectionInMenu(text = Sections.MAIN_PROFILE.title)
         Sections.MAIN_PROFILE.sections
             .zip(Sections.MAIN_PROFILE.routes) { item, route ->
-                itemSectionInMenu(
+                ItemSectionInMenu(
                     text = item,
                     navigation = internalNavigation,
                     route = route
                 )
             }
 
-        titleSectionInMenu(text = Sections.USER_CONTROL.title)
+        TitleSectionInMenu(text = Sections.USER_CONTROL.title)
         Sections.USER_CONTROL.sections
             .zip(Sections.USER_CONTROL.routes) { item, route ->
-                itemSectionInMenu(
+                ItemSectionInMenu(
                     text = item,
                     navigation = internalNavigation,
                     route = route
                 )
             }
 
-        titleSectionInMenu(text = Sections.USER_CUSTOMIZATION.title)
+        TitleSectionInMenu(text = Sections.USER_CUSTOMIZATION.title)
         Sections.USER_CUSTOMIZATION.sections
             .zip(Sections.USER_CUSTOMIZATION.routes) { item, route ->
-                itemSectionInMenu(
+                ItemSectionInMenu(
                     text = item,
                     navigation = internalNavigation,
                     route = route
@@ -274,7 +274,7 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
  * @param text The text to be displayed [Text]
  */
 @Composable
-internal fun titleSectionInMenu(text: String = "") {
+private fun TitleSectionInMenu(text: String = "") {
     Row(
         modifier = Modifier
             .height(40.dp)
@@ -302,7 +302,7 @@ internal fun titleSectionInMenu(text: String = "") {
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-internal fun itemSectionInMenu(
+private fun ItemSectionInMenu(
     text: String = "",
     enabled: Boolean = true,
     navigation: State<NavigationController>,
@@ -367,4 +367,4 @@ internal fun itemSectionInMenu(
 /**
  * Basic horizontal padding for building the left side of the panel
  */
-internal val baseHorizontalPadding: Dp get() = 12.dp
+private val baseHorizontalPadding: Dp get() = 12.dp

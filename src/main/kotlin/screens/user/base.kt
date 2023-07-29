@@ -26,7 +26,7 @@ internal fun baseCardForItemCardUser(
 ) {
     Card(
         modifier = Modifier
-            .height(80.dp)
+            .height(72.dp)
             .fillMaxWidth()
             .padding(bottom = 12.dp)
     ) {
