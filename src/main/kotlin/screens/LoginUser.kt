@@ -13,9 +13,9 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import components.fields.TextFieldAdvanced
-import components.forms.Form
-import components.forms.FormState
+import ui.components.fields.TextFieldAdvanced
+import ui.components.forms.Form
+import ui.components.forms.FormState
 import core.actions.navigationScreen
 import core.navigation.NavigationController
 import core.validation.NotEmptyValidator

@@ -8,23 +8,23 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import components.cards.CardModalSheet
-import components.cards.CardPanelBaseFolderUser
-import components.cards.CartAdvanced
-import components.fields.FieldSearch
-import components.misc.Avatar
-import components.misc.BreadCrumbs
-import components.misc.BreadCrumbsItem
-import components.misc.SwitchPanelDashboard
-import components.modals.ModalRightSheetLayout
-import components.screen.BaseDashboard
+import ui.components.cards.CardModalSheet
+import ui.components.cards.CardPanelBaseFolderUser
+import ui.components.cards.CartFileObject
+import ui.components.fields.FieldSearch
+import ui.components.misc.Avatar
+import ui.components.misc.BreadCrumbs
+import ui.components.misc.BreadCrumbsItem
+import ui.components.misc.SwitchPanelDashboard
+import ui.components.modals.ModalRightSheetLayout
+import ui.components.base.BaseDashboard
 import core.context.ContextScreen
 import core.navigation.NavigationController
 import enums.*
@@ -65,10 +65,7 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
             SwitchPanelDashboard()
                 .render()
 
-            Column(
-                modifier = Modifier
-                    .padding(top = 8.dp)
-            ) {
+            Column {
                 baseFolderForUser.forEach { (folder, icon) ->
                     CardPanelBaseFolderUser(
                         text = folder,
@@ -95,7 +92,7 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
             modifierDrawerInternal = Modifier
                 .fillMaxSize()
                 .padding(12.dp)
-                .background(White)
+                .background(Color.White)
         )
 
         modalRightSheetLayout.render(
@@ -136,32 +133,49 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(White),
+                        .background(Color.White),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val list = (1..10).map { "Object $it" }
+                    val list1 = (1..8).map { "Object $it" }
+                    val list2 = (1..6).map { "Object $it" }
 
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(160.dp),
-                        contentPadding = PaddingValues(16.dp),
-                        content = {
-                            items(list.size) { index ->
-                                if (index < 5) {
-                                    CartAdvanced(
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(bottom = 28.dp)
+                        ) {
+                            TitleCategoryFileObject("Folders", list1.size)
+                            LazyVerticalGrid(
+                                columns = GridCells.Adaptive(160.dp)
+                            ) {
+                                items(list1.size) { index ->
+                                    CartFileObject(
                                         isDirectory = true,
                                         isFile = false,
-                                        text = list[index]
-                                    ).render()
-                                } else {
-                                    CartAdvanced(
-                                        isDirectory = false,
-                                        isFile = true,
-                                        text = list[index]
+                                        text = list1[index]
                                     ).render()
                                 }
                             }
                         }
-                    )
+
+                        Column {
+                            TitleCategoryFileObject("Files", list2.size)
+                            LazyVerticalGrid(
+                                columns = GridCells.Adaptive(160.dp)
+                            ) {
+                                items(list2.size) { index ->
+                                    CartFileObject(
+                                        isDirectory = false,
+                                        isFile = true,
+                                        text = list2[index]
+                                    ).render()
+                                }
+                            }
+                        }
+                    }
 
                     BreadCrumbs(
                         items = listOf(
@@ -189,7 +203,7 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
             .pointerHoverIcon(icon = PointerIcon.Hand)
 
         Column {
-            renderTitleInSectionForCardsModalSheet(Sections.MAIN_PROFILE.title)
+            TitleInSectionForCardsModalSheet(Sections.MAIN_PROFILE.title)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(5),
                 content = {
@@ -200,7 +214,7 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                                 onClickCardSheet(screen = Sections.MAIN_PROFILE.routes[index])
                             }
                         ).render {
-                            renderTextInCardModalSheet(Sections.MAIN_PROFILE.sections[index])
+                            TextInCardModalSheet(Sections.MAIN_PROFILE.sections[index])
                         }
                     }
                 }
@@ -213,7 +227,7 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
         )
 
         Column {
-            renderTitleInSectionForCardsModalSheet(Sections.USER_CONTROL.title)
+            TitleInSectionForCardsModalSheet(Sections.USER_CONTROL.title)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(5),
                 content = {
@@ -224,7 +238,7 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                                 onClickCardSheet(screen = Sections.USER_CONTROL.routes[index])
                             }
                         ).render {
-                            renderTextInCardModalSheet(Sections.USER_CONTROL.sections[index])
+                            TextInCardModalSheet(Sections.USER_CONTROL.sections[index])
                         }
                     }
                 }
@@ -237,7 +251,7 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
         )
 
         Column {
-            renderTitleInSectionForCardsModalSheet(Sections.USER_CUSTOMIZATION.title)
+            TitleInSectionForCardsModalSheet(Sections.USER_CUSTOMIZATION.title)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(5),
                 content = {
@@ -248,7 +262,7 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                                 onClickCardSheet(screen = Sections.USER_CUSTOMIZATION.routes[index])
                             }
                         ).render {
-                            renderTextInCardModalSheet(Sections.USER_CUSTOMIZATION.sections[index])
+                            TextInCardModalSheet(Sections.USER_CUSTOMIZATION.sections[index])
                         }
                     }
                 }
@@ -256,25 +270,46 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
         }
     }
 
-    @Composable
-    private fun renderTextInCardModalSheet(text: String = "") {
-        Text(
-            text = text,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp
-        )
-    }
-
-    @Composable
-    private fun renderTitleInSectionForCardsModalSheet(text: String = "") {
-        Text(
-            text = text,
-            modifier = Modifier
-                .padding(4.dp, 0.dp),
-            color = Colors.TEXT.color,
-            fontWeight = FontWeight.Bold
-        )
-    }
-
 }
+
+/**
+ * Base title for file object category
+ *
+ * @param text The text to be displayed
+ * @param size Count objects
+ */
+@Composable
+private fun TitleCategoryFileObject(text: String, size: Int = 0): Unit = Text(
+    text = "$text ($size)",
+    fontWeight = FontWeight.SemiBold,
+    color = Color.Black,
+    modifier = Modifier
+        .padding(bottom = 12.dp)
+)
+
+/**
+ * Text for user profile navigation element
+ *
+ * @param text The text to be displayed.
+ */
+@Composable
+private fun TextInCardModalSheet(text: String = "") = Text(
+    text = text,
+    textAlign = TextAlign.Center,
+    fontWeight = FontWeight.Medium,
+    fontSize = 14.sp
+)
+
+/**
+ * Header for profile settings section
+ *
+ * @param text The text to be displayed.
+ */
+@Composable
+private fun TitleInSectionForCardsModalSheet(text: String = ""): Unit = Text(
+    text = text,
+    modifier = Modifier
+        .padding(4.dp, 0.dp),
+    color = Colors.TEXT.color,
+    fontWeight = FontWeight.Bold
+)
