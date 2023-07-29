@@ -1,16 +1,7 @@
 package ui.theme
 
 import androidx.compose.material.Colors
-import androidx.compose.runtime.staticCompositionLocalOf
-
 import androidx.compose.ui.graphics.Color
-
-/**
- * Creates a complete color definition
- */
-fun lightColors() {
-
-}
 
 /**
  * Creates a complete color definition
@@ -43,5 +34,3 @@ fun darkColors(
     onError,
     false
 )
-
-val LocalColors = staticCompositionLocalOf { darkColors() }
