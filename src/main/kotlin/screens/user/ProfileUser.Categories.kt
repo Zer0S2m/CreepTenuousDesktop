@@ -1,6 +1,5 @@
 package screens.user
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -10,18 +9,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupPositionProvider
 import core.validation.NotEmptyValidator
 import dto.UserCategory
 import enums.Resources
@@ -31,7 +25,6 @@ import ui.components.base.BaseFormState
 import ui.components.fields.TextFieldAdvanced
 import ui.components.forms.Form
 import ui.components.forms.FormState
-import java.awt.event.KeyEvent
 
 /**
  * Rendering part of the user profile screen [Screen.PROFILE_CATEGORY_SCREEN]
@@ -95,12 +88,6 @@ fun ProfileUser.ProfileCategories.render() {
 private val stateForm: MutableState<BaseFormState> = mutableStateOf(FormState())
 
 /**
- * Text used by accessibility services to describe what this image represents
- */
-@Stable
-private val contentDescriptionDelete: String get() = "Delete category icon"
-
-/**
  * Custom category card. Extends a component [Card]
  *
  * @param text Display text
@@ -145,7 +132,7 @@ internal fun ProfileUser.ProfileCategories.ItemCategory(
 }
 
 /**
- * Modal window for creating a category. Extended component [Popup]
+ * Modal window for creating a category
  *
  * @param stateModal Modal window states for category creation
  * @param action [Button] click event
@@ -155,46 +142,17 @@ internal fun ProfileUser.ProfileCategories.ModalCreateCategory(
     stateModal: MutableState<Boolean>,
     action: () -> Unit
 ) {
-    if (stateModal.value) {
-        Popup(
-            popupPositionProvider = object : PopupPositionProvider {
-                override fun calculatePosition(
-                    anchorBounds: IntRect,
-                    windowSize: IntSize,
-                    layoutDirection: LayoutDirection,
-                    popupContentSize: IntSize
-                ): IntOffset = IntOffset.Zero
-            },
-            focusable = true,
-            onDismissRequest = { stateModal.value = false },
-            onKeyEvent = {
-                if (it.type == KeyEventType.KeyDown && it.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
-                    stateModal.value = false
-                    true
-                } else {
-                    false
-                }
-            }
+    BaseModalPopup(
+        stateModal = stateModal
+    ) {
+        Surface(
+            contentColor = contentColorFor(MaterialTheme.colors.surface),
+            modifier = Modifier
+                .width(360.dp)
+                .height(200.dp)
+                .shadow(24.dp, RoundedCornerShape(4.dp))
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.32f))
-                    .pointerInput({ stateModal.value = false }) {
-                        detectTapGestures(onPress = { stateModal.value = false })
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Surface(
-                    contentColor = contentColorFor(MaterialTheme.colors.surface),
-                    modifier = Modifier
-                        .width(360.dp)
-                        .height(200.dp)
-                        .shadow(24.dp, RoundedCornerShape(4.dp))
-                ) {
-                    ModalCreateCategoryContent(action = action)
-                }
-            }
+            ModalCreateCategoryContent(action = action)
         }
     }
 }

@@ -33,7 +33,7 @@ internal fun ProfileUser.ProfileListUsers.itemUser(
     nameUser: String = "",
     textRoleUser: String = ""
 ) {
-    baseCardForItemCardUser(
+    BaseCardForItemCardUser(
         nameUser = nameUser
     ) {
         Text(

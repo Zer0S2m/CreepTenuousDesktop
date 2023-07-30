@@ -42,12 +42,6 @@ fun ProfileUser.ProfileUserControl.render() {
  * Text used by accessibility services to describe what this image represents
  */
 @Stable
-private val contentDescriptionDelete: String get() = "Delete user icon"
-
-/**
- * Text used by accessibility services to describe what this image represents
- */
-@Stable
 private val contentDescriptionBlock: String get() = "User lock icon"
 
 /**
@@ -69,7 +63,7 @@ internal fun ProfileUser.ProfileUserControl.itemUser(
     nameUser: String = "",
     textRoleUser: String = ""
 ) {
-    baseCardForItemCardUser(
+    BaseCardForItemCardUser(
         nameUser = nameUser,
         fractionBaseInfoUser = 0.6f
     ) {
