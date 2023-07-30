@@ -20,7 +20,7 @@ fun App() {
     MaterialTheme(
         colors = darkColors()
     ) {
-        NavigationRail {
+        Surface {
             CollectScreenLoginUser(navigationController)
             CollectScreenSettingsSystem(navigationController)
             CollectScreenDashboard(navigationController)
