@@ -10,15 +10,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.*
 import core.validation.NotEmptyValidator
 import dto.UserCategory
-import enums.Resources
 import enums.Screen
 import screens.ProfileUser
 import ui.components.base.BaseFormState
@@ -98,36 +95,11 @@ internal fun ProfileUser.ProfileCategories.ItemCategory(
     text: String,
     action: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(8.dp)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(8.dp, 0.dp)
-        ) {
-            Text(
-                text = text
-            )
-
-            IconButton(
-                onClick = action,
-                modifier = Modifier
-                    .padding(4.dp)
-            ) {
-                Icon(
-                    painter = painterResource(resourcePath = Resources.ICON_DELETE.path),
-                    contentDescription = contentDescriptionDelete,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .pointerHoverIcon(PointerIcon.Hand),
-                    tint = Color.Red
-                )
-            }
-        }
+    BaseCardItemGrid {
+        Text(
+            text = text
+        )
+        IconButtonDelete(onClick = action)
     }
 }
 

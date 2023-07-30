@@ -15,10 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import enums.Resources
 import screens.ProfileUser
 import enums.Screen
 
@@ -87,39 +85,15 @@ internal fun ProfileUser.ProfileColors.ColorItem(
     color: Color,
     action: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(8.dp)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+    BaseCardItemGrid {
+        Box(
             modifier = Modifier
-                .padding(8.dp, 0.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(color = color, RoundedCornerShape(4.dp))
-                    .height(40.dp)
-                    .width(80.dp)
-            )
+                .background(color = color, RoundedCornerShape(4.dp))
+                .height(40.dp)
+                .width(80.dp)
+        )
 
-            IconButton(
-                onClick = action,
-                modifier = Modifier
-                    .padding(4.dp)
-            ) {
-                Icon(
-                    painter = painterResource(resourcePath = Resources.ICON_DELETE.path),
-                    contentDescription = contentDescriptionDelete,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .pointerHoverIcon(PointerIcon.Hand),
-                    tint = Color.Red
-                )
-            }
-        }
+        IconButtonDelete(onClick = action)
     }
 }
 

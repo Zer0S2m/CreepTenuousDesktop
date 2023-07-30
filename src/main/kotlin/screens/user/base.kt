@@ -10,15 +10,18 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.awtEventOrNull
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
+import enums.Resources
 import ui.components.misc.Avatar
 import java.awt.event.KeyEvent
 
@@ -140,3 +143,53 @@ internal fun BaseModalPopup(
  */
 @Stable
 internal val contentDescriptionDelete: String get() = "Delete item icon"
+
+/**
+ * The base component for displaying a basic item grid card. Extends a component [Card]
+ *
+ * @param modifier The modifier to be applied to the [Row]
+ * @param content Inner content of the component
+ */
+@Composable
+internal fun BaseCardItemGrid(
+    modifier: Modifier = Modifier
+        .padding(8.dp, 0.dp),
+    content: @Composable () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(8.dp)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+        ) {
+            content()
+        }
+    }
+}
+
+/**
+ * Base element removal component. Extends a component [IconButton]
+ *
+ * @param onClick The lambda to be invoked when this icon is pressed [IconButton]
+ */
+@Composable
+internal fun IconButtonDelete(onClick: () -> Unit) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier
+            .padding(start = 4.dp, top = 4.dp, end = 0.dp, bottom = 4.dp)
+    ) {
+        Icon(
+            painter = painterResource(resourcePath = Resources.ICON_DELETE.path),
+            contentDescription = contentDescriptionDelete,
+            modifier = Modifier
+                .size(24.dp)
+                .pointerHoverIcon(PointerIcon.Hand),
+            tint = Color.Red
+        )
+    }
+}
