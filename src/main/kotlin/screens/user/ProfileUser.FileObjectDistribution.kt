@@ -41,7 +41,7 @@ fun ProfileUser.ProfileFileObjectDistribution.render() {
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                baseTitle("Delete them if necessary (has the highest priority)")
+                BaseTitle("Delete them if necessary (has the highest priority)")
                 switch()
             }
         }
@@ -55,7 +55,7 @@ fun ProfileUser.ProfileFileObjectDistribution.render() {
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                baseTitle("Passing objects to an assigned user")
+                BaseTitle("Passing objects to an assigned user")
                 SelectUserDropMenu()
             }
         }
@@ -68,7 +68,7 @@ fun ProfileUser.ProfileFileObjectDistribution.render() {
  * @param text The text to be displayed
  */
 @Composable
-private fun baseTitle(text: String) = Text(
+private fun BaseTitle(text: String) = Text(
     text = text,
     color = Color.Black,
     fontSize = 16.sp,

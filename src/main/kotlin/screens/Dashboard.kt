@@ -149,7 +149,9 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                         ) {
                             TitleCategoryFileObject("Folders", list1.size)
                             LazyVerticalGrid(
-                                columns = GridCells.Adaptive(160.dp)
+                                columns = GridCells.Adaptive(160.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 items(list1.size) { index ->
                                     CartFileObject(
@@ -164,7 +166,9 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                         Column {
                             TitleCategoryFileObject("Files", list2.size)
                             LazyVerticalGrid(
-                                columns = GridCells.Adaptive(160.dp)
+                                columns = GridCells.Adaptive(160.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 items(list2.size) { index ->
                                     CartFileObject(

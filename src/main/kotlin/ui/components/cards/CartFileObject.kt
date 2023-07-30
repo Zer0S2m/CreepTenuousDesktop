@@ -115,7 +115,6 @@ class CartFileObject(
         Card(
             backgroundColor = animatedCardColor.value,
             modifier = Modifier
-                .padding(6.dp)
                 .fillMaxWidth()
                 .hoverable(interactionSource = interactionSource)
                 .pointerHoverIcon(icon = PointerIcon.Hand),
