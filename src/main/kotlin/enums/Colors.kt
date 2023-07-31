@@ -24,6 +24,6 @@ enum class Colors(val color: Color) {
 
     SECONDARY(Color(0xff5c5470)),
 
-    SECONDARY_VARIANT(Color(red = 219, green = 216, blue = 227))
+    SECONDARY_VARIANT(Color(0xff395b64))
 
 }

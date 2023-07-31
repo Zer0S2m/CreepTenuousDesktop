@@ -129,7 +129,7 @@ private fun UserLoginTextField(
     val isHover: MutableState<Boolean> = remember { mutableStateOf(false) }
     val animatedCardColor = setAnimateColorAsStateInSelectUser(
         isHover = isHover,
-        backgroundHover = Colors.SECONDARY_VARIANT.color
+        backgroundHover = Colors.SECONDARY_VARIANT.color.copy(0.1f)
     )
 
     setHoverInSelectUser(
@@ -194,7 +194,7 @@ private fun DropdownMenuSelectUser(
         modifier = Modifier
             .width(baseWidthColumnSelectUser)
             .padding(0.dp)
-            .background(Colors.SECONDARY.color)
+            .background(Colors.SECONDARY_VARIANT.color)
     ) {
         selectUseItems.forEachIndexed { index, item ->
             DropdownMenuItemSelectUser(expandedStates, selectedUserItem, index) {

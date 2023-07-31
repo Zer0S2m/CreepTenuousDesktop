@@ -1,15 +1,22 @@
 package screens.user
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.toMutableStateList
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dto.GrantedRight
 import enums.Screen
 import enums.TypeFileObject
@@ -61,12 +68,20 @@ fun ProfileUser.ProfileGrantedRights.render() {
 }
 
 /**
+ * Selected right for later deletion
+ */
+@Stable
+private var contextSelectDeleteRight: MutableList<TypeRight> = mutableListOf()
+
+/**
  * Basic grant card for interacting with file objects
  */
 @Composable
 internal fun ProfileUser.ProfileGrantedRights.ItemGrantedRight(
     item: GrantedRight
 ) {
+    val stateModal: MutableState<Boolean> = remember { mutableStateOf(false) }
+
     BaseCardItemGrid(
         modifier = Modifier
             .padding(8.dp)
@@ -99,6 +114,111 @@ internal fun ProfileUser.ProfileGrantedRights.ItemGrantedRight(
             }
         }
 
-        IconButtonDelete(onClick = {})
+        IconButtonDelete(onClick = {
+            stateModal.value = true
+            contextSelectDeleteRight.clear()
+            contextSelectDeleteRight.addAll(item.typeRight)
+        })
     }
+
+    PopupDeleteRight(stateModal = stateModal)
+}
+
+/**
+ * Modal window for selecting right removal
+ *
+ * @param stateModal Modal window states for category creation
+ */
+@Composable
+private fun PopupDeleteRight(
+    stateModal: MutableState<Boolean>
+) {
+    BaseModalPopup(
+        stateModal = stateModal
+    ) {
+        Surface(
+            contentColor = contentColorFor(MaterialTheme.colors.surface),
+            modifier = Modifier
+                .width(360.dp)
+                .height(500.dp)
+                .shadow(24.dp, RoundedCornerShape(4.dp))
+        ) {
+            PopupDeleteRightContent()
+        }
+    }
+}
+
+@Composable
+private fun PopupDeleteRightContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .pointerInput({}) {
+                detectTapGestures(onPress = {
+                    // Workaround to disable clicks on Surface background
+                    // https://github.com/JetBrains/compose-jb/issues/2581
+                })
+            }
+    ) {
+        Text(
+            text = "Removing rights",
+            fontSize = 20.sp
+        )
+        Column(
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .fillMaxWidth()
+        ) {
+            contextSelectDeleteRight.forEach { item ->
+                PopupItemDeleteRight(item)
+            }
+        }
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .pointerHoverIcon(PointerIcon.Hand)
+                .padding(top = 8.dp),
+            onClick = {}
+        ) {
+            Text("Delete")
+        }
+    }
+}
+
+/**
+ * Right element to delete
+ *
+ * @param typeRight Type of right to delete
+ */
+@Composable
+private fun PopupItemDeleteRight(typeRight: TypeRight) {
+    val checkedState: MutableState<Boolean> = remember { mutableStateOf(false) }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp, 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = typeRight.title,
+                fontWeight = FontWeight.Medium
+            )
+
+            Checkbox(
+                checked = checkedState.value,
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand),
+                onCheckedChange = { checkedState.value = it }
+            )
+        }
+    }
+
+    Divider(thickness = 1.dp)
 }

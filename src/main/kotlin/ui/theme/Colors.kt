@@ -9,8 +9,8 @@ import androidx.compose.ui.graphics.Color
 fun darkColors(
     primary: Color = Color(0xffa5c9ca),
     primaryVariant: Color = Color(0xff395b64),
-    secondary: Color = Color(0xff5c5470),
-    secondaryVariant: Color = Color(0xff5c5470),
+    secondary: Color = Color(0xffa5c9ca),
+    secondaryVariant: Color = Color(0xff395b64),
     background: Color = Color(red = 48, green = 48, blue = 48),
     surface: Color = Color(red = 48, green = 48, blue = 48),
     error: Color = Color(0xFFCF6679),
