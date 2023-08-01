@@ -15,6 +15,6 @@ data class User(
 
     val login: String,
 
-    val role: Collection<UserRole>
+    val role: List<UserRole>
 
 )

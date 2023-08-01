@@ -18,6 +18,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import core.reactive.ReactiveCommon
 import enums.Resources
 import enums.Screen
 import screens.ProfileUser
@@ -31,10 +32,9 @@ fun ProfileUser.ProfileUserControl.render() {
         modifier = Modifier
             .fillMaxSize()
     ) {
-        itemUser(nameUser = "Name user 1", textRoleUser = "USER")
-        itemUser(nameUser = "Name user 2", textRoleUser = "USER")
-        itemUser(nameUser = "Name user 3", textRoleUser = "USER")
-        itemUser(nameUser = "Name user 4", textRoleUser = "ADMIN")
+        ReactiveCommon.systemUsers.forEach {
+            itemUser(nameUser = it.name, loginUser = it.login, roleUser = it.role[0].title)
+        }
     }
 }
 
@@ -55,16 +55,19 @@ private val baseModifierIcon: Modifier get() = Modifier
 /**
  * The main card to show the user in the system
  *
- * @param nameUser The text to be displayed.
- * @param textRoleUser The text to be displayed.
+ * @param nameUser Username.
+ * @param loginUser Login user..
+ * @param roleUser Role.
  */
 @Composable
 internal fun ProfileUser.ProfileUserControl.itemUser(
-    nameUser: String = "",
-    textRoleUser: String = ""
+    nameUser: String,
+    loginUser: String,
+    roleUser: String
 ) {
     BaseCardForItemCardUser(
         nameUser = nameUser,
+        loginUser = loginUser,
         fractionBaseInfoUser = 0.6f
     ) {
         Row(
@@ -80,7 +83,7 @@ internal fun ProfileUser.ProfileUserControl.itemUser(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Role - $textRoleUser"
+                    text = "Role - $roleUser"
                 )
             }
             BaseTooltipAreaForItemUser(text = "User blocking") {

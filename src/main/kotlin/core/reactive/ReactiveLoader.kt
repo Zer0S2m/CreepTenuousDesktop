@@ -1,7 +1,7 @@
 package core.reactive
 
 import androidx.compose.runtime.Stable
-import core.errors.LoaderException
+import core.errors.ReactiveLoaderException
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
 import kotlin.reflect.full.*
@@ -85,7 +85,7 @@ internal suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
                     handler = annotationReactive.handler
                 )
             } else if (kProperty.hasAnnotation<Lazy<Any>>() && kProperty.hasAnnotation<Reactive<Any>>()) {
-                throw LoaderException("Parameter [${kProperty.name}] must have only one annotation")
+                throw ReactiveLoaderException("Parameter [${kProperty.name}] must have only one annotation")
             }
         }
     }

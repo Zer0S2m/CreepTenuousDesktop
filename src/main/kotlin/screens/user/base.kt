@@ -28,13 +28,15 @@ import java.awt.event.KeyEvent
 /**
  * Basic card for user interaction in the system. Extends a component [Card]
  *
- * @param nameUser The text to be displayed
+ * @param nameUser Username
+ * @param loginUser Login user
  * @param fractionBaseInfoUser ave the content fill [Modifier.fillMaxHeight] basic user information
  * @param content Map internal content
  */
 @Composable
 internal fun BaseCardForItemCardUser(
     nameUser: String,
+    loginUser: String,
     fractionBaseInfoUser: Float = 0.8f,
     content: @Composable () -> Unit
 ) {
@@ -57,7 +59,7 @@ internal fun BaseCardForItemCardUser(
                     .fillMaxWidth(fractionBaseInfoUser),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                baseInfoForItemCardUser(text = nameUser)
+                baseInfoForItemCardUser(name = nameUser, login = loginUser)
             }
             Row(
                 horizontalArrangement = Arrangement.Start,
@@ -74,10 +76,11 @@ internal fun BaseCardForItemCardUser(
 /**
  * Basic information about the user. Uses component [Avatar], [Text]
  *
- * @param text The text to be displayed
+ * @param name Username
+ * @param login Login user
  */
 @Composable
-private fun baseInfoForItemCardUser(text: String) {
+private fun baseInfoForItemCardUser(name: String, login: String) {
     Avatar(
         modifierIcon = Modifier
             .size(32.dp)
@@ -85,7 +88,7 @@ private fun baseInfoForItemCardUser(text: String) {
             .padding(0.dp)
     ).render()
     Text(
-        text = text,
+        text = "$name ($login)",
         modifier = Modifier
             .padding(start = 8.dp)
     )

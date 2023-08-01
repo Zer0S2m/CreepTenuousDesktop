@@ -7,4 +7,4 @@ import core.reactive.Loader
  *
  * @param message Error message
  */
-class LoaderException (message: String) : Exception(message)
+class ReactiveLoaderException (message: String) : Exception(message)
