@@ -9,6 +9,9 @@ import core.navigation.graphs.CollectScreenLoginUser
 import core.navigation.graphs.CollectScreenProfileUser
 import core.navigation.graphs.CollectScreenSettingsSystem
 import core.navigation.runtime.rememberNavigationController
+import core.reactive.ReactiveCommon
+import core.reactive.ReactiveUser
+import core.reactive.collectLoader
 import enums.Screen
 import ui.theme.darkColors
 
@@ -27,4 +30,12 @@ fun App() {
             CollectScreenProfileUser(navigationController)
         }
     }
+
+    collectLoader(
+        classes = listOf(
+            ReactiveUser.UserSettings,
+            ReactiveUser.GrantedRights,
+            ReactiveCommon
+        )
+    )
 }

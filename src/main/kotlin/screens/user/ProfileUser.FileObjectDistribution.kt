@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import core.reactive.ReactiveCommon
+import core.reactive.ReactiveUser
 import enums.Colors
 import enums.Resources
 import enums.Screen
@@ -80,12 +82,19 @@ private fun BaseTitle(text: String) = Text(
  */
 @Composable
 internal fun ProfileUser.ProfileFileObjectDistribution.switch() {
-    val checkedState = remember { mutableStateOf(true) }
+    val isDeletingFilesWhenDeletingUser: Boolean =
+        if (ReactiveUser.UserSettings.isDeletingFilesWhenDeletingUser == null) false
+        else ReactiveUser.UserSettings.isDeletingFilesWhenDeletingUser!!
+    val checkedState = remember { mutableStateOf(isDeletingFilesWhenDeletingUser) }
+
     Switch(
         checked = checkedState.value,
         modifier = Modifier
             .pointerHoverIcon(icon = PointerIcon.Hand),
-        onCheckedChange = { checkedState.value = it }
+        onCheckedChange = {
+            checkedState.value = it
+            ReactiveUser.UserSettings.isDeletingFilesWhenDeletingUser = it
+        }
     )
 }
 
@@ -103,7 +112,7 @@ internal fun ProfileUser.ProfileFileObjectDistribution.SelectUserDropMenu() {
             .padding(top = 12.dp)
     ) {
         if (selectedUserItem.value != -1) {
-            textState.value = selectUseItems[selectedUserItem.value]
+            textState.value = ReactiveCommon.systemUsers[selectedUserItem.value].name
             UserLoginTextField(text = textState, selectedUserItem = selectedUserItem)
         } else {
             UserLoginTextField(text = textState, selectedUserItem = selectedUserItem)
@@ -196,9 +205,9 @@ private fun DropdownMenuSelectUser(
             .padding(0.dp)
             .background(Colors.SECONDARY_VARIANT.color)
     ) {
-        selectUseItems.forEachIndexed { index, item ->
+        ReactiveCommon.systemUsers.forEachIndexed { index, item ->
             DropdownMenuItemSelectUser(expandedStates, selectedUserItem, index) {
-                Text(item, color = Color.White)
+                Text(item.name, color = Color.White)
             }
         }
     }
@@ -209,7 +218,7 @@ private fun DropdownMenuSelectUser(
  *
  * @param expandedStates Whether the menu is currently open and visible to the user
  * @param selectedUserItem State of the selected user from the list by his index
- * @param index Index of an element from a list [selectUseItems]
+ * @param index Index of an element from a list [ReactiveCommon.systemUsers]
  * @param content Internal block content
  */
 @Composable
@@ -243,13 +252,3 @@ private val contentDescriptionIconArrow: String get() = "Open user list"
  */
 @get:ReadOnlyComposable
 private val baseWidthColumnSelectUser: Dp get() = 200.dp
-
-/**
- * User choice list
- */
-@get:ReadOnlyComposable
-private val selectUseItems: List<String> get() = listOf(
-    "User name 1",
-    "User name 2",
-    "User name 3"
-)
