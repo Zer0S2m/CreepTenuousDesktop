@@ -3,7 +3,9 @@ package core.reactive
 import kotlin.reflect.KClass
 
 /**
- * The annotation defines that the data will be loaded at a certain moment
+ * The annotation defines that the data will be loaded at a certain moment.
+ *
+ * Before specifying an annotation before a property, it is required to exclude `final`.
  */
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)

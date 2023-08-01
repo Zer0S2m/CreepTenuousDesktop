@@ -2,12 +2,22 @@ package core.reactive
 
 import core.handlers.HandlerLazyUserSettingsDeleteFiles
 import core.handlers.HandlerLazyUserSettingsPassingFiles
+import core.handlers.HandlerReactiveUserCustomCategories
 import dto.User
+import dto.UserCategory
 
 /**
  * `Reactive` behavior user model
  */
 object ReactiveUser : ReactiveLazyObject {
+
+    /**
+     * Custom categories for the user
+     */
+    @Reactive<MutableCollection<UserCategory>>(
+        handler = HandlerReactiveUserCustomCategories::class
+    )
+    var customCategories: MutableCollection<UserCategory> = mutableListOf()
 
     /**
      * Storage of user settings

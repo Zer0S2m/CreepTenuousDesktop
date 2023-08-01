@@ -4,6 +4,8 @@ import kotlin.reflect.KClass
 
 /**
  * The annotation specifies that the data will be loaded when the application starts.
+ *
+ * Before specifying an annotation before a property, it is required to exclude `final`.
  */
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)

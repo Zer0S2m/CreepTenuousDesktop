@@ -14,6 +14,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.*
+import core.reactive.ReactiveUser
 import core.validation.NotEmptyValidator
 import dto.UserCategory
 import enums.Screen
@@ -30,8 +31,8 @@ import ui.components.forms.FormState
 fun ProfileUser.ProfileCategories.render() {
     val openModalCreateCategory: MutableState<Boolean> = remember { mutableStateOf(false) }
 
-    val listCategories: MutableList<String> = remember {
-        (1 .. 7).map { "Category $it" }.toMutableStateList()
+    val listCategories: MutableList<UserCategory> = remember {
+        ReactiveUser.customCategories.toMutableStateList()
     }
 
     Column(
@@ -59,7 +60,7 @@ fun ProfileUser.ProfileCategories.render() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(listCategories.size) { index ->
-                    ItemCategory(listCategories[index]) {
+                    ItemCategory(listCategories[index].title) {
                         listCategories.removeAt(index)
                     }
                 }
@@ -73,7 +74,7 @@ fun ProfileUser.ProfileCategories.render() {
             val data = UserCategory(
                 title = dataForm["title"].toString()
             )
-            listCategories.add(data.title)
+            listCategories.add(UserCategory(title = data.title))
         }
     }
 }

@@ -37,6 +37,7 @@ fun App() {
     coroutineScope.launch {
         collectLoader(
             classes = listOf(
+                ReactiveUser,
                 ReactiveUser.UserSettings,
                 ReactiveUser.GrantedRights,
                 ReactiveCommon
