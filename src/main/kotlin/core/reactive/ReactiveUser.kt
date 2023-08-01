@@ -1,10 +1,9 @@
 package core.reactive
 
-import core.handlers.HandlerLazyUserSettingsDeleteFiles
-import core.handlers.HandlerLazyUserSettingsPassingFiles
+import core.handlers.HandlerUserSettingsFileObjectDistribution
 import core.handlers.HandlerReactiveUserCustomCategories
-import dto.User
 import dto.UserCategory
+import dto.UserSettingsFileObjectDistribution
 
 /**
  * `Reactive` behavior user model
@@ -25,28 +24,18 @@ object ReactiveUser : ReactiveLazyObject {
     object UserSettings : ReactiveLazyObject {
 
         /**
-         * Whether to delete file objects when deleting a user
+         * Basic settings for the distribution of file objects
          */
-        @Lazy<Boolean?>(
+        @Lazy<UserSettingsFileObjectDistribution>(
             event = "Go to the user settings in the section - File object distribution settings",
-            handler = HandlerLazyUserSettingsDeleteFiles::class
+            handler = HandlerUserSettingsFileObjectDistribution::class
         )
-        var isDeletingFilesWhenDeletingUser: Boolean? = null
-            set(isDeleting) {
-                field = isDeleting
+        var userSettingsFileObjectDistribution: UserSettingsFileObjectDistribution =
+            UserSettingsFileObjectDistribution(null, null)
+            set(settings) {
+                field = settings
             }
 
-        /**
-         * Transfer file objects to assigned user if their owner leaves
-         */
-        @Lazy<User?>(
-            event = "Go to the user settings in the section - File object distribution settings",
-            handler = HandlerLazyUserSettingsPassingFiles::class
-        )
-        var passingFilesToUser: User? = null
-            set(user) {
-                field = user
-            }
     }
 
     object GrantedRights : ReactiveLazyObject {

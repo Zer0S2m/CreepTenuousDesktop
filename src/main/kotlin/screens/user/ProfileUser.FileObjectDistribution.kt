@@ -34,8 +34,7 @@ import ui.animations.setHoverInSelectUser
 fun ProfileUser.ProfileFileObjectDistribution.render() {
     val coroutineScope = rememberCoroutineScope()
     coroutineScope.launch {
-        Loader.load<Boolean>("isDeletingFilesWhenDeletingUser")
-        Loader.load<Boolean>("passingFilesToUser")
+        Loader.load<Boolean>("userSettingsFileObjectDistribution")
     }
 
     Column(
@@ -91,8 +90,7 @@ private fun BaseTitle(text: String) = Text(
 @Composable
 internal fun ProfileUser.ProfileFileObjectDistribution.switch() {
     val isDeletingFilesWhenDeletingUser: Boolean =
-        if (ReactiveUser.UserSettings.isDeletingFilesWhenDeletingUser == null) false
-        else ReactiveUser.UserSettings.isDeletingFilesWhenDeletingUser!!
+        ReactiveUser.UserSettings.userSettingsFileObjectDistribution.isDeletingFilesWhenDeletingUser!!
     val checkedState = remember { mutableStateOf(isDeletingFilesWhenDeletingUser) }
 
     Switch(
@@ -101,7 +99,7 @@ internal fun ProfileUser.ProfileFileObjectDistribution.switch() {
             .pointerHoverIcon(icon = PointerIcon.Hand),
         onCheckedChange = {
             checkedState.value = it
-            ReactiveUser.UserSettings.isDeletingFilesWhenDeletingUser = it
+            ReactiveUser.UserSettings.userSettingsFileObjectDistribution.isDeletingFilesWhenDeletingUser = it
         }
     )
 }
@@ -111,7 +109,9 @@ internal fun ProfileUser.ProfileFileObjectDistribution.switch() {
  */
 @Composable
 internal fun ProfileUser.ProfileFileObjectDistribution.SelectUserDropMenu() {
-    val selectedUserItem: MutableState<Int> = remember { mutableStateOf(-1) }
+    val selectedUserItem: MutableState<String?> = remember { mutableStateOf(
+        ReactiveUser.UserSettings.userSettingsFileObjectDistribution.passingFilesToUser
+    ) }
     val textState: MutableState<String> = remember { mutableStateOf("") }
 
     Column(
@@ -119,12 +119,10 @@ internal fun ProfileUser.ProfileFileObjectDistribution.SelectUserDropMenu() {
             .width(baseWidthColumnSelectUser)
             .padding(top = 12.dp)
     ) {
-        if (selectedUserItem.value != -1) {
-            textState.value = ReactiveCommon.systemUsers[selectedUserItem.value].name
-            UserLoginTextField(text = textState, selectedUserItem = selectedUserItem)
-        } else {
-            UserLoginTextField(text = textState, selectedUserItem = selectedUserItem)
-        }
+        textState.value = ReactiveCommon.systemUsers.find {
+            it.login == selectedUserItem.value
+        }?.name ?: ""
+        UserLoginTextField(text = textState, selectedUserItem = selectedUserItem)
     }
 }
 
@@ -132,13 +130,13 @@ internal fun ProfileUser.ProfileFileObjectDistribution.SelectUserDropMenu() {
  * Base field for displaying the user's login when its value is selected
  *
  * @param text the input [String] text to be shown in the text field
- * @param selectedUserItem State of the selected user from the list by his index
+ * @param selectedUserItem State of the selected user from the list by his login
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun UserLoginTextField(
     text: MutableState<String>,
-    selectedUserItem: MutableState<Int>
+    selectedUserItem: MutableState<String?>
 ) {
     val expandedStates: MutableState<Boolean> = remember { mutableStateOf(false) }
 
@@ -195,27 +193,26 @@ private fun UserLoginTextField(
  * User select dropdown
  *
  * @param expandedStates Whether the menu is currently open and visible to the user
- * @param selectedUserItem State of the selected user from the list by his index
+ * @param selectedUserItem State of the selected user from the list by his login
  */
 @Composable
 private fun DropdownMenuSelectUser(
     expandedStates: MutableState<Boolean>,
-    selectedUserItem: MutableState<Int>,
+    selectedUserItem: MutableState<String?>,
 ) {
     DropdownMenu(
         expanded = expandedStates.value,
         onDismissRequest = {
             expandedStates.value = false
-            println(selectedUserItem)
         },
         modifier = Modifier
             .width(baseWidthColumnSelectUser)
             .padding(0.dp)
             .background(Colors.SECONDARY_VARIANT.color)
     ) {
-        ReactiveCommon.systemUsers.forEachIndexed { index, item ->
-            DropdownMenuItemSelectUser(expandedStates, selectedUserItem, index) {
-                Text(item.name, color = Color.White)
+        ReactiveCommon.systemUsers.forEach { user ->
+            DropdownMenuItemSelectUser(expandedStates, selectedUserItem, user.login) {
+                Text(user.name, color = Color.White)
             }
         }
     }
@@ -225,20 +222,21 @@ private fun DropdownMenuSelectUser(
  * The base element for selecting a user from a drop-down list
  *
  * @param expandedStates Whether the menu is currently open and visible to the user
- * @param selectedUserItem State of the selected user from the list by his index
- * @param index Index of an element from a list [ReactiveCommon.systemUsers]
+ * @param selectedUserItem State of the selected user from the list by his login
+ * @param newUser The new selected user. His login from [ReactiveCommon.systemUsers]
  * @param content Internal block content
  */
 @Composable
 private fun DropdownMenuItemSelectUser(
     expandedStates: MutableState<Boolean>,
-    selectedUserItem: MutableState<Int>,
-    index: Int,
+    selectedUserItem: MutableState<String?>,
+    newUser: String,
     content: @Composable () -> Unit
 ) {
     DropdownMenuItem(
         onClick = {
-            selectedUserItem.value = index
+            ReactiveUser.UserSettings.userSettingsFileObjectDistribution.passingFilesToUser = newUser
+            selectedUserItem.value = newUser
             expandedStates.value = false
         },
         modifier = Modifier

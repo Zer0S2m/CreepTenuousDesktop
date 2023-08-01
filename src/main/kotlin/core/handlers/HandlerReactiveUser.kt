@@ -2,37 +2,30 @@ package core.handlers
 
 import core.http.HttpClient
 import core.reactive.ReactiveHandler
-import dto.User
 import dto.UserCategory
+import dto.UserSettingsFileObjectDistribution
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 
-object HandlerLazyUserSettingsDeleteFiles : ReactiveHandler<Boolean?> {
+/**
+ * Lazy handler for getting data about file object distribution settings
+ */
+object HandlerUserSettingsFileObjectDistribution : ReactiveHandler<UserSettingsFileObjectDistribution> {
 
     /**
      * Process reactive property
      *
      * @return result
      */
-    override suspend fun handler(): Boolean {
-        return true
+    override suspend fun handler(): UserSettingsFileObjectDistribution {
+        return HttpClient.client.get("/api/v1/user/profile").body()
     }
 
 }
 
-object HandlerLazyUserSettingsPassingFiles : ReactiveHandler<User?> {
-
-    /**
-     * Process reactive property
-     *
-     * @return result
-     */
-    override suspend fun handler(): User? {
-        return null
-    }
-
-}
-
+/**
+ * Reactive handler for getting data about custom categories
+ */
 object HandlerReactiveUserCustomCategories : ReactiveHandler<MutableCollection<UserCategory>> {
 
     /**
