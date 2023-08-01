@@ -12,6 +12,6 @@ fun interface ReactiveHandler<T> {
      *
      * @return result
      */
-    fun handler(): T
+    suspend fun handler(): T
 
 }

@@ -37,7 +37,7 @@ private const val HANDLER_NAME = "handler"
 /**
  * Main data loader
  */
-class Loader {
+object Loader {
 
     fun load() {
 
@@ -50,7 +50,7 @@ class Loader {
  *
  * @param classes Reactive classes for collecting data
  */
-internal fun collectLoader(classes: Collection<ReactiveLazyObject>) {
+internal suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
     classes.forEach { reactiveLazyObject ->
         reactiveLazyObject::class.memberProperties.forEach { kProperty ->
             val annotationLazy = kProperty.findAnnotation<Lazy<Any>>()
@@ -83,8 +83,8 @@ internal fun collectLoader(classes: Collection<ReactiveLazyObject>) {
 /**
  * Set reactive values via map
  */
-private fun setReactiveValues() {
-    map.forEach { (key, value) ->
+private suspend fun setReactiveValues() {
+    map.forEach { (_, value) ->
         if (value.isReactive) {
             val field = value.field
             val method = value.handler.declaredMemberFunctions.find {
@@ -92,7 +92,7 @@ private fun setReactiveValues() {
             }
             if (method != null) {
                 field.isAccessible = true
-                field.set(value.reactiveLazyObject, method.call(value.handler.objectInstance))
+                field.set(value.reactiveLazyObject, method.callSuspend(value.handler.objectInstance))
             }
         }
     }

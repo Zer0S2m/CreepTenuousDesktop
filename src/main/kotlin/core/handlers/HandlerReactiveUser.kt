@@ -10,7 +10,7 @@ object HandlerLazyUserSettingsDeleteFiles : ReactiveHandler<Boolean?> {
      *
      * @return result
      */
-    override fun handler(): Boolean {
+    override suspend fun handler(): Boolean {
         return true
     }
 
@@ -23,7 +23,7 @@ object HandlerLazyUserSettingsPassingFiles : ReactiveHandler<User?> {
      *
      * @return result
      */
-    override fun handler(): User? {
+    override suspend fun handler(): User? {
         return null
     }
 
