@@ -16,11 +16,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import core.reactive.Loader
 import core.reactive.ReactiveCommon
 import core.reactive.ReactiveUser
 import enums.Colors
 import enums.Resources
 import enums.Screen
+import kotlinx.coroutines.launch
 import screens.ProfileUser
 import ui.animations.setAnimateColorAsStateInSelectUser
 import ui.animations.setHoverInSelectUser
@@ -30,6 +32,12 @@ import ui.animations.setHoverInSelectUser
  */
 @Composable
 fun ProfileUser.ProfileFileObjectDistribution.render() {
+    val coroutineScope = rememberCoroutineScope()
+    coroutineScope.launch {
+        Loader.load<Boolean>("isDeletingFilesWhenDeletingUser")
+        Loader.load<Boolean>("passingFilesToUser")
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -39,8 +39,21 @@ private const val HANDLER_NAME = "handler"
  */
 object Loader {
 
-    fun load() {
-
+    /**
+     * Load a single property of lazy behavior from the map of objects that are collected with [collectLoader]
+     *
+     * @param T The return type of the object specified in [ReactiveHandler.handler]
+     * @param nameProperty The name of the lazy behavior property is specified using an annotation [Lazy]
+     */
+    @Suppress("UNCHECKED_CAST")
+    suspend fun <T> load(nameProperty: String): T? {
+        val lazyObject: ReactiveLazy? = map[nameProperty]
+        if (lazyObject != null) {
+            val field = lazyObject.field
+            setReactiveValue(reactiveLazyObject = lazyObject)
+            return field.get(lazyObject.reactiveLazyObject) as T
+        }
+        return null
     }
 
 }
@@ -85,15 +98,23 @@ internal suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
  */
 private suspend fun setReactiveValues() {
     map.forEach { (_, value) ->
-        if (value.isReactive) {
-            val field = value.field
-            val method = value.handler.declaredMemberFunctions.find {
-                it.name == HANDLER_NAME
-            }
-            if (method != null) {
-                field.isAccessible = true
-                field.set(value.reactiveLazyObject, method.callSuspend(value.handler.objectInstance))
-            }
-        }
+        setReactiveValue(reactiveLazyObject = value)
+    }
+}
+
+/**
+ * Set reactive value via map
+ */
+private suspend fun setReactiveValue(reactiveLazyObject: ReactiveLazy) {
+    val field = reactiveLazyObject.field
+    val method = reactiveLazyObject.handler.declaredMemberFunctions.find {
+        it.name == HANDLER_NAME
+    }
+    if (method != null) {
+        field.isAccessible = true
+        field.set(
+            reactiveLazyObject.reactiveLazyObject,
+            method.callSuspend(reactiveLazyObject.handler.objectInstance)
+        )
     }
 }
