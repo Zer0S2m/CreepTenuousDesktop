@@ -68,13 +68,15 @@ fun ProfileUser.ProfileCategories.render() {
         }
 
         ModalCreateCategory(stateModal = openModalCreateCategory) {
-            openModalCreateCategory.value = false
+            if (stateForm.value.validateForm()) {
+                openModalCreateCategory.value = false
 
-            val dataForm = stateForm.value.getData()
-            val data = UserCategory(
-                title = dataForm["title"].toString()
-            )
-            listCategories.add(UserCategory(title = data.title))
+                val dataForm = stateForm.value.getData()
+                val data = UserCategory(
+                    title = dataForm["title"].toString()
+                )
+                listCategories.add(UserCategory(title = data.title))
+            }
         }
     }
 }
