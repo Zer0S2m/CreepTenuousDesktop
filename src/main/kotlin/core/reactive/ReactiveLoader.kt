@@ -1,6 +1,5 @@
 package core.reactive
 
-import androidx.compose.runtime.Stable
 import core.errors.ReactiveLoaderException
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
@@ -9,7 +8,6 @@ import kotlin.reflect.full.*
 /**
  * the main storage of values that will be loaded or will be loaded
  */
-@Stable
 private val map: MutableMap<String, ReactiveLazy> = mutableMapOf()
 
 /**

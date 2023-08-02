@@ -1,13 +1,11 @@
 package enums
 
-import core.actions.ActionNavigation
-
 /**
  * The main storage of the main names of navigation blocks
  *
  * @param title Name of the sectional block
  * @param sections Basic name blocks
- * @param routes Routes to change the current state of the screen through an action [ActionNavigation.action]
+ * @param routes Routes to change the current state of the screen through an action
  */
 enum class Sections(val title: String, val sections: List<String>, val routes: List<Screen>) {
 

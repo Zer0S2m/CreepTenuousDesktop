@@ -5,5 +5,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "CreepTenuousDesktop"
+include("common")
 
+rootProject.name = "CreepTenuousDesktop"
