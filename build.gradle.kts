@@ -1,15 +1,12 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.3.2"
-
 plugins {
     kotlin("jvm") version "1.8.0"
-    kotlin("plugin.serialization") version "1.8.0"
     id("org.jetbrains.compose") version "1.4.1"
 }
 
-group = "com.zer0s2m"
+group = "com.zer0s2m.creeptenuous.desktop"
 version = "0.0.1-SNAPSHOT"
 
 repositories {
@@ -19,8 +16,8 @@ repositories {
 }
 
 allprojects {
-    group = "com.zer0s2m"
-    version = "0.0.1"
+    group = "com.zer0s2m.creeptenuous.desktop"
+    version = "0.0.1-SNAPSHOT"
 
     tasks.withType<JavaCompile> {
         sourceCompatibility = "1.8"
@@ -45,7 +42,7 @@ subprojects {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "com.zer0s2m.creeptenuous.desktop.ui.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "CreepTenuousDesktop"
@@ -55,16 +52,9 @@ compose.desktop {
 }
 
 dependencies {
-    implementation(project(":common"))
+    implementation(project(":creep-tenuous-desktop-common"))
+    implementation(project(":creep-tenuous-desktop-core"))
+    implementation(project(":creep-tenuous-desktop-ui"))
 
     implementation(compose.desktop.currentOs)
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
-
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-cio:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-
-    implementation("org.slf4j:slf4j-api:2.0.7")
-    implementation("org.slf4j:slf4j-simple:2.0.7")
 }
