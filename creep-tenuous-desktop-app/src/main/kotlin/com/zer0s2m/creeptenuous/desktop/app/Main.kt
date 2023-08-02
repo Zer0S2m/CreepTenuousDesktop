@@ -1,11 +1,10 @@
-package com.zer0s2m.creeptenuous.desktop.ui
+package com.zer0s2m.creeptenuous.desktop.app
 
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.zer0s2m.creeptenuous.desktop.ui.app.App
 
 fun main() = application {
     val windowState = rememberWindowState(

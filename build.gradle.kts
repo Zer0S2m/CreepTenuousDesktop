@@ -42,7 +42,7 @@ subprojects {
 
 compose.desktop {
     application {
-        mainClass = "com.zer0s2m.creeptenuous.desktop.ui.MainKt"
+        mainClass = "com.zer0s2m.creeptenuous.desktop.app.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "CreepTenuousDesktop"
@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":creep-tenuous-desktop-common"))
     implementation(project(":creep-tenuous-desktop-core"))
     implementation(project(":creep-tenuous-desktop-ui"))
+    implementation(project(":creep-tenuous-desktop-app"))
 
     implementation(compose.desktop.currentOs)
 }

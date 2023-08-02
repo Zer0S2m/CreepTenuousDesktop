@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.ui.app
+package com.zer0s2m.creeptenuous.desktop.app
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.material.*
@@ -9,13 +9,13 @@ import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenDashbo
 import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenLoginUser
 import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenProfileUser
 import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenSettingsSystem
+import com.zer0s2m.creeptenuous.desktop.ui.theme.darkColors
 import com.zer0s2m.creeptenuous.desktop.core.navigation.runtime.rememberNavigationController
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveCommon
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.core.reactive.collectLoader
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import kotlinx.coroutines.launch
-import com.zer0s2m.creeptenuous.desktop.ui.theme.darkColors
 
 @Composable
 @Preview
