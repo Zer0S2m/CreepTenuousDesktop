@@ -58,7 +58,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
      * Event when clicking on the button to go to the section of an individual user profile
      *
      * @param screen Internal profile screen to go to
-     * @param screen Internal profile screen to go to
+     * @param scope Defines a scope for new coroutines
      * @param sectionProfile New section in profile
      */
     private fun onClickCardSheet(screen: Screen, scope: CoroutineScope, sectionProfile: Sections) {
@@ -159,8 +159,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
                         .background(Color.White),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val list1 = (1..8).map { "Object $it" }
-                    val list2 = (1..6).map { "Object $it" }
+                    val list1 = (1..8).map { "Folder $it" }
+                    val list2 = (1..6).map { "File $it" }
 
                     Column(
                         modifier = Modifier

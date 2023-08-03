@@ -424,4 +424,5 @@ private fun ItemSectionInMenu(
 /**
  * Basic horizontal padding for building the left side of the panel
  */
+@get:ReadOnlyComposable
 private val baseHorizontalPadding: Dp get() = 12.dp

@@ -33,6 +33,9 @@ enum class Sections(
         objects = mapOf(
             Screen.PROFILE_FILE_OBJECT_DISTRIBUTION to listOf(
                 "userSettingsFileObjectDistribution"
+            ),
+            Screen.PROFILE_GRANTED_RIGHTS_SCREEN to listOf(
+                "grantedRightsFileObjects"
             )
         )
     ),
