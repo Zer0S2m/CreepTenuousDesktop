@@ -5,5 +5,11 @@ pluginManagement {
     }
 }
 
-rootProject.name = "CreepTenuousDesktop"
+include(
+    "creep-tenuous-desktop-common",
+    "creep-tenuous-desktop-core",
+    "creep-tenuous-desktop-ui",
+    "creep-tenuous-desktop-app"
+)
 
+rootProject.name = "CreepTenuousDesktop"
