@@ -63,9 +63,9 @@ enum class Screen {
     /**
      * List of child elements of parent
      */
-    val childs: MutableSet<Screen>
+    val childs: Set<Screen>
         get() = when (this) {
-            PROFILE_SCREEN -> mutableSetOf(
+            PROFILE_SCREEN -> setOf(
                 PROFILE_CATEGORY_SCREEN,
                 PROFILE_GRANTED_RIGHTS_SCREEN,
                 PROFILE_USER_MANAGEMENT_SCREEN,
@@ -75,7 +75,7 @@ enum class Screen {
                 PROFILE_LIST_USERS_SCREEN
             )
 
-            else -> { mutableSetOf() }
+            else -> { setOf() }
         }
 
 }

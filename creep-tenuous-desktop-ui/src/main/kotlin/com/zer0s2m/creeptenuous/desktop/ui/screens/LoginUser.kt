@@ -92,7 +92,8 @@ class LoginUser {
                             println(dataClass)
                             navigationScreen.action(
                                 state = mutableStateOf(navigationController),
-                                route = Screen.DASHBOARD_SCREEN
+                                route = Screen.DASHBOARD_SCREEN,
+                                scope = scope
                             )
                         }
                     },

@@ -81,7 +81,8 @@ class SettingsSystem {
                             println(dataClass)
                             navigationScreen.action(
                                 state = mutableStateOf(navigationController),
-                                route = Screen.LOGIN_SCREEN
+                                route = Screen.LOGIN_SCREEN,
+                                scope = scope
                             )
                         }
                     },

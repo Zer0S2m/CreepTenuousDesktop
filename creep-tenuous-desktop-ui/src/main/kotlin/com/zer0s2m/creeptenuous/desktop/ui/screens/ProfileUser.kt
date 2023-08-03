@@ -22,41 +22,65 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.*
 import com.zer0s2m.creeptenuous.desktop.common.enums.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
-import com.zer0s2m.creeptenuous.desktop.core.actions.navigationScreen
+import com.zer0s2m.creeptenuous.desktop.core.context.BaseContextScreen
+import com.zer0s2m.creeptenuous.desktop.core.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.core.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.*
+import kotlinx.coroutines.launch
 
 /**
  * User profile screen
  *
  * @param navigation Handler for the navigation host for changing the current screen state
  */
-class ProfileUser(override var navigation: NavigationController?) : BaseDashboard {
+class ProfileUser(override var navigation: NavigationController) : BaseDashboard {
 
     /**
      * Text used by accessibility services to describe what this image represents
      */
     private val contentDescriptionIcon: String = "Go to main menu"
 
-    companion object {
+    /**
+     * Base object for managing profile screen state
+     */
+    internal companion object {
 
         /**
          * Base screen for initial user profile page
          */
-        internal val baseScreen: Screen = Screen.PROFILE_SETTINGS_SCREEN
+        private val baseScreen: Screen = Screen.PROFILE_SETTINGS_SCREEN
+
+        /**
+         * Base section for initial user profile page
+         */
+        private val baseSection: Sections = Sections.MAIN_PROFILE
 
         /**
          * The new state of the applied screen from the transition from the previous screen
          */
-        internal val appliedScreenFromTransitionFromPast: MutableState<Screen> = mutableStateOf(baseScreen)
+        private val appliedScreenFromTransitionFromPast: MutableState<Screen> = mutableStateOf(baseScreen)
+
+        /**
+         * The new state of the applied screen from the transition from the previous screen
+         */
+        private val appliedSectionFromTransitionFromPast: MutableState<Sections> = mutableStateOf(baseSection)
 
         /**
          * Set new screen state from past transition
          *
          * @param context Context `illusion` to convey new screen state
          */
-        fun setAppliedScreenFromTransitionFromPast(context: com.zer0s2m.creeptenuous.desktop.core.context.BaseContextScreen) {
-            appliedScreenFromTransitionFromPast.value = context.screen!!
+        internal fun setAppliedScreenFromTransitionFromPast(context: BaseContextScreen) {
+            appliedScreenFromTransitionFromPast.value = context.screen
+        }
+
+        /**
+         * Set new section state from past transition
+         *
+         * @param section Section
+         */
+        internal fun setAppliedSectionFromTransitionFromPast(section: Sections) {
+            appliedSectionFromTransitionFromPast.value = section
         }
 
         /**
@@ -84,13 +108,27 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
     ) {
         super.render(scaffoldState = scaffoldState)
 
-        if (navigation == null) {
-            throw com.zer0s2m.creeptenuous.desktop.core.errors.ComponentException(message = "To build a screen [ProfileUser], you need a parameter [navigation]")
-        }
+        val coroutineScope = rememberCoroutineScope()
 
         if (isFromPastScreen.value) {
-            internalNavigation.value.navigate(appliedScreenFromTransitionFromPast.value.name)
+            var objects: Collection<String> = listOf()
+            val currentScreen = appliedScreenFromTransitionFromPast.value
+
+            val objectsFromSection = appliedSectionFromTransitionFromPast.value.objects[currentScreen]
+            if (objectsFromSection != null) {
+                objects = objectsFromSection
+            }
+
             isFromPastScreen.value = false
+
+            coroutineScope.launch {
+                reactiveNavigationScreen.action(
+                    state = internalNavigation,
+                    route = appliedScreenFromTransitionFromPast.value,
+                    objects = objects,
+                    scope = coroutineScope
+                )
+            }
         }
     }
 
@@ -181,6 +219,8 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
      */
     @Composable
     private fun renderUserAvatar() {
+        val coroutineScope = rememberCoroutineScope()
+
         Row(
             modifier = Modifier
                 .fillMaxSize(),
@@ -209,9 +249,12 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
             }
             IconButton(
                 onClick = {
-                    navigation?.navigate(Screen.DASHBOARD_SCREEN.name)
-                    isFromPastScreen.value = true
-                    appliedScreenFromTransitionFromPast.value = baseScreen
+                    coroutineScope.launch {
+                        isFromPastScreen.value = true
+                        appliedScreenFromTransitionFromPast.value = baseScreen
+
+                        navigation.navigate(Screen.DASHBOARD_SCREEN.name)
+                    }
                 },
                 modifier = Modifier
                     .size(40.dp)
@@ -239,7 +282,8 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
                 ItemSectionInMenu(
                     text = item,
                     navigation = internalNavigation,
-                    route = route
+                    route = route,
+                    section = Sections.MAIN_PROFILE
                 )
             }
 
@@ -249,7 +293,8 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
                 ItemSectionInMenu(
                     text = item,
                     navigation = internalNavigation,
-                    route = route
+                    route = route,
+                    section = Sections.USER_CONTROL
                 )
             }
 
@@ -259,7 +304,8 @@ class ProfileUser(override var navigation: NavigationController?) : BaseDashboar
                 ItemSectionInMenu(
                     text = item,
                     navigation = internalNavigation,
-                    route = route
+                    route = route,
+                    section = Sections.USER_CUSTOMIZATION
                 )
             }
     }
@@ -304,8 +350,11 @@ private fun ItemSectionInMenu(
     text: String = "",
     enabled: Boolean = true,
     navigation: State<NavigationController>,
-    route: Screen
+    route: Screen,
+    section: Sections
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     val isCurrentScreenRoute: Boolean = navigation.value.currentScreen.value == route.name
     val colors: ButtonColors = ButtonDefaults.outlinedButtonColors()
     val contentColor by colors.contentColor(enabled)
@@ -319,10 +368,20 @@ private fun ItemSectionInMenu(
 
     Surface(
         onClick = {
-            navigationScreen.action(
-                state = navigation,
-                route = route
-            )
+            var objects: Collection<String> = listOf()
+
+            if (section.objects.containsKey(route)) {
+                objects = section.objects[route]!!
+            }
+
+            coroutineScope.launch {
+                reactiveNavigationScreen.action(
+                    state = navigation,
+                    route = route,
+                    objects = objects,
+                    scope = coroutineScope
+                )
+            }
         },
         modifier = modifier.semantics { role = Role.Button },
         enabled = if (isCurrentScreenRoute) false else enabled,

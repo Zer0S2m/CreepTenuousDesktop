@@ -15,29 +15,45 @@ repositories {
     google()
 }
 
-allprojects {
-    group = "com.zer0s2m.creeptenuous.desktop"
-    version = "0.0.1-SNAPSHOT"
-
+fun runTasks() {
     tasks.withType<JavaCompile> {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "1.8"
+            jvmTarget = "17"
         }
     }
 }
 
+allprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+
+    group = "com.zer0s2m.creeptenuous.desktop"
+    version = "0.0.1-SNAPSHOT"
+
+    runTasks()
+}
+
 subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+
     repositories {
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         google()
     }
+
+    dependencies {
+        if (!project.name.contains("creep-tenuous-desktop-common")) {
+            implementation(project(":creep-tenuous-desktop-common"))
+        }
+    }
+
+    runTasks()
 }
 
 compose.desktop {

@@ -10,6 +10,6 @@ interface BaseContextScreen {
     /**
      * The new screen state obtained from the previous screen (`state`)
      */
-    val screen: Screen?
+    val screen: Screen
 
 }

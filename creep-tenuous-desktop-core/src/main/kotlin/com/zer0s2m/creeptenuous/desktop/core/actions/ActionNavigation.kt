@@ -3,6 +3,7 @@ package com.zer0s2m.creeptenuous.desktop.core.actions
 import androidx.compose.runtime.State
 import com.zer0s2m.creeptenuous.desktop.core.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Basic interface for all kinds of actions for system elements,
@@ -15,7 +16,8 @@ fun interface ActionNavigation {
      *
      * @param state The current state of the screen state handler
      * @param route Name of the screen to go to it [Screen]
+     * @param scope Defines a scope for new coroutines
      */
-    fun action(state: State<NavigationController>, route: Screen)
+    fun action(state: State<NavigationController>, route: Screen, scope: CoroutineScope)
 
 }

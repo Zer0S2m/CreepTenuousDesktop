@@ -6,7 +6,6 @@ plugins {
 dependencies {
     implementation(compose.desktop.currentOs)
 
-    implementation(project(":creep-tenuous-desktop-common"))
     implementation(project(":creep-tenuous-desktop-ui"))
     implementation(project(":creep-tenuous-desktop-core"))
 }

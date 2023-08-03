@@ -19,7 +19,7 @@ interface BaseDashboard {
     /**
      * Navigation handler for changing the state of the current screen
      */
-    var navigation: NavigationController?
+    var navigation: NavigationController
 
     /**
      * Rendering the left side of the content
@@ -67,7 +67,7 @@ interface BaseDashboard {
      */
     @Composable
     fun render(
-        navigationController: NavigationController? = null,
+        navigationController: NavigationController,
         scaffoldState: ScaffoldState = rememberScaffoldState()
     ) {
         navigation = navigationController

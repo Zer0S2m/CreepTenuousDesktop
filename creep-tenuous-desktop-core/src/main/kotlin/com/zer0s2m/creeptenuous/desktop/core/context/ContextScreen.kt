@@ -8,5 +8,5 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
  * @param screen The new screen state obtained from the previous screen (state)
  */
 class ContextScreen(
-    override val screen: Screen? = null
+    override val screen: Screen
 ) : BaseContextScreen

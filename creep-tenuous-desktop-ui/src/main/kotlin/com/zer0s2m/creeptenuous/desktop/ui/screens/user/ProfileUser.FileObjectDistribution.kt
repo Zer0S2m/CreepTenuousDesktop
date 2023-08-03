@@ -16,13 +16,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zer0s2m.creeptenuous.desktop.core.reactive.Loader
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveCommon
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.Colors
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
-import kotlinx.coroutines.launch
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setAnimateColorAsStateInSelectUser
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInSelectUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
@@ -32,11 +30,6 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
  */
 @Composable
 fun ProfileUser.ProfileFileObjectDistribution.render() {
-    val coroutineScope = rememberCoroutineScope()
-    coroutineScope.launch {
-        Loader.load<Boolean>("userSettingsFileObjectDistribution")
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -23,7 +23,9 @@ private data class ReactiveLazy(
 
     val reactiveLazyObject: ReactiveLazyObject,
 
-    val handler: KClass<out ReactiveHandler<Any>>
+    val handler: KClass<out ReactiveHandler<Any>>,
+
+    var isLoad: Boolean = false
 
 )
 
@@ -40,18 +42,14 @@ object Loader {
     /**
      * Load a single property of lazy behavior from the map of objects that are collected with [collectLoader]
      *
-     * @param T The return type of the object specified in [ReactiveHandler.handler]
      * @param nameProperty The name of the lazy behavior property is specified using an annotation [Lazy]
      */
-    @Suppress("UNCHECKED_CAST")
-    suspend fun <T> load(nameProperty: String): T? {
+    suspend fun load(nameProperty: String) {
         val lazyObject: ReactiveLazy? = map[nameProperty]
-        if (lazyObject != null) {
-            val field = lazyObject.field
+        if (lazyObject != null && !lazyObject.isLoad) {
             setReactiveValue(reactiveLazyObject = lazyObject)
-            return field.get(lazyObject.reactiveLazyObject) as T
+            lazyObject.isLoad = true
         }
-        return null
     }
 
 }
@@ -88,15 +86,23 @@ suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
         }
     }
 
-    setReactiveValues()
+    setReactiveValues(
+        isReactive = true,
+        isLazy = false
+    )
 }
 
 /**
  * Set reactive values via map
  */
-private suspend fun setReactiveValues() {
+private suspend fun setReactiveValues(isReactive: Boolean, isLazy: Boolean) {
     map.forEach { (_, value) ->
-        setReactiveValue(reactiveLazyObject = value)
+        if (isReactive && value.isReactive) {
+            setReactiveValue(reactiveLazyObject = value)
+        }
+        if (isLazy && value.isLazy) {
+            setReactiveValue(reactiveLazyObject = value)
+        }
     }
 }
 
@@ -114,5 +120,6 @@ private suspend fun setReactiveValue(reactiveLazyObject: ReactiveLazy) {
             reactiveLazyObject.reactiveLazyObject,
             method.callSuspend(reactiveLazyObject.handler.objectInstance)
         )
+        reactiveLazyObject.isLoad = true
     }
 }

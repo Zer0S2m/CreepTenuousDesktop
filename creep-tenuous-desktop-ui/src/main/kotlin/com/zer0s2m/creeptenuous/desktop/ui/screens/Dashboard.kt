@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.enums.*
 import com.zer0s2m.creeptenuous.desktop.common.enums.Colors
+import com.zer0s2m.creeptenuous.desktop.core.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CartFileObject
@@ -29,13 +32,17 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.modals.ModalRightSheetLayo
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.navigation.NavigationController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * The main dashboard for interacting with system file objects
  *
  * @param navigation Handler for the navigation host for changing the current screen state
  */
-class Dashboard(override var navigation: NavigationController?) : BaseDashboard {
+class Dashboard(override var navigation: NavigationController) : BaseDashboard {
+
+    private val navigationState: State<NavigationController> = mutableStateOf(navigation)
 
     /**
      * Base directories for system user
@@ -47,13 +54,25 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
         "Musics" to Resources.ICON_MUSIC.path
     )
 
-    private fun onClickCardSheet(screen: Screen) {
-        navigation?.navigate(Screen.PROFILE_SCREEN.name)
-        ProfileUser.setAppliedScreenFromTransitionFromPast(
-            ContextScreen(
-                screen
+    /**
+     * Event when clicking on the button to go to the section of an individual user profile
+     *
+     * @param screen Internal profile screen to go to
+     * @param screen Internal profile screen to go to
+     * @param sectionProfile New section in profile
+     */
+    private fun onClickCardSheet(screen: Screen, scope: CoroutineScope, sectionProfile: Sections) {
+        scope.launch {
+            ProfileUser.setAppliedScreenFromTransitionFromPast(context = ContextScreen(screen))
+            ProfileUser.setAppliedSectionFromTransitionFromPast(section = sectionProfile)
+
+            reactiveNavigationScreen.action(
+                state = navigationState,
+                route = Screen.PROFILE_SCREEN,
+                objects = listOf(),
+                scope = scope
             )
-        )
+        }
     }
 
     /**
@@ -210,6 +229,8 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
             .padding(4.dp)
             .pointerHoverIcon(icon = PointerIcon.Hand)
 
+        val coroutineScope: CoroutineScope = rememberCoroutineScope()
+
         Column {
             TitleInSectionForCardsModalSheet(Sections.MAIN_PROFILE.title)
             LazyVerticalGrid(
@@ -217,11 +238,14 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                 content = {
                     items(Sections.MAIN_PROFILE.sections.size) { index ->
                         CardModalSheet(
-                            modifier = baseModifierCard,
-                            onClick = {
-                                onClickCardSheet(screen = Sections.MAIN_PROFILE.routes[index])
-                            }
-                        ).render {
+                            modifier = baseModifierCard
+                        ) {
+                            onClickCardSheet(
+                                screen = Sections.MAIN_PROFILE.routes[index],
+                                scope = coroutineScope,
+                                sectionProfile = Sections.MAIN_PROFILE
+                            )
+                        }.render {
                             TextInCardModalSheet(Sections.MAIN_PROFILE.sections[index])
                         }
                     }
@@ -241,11 +265,14 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                 content = {
                     items(Sections.USER_CONTROL.sections.size) { index ->
                         CardModalSheet(
-                            modifier = baseModifierCard,
-                            onClick = {
-                                onClickCardSheet(screen = Sections.USER_CONTROL.routes[index])
-                            }
-                        ).render {
+                            modifier = baseModifierCard
+                        ) {
+                            onClickCardSheet(
+                                screen = Sections.USER_CONTROL.routes[index],
+                                scope = coroutineScope,
+                                sectionProfile = Sections.USER_CONTROL
+                            )
+                        }.render {
                             TextInCardModalSheet(Sections.USER_CONTROL.sections[index])
                         }
                     }
@@ -265,11 +292,14 @@ class Dashboard(override var navigation: NavigationController?) : BaseDashboard 
                 content = {
                     items(Sections.USER_CUSTOMIZATION.sections.size) { index ->
                         CardModalSheet(
-                            modifier = baseModifierCard,
-                            onClick = {
-                                onClickCardSheet(screen = Sections.USER_CUSTOMIZATION.routes[index])
-                            }
-                        ).render {
+                            modifier = baseModifierCard
+                        ) {
+                            onClickCardSheet(
+                                screen = Sections.USER_CUSTOMIZATION.routes[index],
+                                scope = coroutineScope,
+                                sectionProfile = Sections.USER_CUSTOMIZATION
+                            )
+                        }.render {
                             TextInCardModalSheet(Sections.USER_CUSTOMIZATION.sections[index])
                         }
                     }

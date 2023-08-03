@@ -6,8 +6,14 @@ package com.zer0s2m.creeptenuous.desktop.common.enums
  * @param title Name of the sectional block
  * @param sections Basic name blocks
  * @param routes Routes to change the current state of the screen through an action
+ * @param objects The name of the properties that are marked with an annotation Reactive or Lazy
  */
-enum class Sections(val title: String, val sections: List<String>, val routes: List<Screen>) {
+enum class Sections(
+    val title: String,
+    val sections: List<String>,
+    val routes: List<Screen>,
+    val objects: Map<Screen, Collection<String>> = mapOf()
+) {
 
     /**
      * Main sections for storing user settings for system regulation
@@ -23,6 +29,11 @@ enum class Sections(val title: String, val sections: List<String>, val routes: L
             Screen.PROFILE_FILE_OBJECT_DISTRIBUTION,
             Screen.PROFILE_SETTINGS_SCREEN,
             Screen.PROFILE_GRANTED_RIGHTS_SCREEN
+        ),
+        objects = mapOf(
+            Screen.PROFILE_FILE_OBJECT_DISTRIBUTION to listOf(
+                "userSettingsFileObjectDistribution"
+            )
         )
     ),
 
