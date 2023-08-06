@@ -26,7 +26,11 @@ object ReactiveUser : ReactiveLazyObject {
      * Basic parameters for the user
      */
     @Reactive<UserProfileSettings>(
-        handler = HandlerReactiveUserProfileSettings::class
+        handler = HandlerReactiveUserProfileSettings::class,
+        node = Node(
+            type = NodeType.KTOR,
+            unit = "userProfile"
+        )
     )
     var profileSettings: UserProfileSettings? = null
 
@@ -40,7 +44,11 @@ object ReactiveUser : ReactiveLazyObject {
          */
         @Lazy<UserSettingsFileObjectDistribution>(
             event = "Go to the user profile in the section - File object distribution settings",
-            handler = HandlerUserSettingsFileObjectDistribution::class
+            handler = HandlerUserSettingsFileObjectDistribution::class,
+            node = Node(
+                type = NodeType.KTOR,
+                unit = "userProfile"
+            )
         )
         var userSettingsFileObjectDistribution: UserSettingsFileObjectDistribution =
             UserSettingsFileObjectDistribution(null, null)

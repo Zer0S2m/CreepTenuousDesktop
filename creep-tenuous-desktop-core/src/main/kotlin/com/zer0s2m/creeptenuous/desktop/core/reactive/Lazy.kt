@@ -22,6 +22,11 @@ annotation class Lazy<T>(
     /**
      * Lazy behavior handler to inject data into a property at a certain moment
      */
-    val handler: KClass<out ReactiveHandler<T>>
+    val handler: KClass<out ReactiveHandler<T>>,
+
+    /**
+     * Node for injecting objects into other reactive or lazy objects
+     */
+    val node: Node = Node()
 
 )
