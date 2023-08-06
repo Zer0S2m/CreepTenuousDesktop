@@ -4,6 +4,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.GrantedRight
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandler
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserProfileSettings
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserSettingsFileObjectDistribution
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -52,6 +53,22 @@ object HandlerReactiveUserGrantedRights : ReactiveHandler<GrantedRight> {
      */
     override suspend fun handler(): GrantedRight {
         return HttpClient.client.get("/api/v1/user/global/right/list-all").body()
+    }
+
+}
+
+/**
+ * Reactive handler for getting data about user parameters
+ */
+object HandlerReactiveUserProfileSettings : ReactiveHandler<UserProfileSettings> {
+
+    /**
+     * Process reactive property
+     *
+     * @return result
+     */
+    override suspend fun handler(): UserProfileSettings {
+        return HttpClient.client.get("/api/v1/user/profile").body()
     }
 
 }

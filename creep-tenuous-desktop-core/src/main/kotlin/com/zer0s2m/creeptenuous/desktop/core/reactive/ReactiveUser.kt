@@ -4,8 +4,10 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.GrantedRight
 import com.zer0s2m.creeptenuous.desktop.core.handlers.HandlerUserSettingsFileObjectDistribution
 import com.zer0s2m.creeptenuous.desktop.core.handlers.HandlerReactiveUserCustomCategories
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserProfileSettings
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserSettingsFileObjectDistribution
 import com.zer0s2m.creeptenuous.desktop.core.handlers.HandlerReactiveUserGrantedRights
+import com.zer0s2m.creeptenuous.desktop.core.handlers.HandlerReactiveUserProfileSettings
 
 /**
  * `Reactive` behavior user model
@@ -19,6 +21,14 @@ object ReactiveUser : ReactiveLazyObject {
         handler = HandlerReactiveUserCustomCategories::class
     )
     var customCategories: MutableCollection<UserCategory> = mutableListOf()
+
+    /**
+     * Basic parameters for the user
+     */
+    @Reactive<UserProfileSettings>(
+        handler = HandlerReactiveUserProfileSettings::class
+    )
+    var profileSettings: UserProfileSettings? = null
 
     /**
      * Storage of user settings
