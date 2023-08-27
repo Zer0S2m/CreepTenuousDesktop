@@ -1,6 +1,7 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive
 
 import com.zer0s2m.creeptenuous.desktop.core.errors.ReactiveLoaderException
+import com.zer0s2m.creeptenuous.desktop.core.reactive.backend.Ktor
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
 import kotlin.reflect.full.*
@@ -18,7 +19,7 @@ private val mapNodes: MutableMap<String, MutableCollection<ReactiveLazyNode>> = 
 /**
  * A class that stores information about a reactive or lazy object
  */
-private data class ReactiveLazy(
+internal data class ReactiveLazy(
 
     val isLazy: Boolean,
 
@@ -43,13 +44,15 @@ private data class ReactiveLazyNode(
 
     val type: NodeType,
 
-    val reactiveLazyObject: ReactiveLazy
+    val reactiveLazyObject: ReactiveLazy,
+
+    val handler: ReactiveHandlerKtor? = null
 )
 
 /**
  * The name of the method for inverting a reactive property. [ReactiveHandler.handler]
  */
-private const val HANDLER_NAME = "handler"
+internal const val HANDLER_NAME = "handler"
 
 /**
  * Main data loader
@@ -117,6 +120,8 @@ suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
         }
     }
 
+    loadNode()
+
     setReactiveValues(
         isReactive = true,
         isLazy = false
@@ -130,7 +135,8 @@ private fun collectNodes(node: Node, reactiveLazyObject: ReactiveLazy) {
     val reactiveLazyNodeObject = ReactiveLazyNode(
         title = node.unit,
         type = node.type,
-        reactiveLazyObject = reactiveLazyObject
+        reactiveLazyObject = reactiveLazyObject,
+        handler = reactiveLazyObject.handler.objectInstance
     )
     if (!mapNodes.containsKey(node.unit)) {
         mapNodes[node.unit] = mutableListOf(reactiveLazyNodeObject)
@@ -139,8 +145,44 @@ private fun collectNodes(node: Node, reactiveLazyObject: ReactiveLazy) {
     }
 }
 
-private fun loadNode() {
+private suspend fun loadNode() {
+    mapNodes.forEach { (_, nodes) ->
+        val nodesTypeKtor: MutableList<ReactiveLazyNode> = findNodes(nodes = nodes, type = NodeType.KTOR)
+        val reactiveLazyObject: MutableList<ReactiveLazy> = mutableListOf()
 
+        nodesTypeKtor.forEach {
+            reactiveLazyObject.add(it.reactiveLazyObject)
+        }
+
+        if (nodesTypeKtor.isNotEmpty()) {
+            nodesTypeKtor[0].handler?.let {
+                Ktor.load(reactiveLazyObject = reactiveLazyObject, handler = it)
+            }
+        }
+    }
+}
+
+/**
+ * Finds all reactive properties with a specific node type
+ *
+ * @param nodes dirty reactive properties
+ * @param type node type
+ *
+ * @return filtered reactive properties
+ */
+private fun findNodes(
+    nodes: MutableCollection<ReactiveLazyNode>,
+    type: NodeType
+): MutableList<ReactiveLazyNode> {
+    val nodesTypeKtor: MutableList<ReactiveLazyNode> = mutableListOf()
+
+    nodes.forEach { node ->
+        if (node.type == type) {
+            nodesTypeKtor.add(node)
+        }
+    }
+
+    return nodesTypeKtor
 }
 
 /**
@@ -148,10 +190,10 @@ private fun loadNode() {
  */
 private suspend fun setReactiveValues(isReactive: Boolean, isLazy: Boolean) {
     mapReactiveLazyObjects.forEach { (_, value) ->
-        if (isReactive && value.isReactive) {
+        if (isReactive && value.isReactive && !value.isLoad) {
             setReactiveValue(reactiveLazyObject = value)
         }
-        if (isLazy && value.isLazy) {
+        if (isLazy && value.isLazy && !value.isLoad) {
             setReactiveValue(reactiveLazyObject = value)
         }
     }
