@@ -30,7 +30,6 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 @Composable
 fun ProfileUser.ProfileCategories.render() {
     val openModalCreateCategory: MutableState<Boolean> = remember { mutableStateOf(false) }
-
     val listCategories: MutableList<UserCategory> = remember {
         ReactiveUser.customCategories.toMutableStateList()
     }

@@ -1,13 +1,7 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive
 
-import com.zer0s2m.creeptenuous.desktop.common.dto.GrantedRight
-import com.zer0s2m.creeptenuous.desktop.core.handlers.HandlerUserSettingsFileObjectDistribution
-import com.zer0s2m.creeptenuous.desktop.core.handlers.HandlerReactiveUserCustomCategories
-import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
-import com.zer0s2m.creeptenuous.desktop.common.dto.UserProfileSettings
-import com.zer0s2m.creeptenuous.desktop.common.dto.UserSettingsFileObjectDistribution
-import com.zer0s2m.creeptenuous.desktop.core.handlers.HandlerReactiveUserGrantedRights
-import com.zer0s2m.creeptenuous.desktop.core.handlers.HandlerReactiveUserProfileSettings
+import com.zer0s2m.creeptenuous.desktop.common.dto.*
+import com.zer0s2m.creeptenuous.desktop.core.handlers.*
 
 /**
  * `Reactive` behavior user model
@@ -33,6 +27,14 @@ object ReactiveUser : ReactiveLazyObject {
         )
     )
     var profileSettings: UserProfileSettings? = null
+
+    /**
+     * Custom colors
+     */
+    @Reactive<MutableCollection<UserColor>>(
+        handler = HandlerReactiveUserColor::class
+    )
+    var userColors: MutableCollection<UserColor> = mutableListOf()
 
     /**
      * Storage of user settings

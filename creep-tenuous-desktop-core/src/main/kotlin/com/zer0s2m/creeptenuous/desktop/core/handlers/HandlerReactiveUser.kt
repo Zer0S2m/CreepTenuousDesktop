@@ -1,10 +1,7 @@
 package com.zer0s2m.creeptenuous.desktop.core.handlers
 
-import com.zer0s2m.creeptenuous.desktop.common.dto.GrantedRight
+import com.zer0s2m.creeptenuous.desktop.common.dto.*
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
-import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
-import com.zer0s2m.creeptenuous.desktop.common.dto.UserProfileSettings
-import com.zer0s2m.creeptenuous.desktop.common.dto.UserSettingsFileObjectDistribution
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -87,6 +84,22 @@ private object HandlerReactiveUser : ReactiveHandlerKtor {
      */
     override suspend fun handlerKtor(): HttpResponse {
         return HttpClient.client.get("/api/v1/user/profile")
+    }
+
+}
+
+/**
+ * Reactive handler for getting custom color data
+ */
+object HandlerReactiveUserColor : ReactiveHandler<MutableCollection<UserColor>> {
+
+    /**
+     * Process reactive property
+     *
+     * @return result
+     */
+    override suspend fun handler(): MutableCollection<UserColor> {
+        return HttpClient.client.get("/api/v1/user/customization/color").body()
     }
 
 }

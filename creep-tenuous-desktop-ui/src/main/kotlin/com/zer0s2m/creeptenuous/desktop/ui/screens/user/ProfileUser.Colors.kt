@@ -17,7 +17,10 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.dto.ConverterColor
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 
 /**
@@ -26,17 +29,8 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 @Composable
 fun ProfileUser.ProfileColors.render() {
     val stateModal: MutableState<Boolean> = remember { mutableStateOf(false) }
-
     val listColors: MutableList<Color> = remember {
-        listOf(
-            Color(140, 150, 33),
-            Color(3, 2, 33),
-            Color(33, 1, 33),
-            Color(2, 22, 23),
-            Color(12, 150, 123),
-            Color(12, 22, 33),
-            Color(32, 123, 33)
-        ).toMutableStateList()
+        getUserColorRgbFromHex().toMutableStateList()
     }
 
     Column(
@@ -228,4 +222,20 @@ private fun ButtonCreateCustomColor(stateModal: MutableState<Boolean>) {
     ) {
         Text("Create color")
     }
+}
+
+private fun getUserColorRgbFromHex(): Collection<Color> {
+    val colors: MutableList<Color> = mutableListOf()
+
+    ReactiveUser.userColors.forEach {
+        val convertedColor: ConverterColor = colorConvertHexToRgb(it.color)
+
+        colors.add(Color(
+            red = convertedColor.red,
+            green = convertedColor.green,
+            blue = convertedColor.blue
+        ))
+    }
+
+    return colors
 }
