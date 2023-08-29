@@ -3,6 +3,8 @@ package com.zer0s2m.creeptenuous.desktop.core.handlers
 import com.zer0s2m.creeptenuous.desktop.common.dto.*
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
+import com.zer0s2m.creeptenuous.desktop.core.reactive.collections.ReactiveMutableList
+import com.zer0s2m.creeptenuous.desktop.core.reactive.collections.toReactiveMutableList
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse
@@ -28,15 +30,16 @@ object HandlerUserSettingsFileObjectDistribution :
 /**
  * Reactive handler for getting data about custom categories
  */
-object HandlerReactiveUserCustomCategories : ReactiveHandler<MutableCollection<UserCategory>> {
+object HandlerReactiveUserCustomCategories : ReactiveHandler<ReactiveMutableList<UserCategory>> {
 
     /**
      * Process reactive property
      *
      * @return result
      */
-    override suspend fun handler(): MutableCollection<UserCategory> {
-        return HttpClient.client.get("/api/v1/user/category").body()
+    override suspend fun handler(): ReactiveMutableList<UserCategory> {
+        val data: MutableCollection<UserCategory> = HttpClient.client.get("/api/v1/user/category").body()
+        return data.toReactiveMutableList()
     }
 
 }
@@ -93,15 +96,16 @@ private object HandlerReactiveUser : ReactiveHandlerKtor {
 /**
  * Reactive handler for getting custom color data
  */
-object HandlerReactiveUserColor : ReactiveHandler<MutableCollection<UserColor>> {
+object HandlerReactiveUserColor : ReactiveHandler<ReactiveMutableList<UserColor>> {
 
     /**
      * Process reactive property
      *
      * @return result
      */
-    override suspend fun handler(): MutableCollection<UserColor> {
-        return HttpClient.client.get("/api/v1/user/customization/color").body()
+    override suspend fun handler(): ReactiveMutableList<UserColor> {
+        val data: MutableCollection<UserColor> = HttpClient.client.get("/api/v1/user/customization/color").body()
+        return data.toReactiveMutableList()
     }
 
 }

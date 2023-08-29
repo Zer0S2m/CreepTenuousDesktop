@@ -6,6 +6,9 @@ package com.zer0s2m.creeptenuous.desktop.core.reactive
  * Needed to inject data from one handler into multiple [Reactive] or [Lazy] properties.
  * Also needed for object encapsulation.
  */
+@Target(AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.RUNTIME)
+@MustBeDocumented
 annotation class Node(
 
     /**
