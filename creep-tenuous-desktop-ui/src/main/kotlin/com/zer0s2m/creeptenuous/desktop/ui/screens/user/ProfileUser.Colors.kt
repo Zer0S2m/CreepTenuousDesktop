@@ -55,7 +55,7 @@ fun ProfileUser.ProfileColors.render() {
                 .fillMaxSize()
         ) {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(5),
+                columns = GridCells.Fixed(4),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -79,7 +79,7 @@ fun ProfileUser.ProfileColors.render() {
  * @param action Detailed documentation щт [IconButtonDelete] in the argument `onClick`
  */
 @Composable
-internal fun ProfileUser.ProfileColors.ColorItem(
+internal fun ColorItem(
     color: Color,
     action: () -> Unit
 ) {
@@ -91,7 +91,10 @@ internal fun ProfileUser.ProfileColors.ColorItem(
                 .width(80.dp)
         )
 
-        IconButtonDelete(onClick = action)
+        Row {
+            IconButtonEdit(onClick = {})
+            IconButtonDelete(onClick = action)
+        }
     }
 }
 
@@ -102,7 +105,7 @@ internal fun ProfileUser.ProfileColors.ColorItem(
  * @param listColors Collection of custom flowers. Required to create a new color
 */
 @Composable
-internal fun ProfileUser.ProfileColors.ModalCreateCustomColor(
+internal fun ModalCreateCustomColor(
     stateModal: MutableState<Boolean>,
     listColors: MutableList<Color>
 ) {

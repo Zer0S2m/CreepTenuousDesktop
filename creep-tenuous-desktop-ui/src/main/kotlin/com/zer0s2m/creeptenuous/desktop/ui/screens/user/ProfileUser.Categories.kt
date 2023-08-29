@@ -54,7 +54,7 @@ fun ProfileUser.ProfileCategories.render() {
                 .fillMaxSize()
         ) {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(5),
+                columns = GridCells.Fixed(4),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -97,7 +97,7 @@ private val stateForm: MutableState<BaseFormState> = mutableStateOf(FormState())
  * @param action The lambda to be invoked when this icon is pressed
  */
 @Composable
-internal fun ProfileUser.ProfileCategories.ItemCategory(
+internal fun ItemCategory(
     text: String,
     action: () -> Unit
 ) {
@@ -105,7 +105,11 @@ internal fun ProfileUser.ProfileCategories.ItemCategory(
         Text(
             text = text
         )
-        IconButtonDelete(onClick = action)
+
+        Row {
+            IconButtonEdit(onClick = {})
+            IconButtonDelete(onClick = action)
+        }
     }
 }
 
@@ -116,7 +120,7 @@ internal fun ProfileUser.ProfileCategories.ItemCategory(
  * @param action [Button] click event
  */
 @Composable
-internal fun ProfileUser.ProfileCategories.ModalCreateCategory(
+internal fun ModalCreateCategory(
     stateModal: MutableState<Boolean>,
     action: () -> Unit
 ) {
