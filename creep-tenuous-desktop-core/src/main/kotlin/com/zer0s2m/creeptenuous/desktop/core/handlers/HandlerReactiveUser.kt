@@ -11,7 +11,8 @@ import io.ktor.client.statement.HttpResponse
  * Lazy handler for getting data about file object distribution settings
  */
 object HandlerUserSettingsFileObjectDistribution :
-    ReactiveHandler<UserSettingsFileObjectDistribution>, ReactiveHandlerKtor by HandlerReactiveUser {
+    ReactiveHandler<UserSettingsFileObjectDistribution>,
+    ReactiveHandlerKtor by HandlerReactiveUser {
 
     /**
      * Process reactive property
@@ -60,7 +61,8 @@ object HandlerReactiveUserGrantedRights : ReactiveHandler<GrantedRight> {
  * Reactive handler for getting data about user parameters
  */
 object HandlerReactiveUserProfileSettings :
-    ReactiveHandler<UserProfileSettings>, ReactiveHandlerKtor by HandlerReactiveUser {
+    ReactiveHandler<UserProfileSettings>,
+    ReactiveHandlerKtor by HandlerReactiveUser {
 
     /**
      * Process reactive property

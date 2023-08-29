@@ -66,13 +66,14 @@ fun ProfileUser.ProfileColors.render() {
         }
     }
 
-    ModalCreateCustomColor(stateModal = stateModal)
+    ModalCreateCustomColor(stateModal = stateModal, listColors = listColors)
 }
 
 /**
  * Custom color base card
  *
  * @param color Color
+ * @param action Detailed documentation щт [IconButtonDelete] in the argument `onClick`
  */
 @Composable
 internal fun ProfileUser.ProfileColors.ColorItem(
@@ -95,10 +96,12 @@ internal fun ProfileUser.ProfileColors.ColorItem(
  * Modal window for creating a custom category
  *
  * @param stateModal Modal window states for category creation
+ * @param listColors Collection of custom flowers. Required to create a new color
 */
 @Composable
 internal fun ProfileUser.ProfileColors.ModalCreateCustomColor(
-    stateModal: MutableState<Boolean>
+    stateModal: MutableState<Boolean>,
+    listColors: MutableList<Color>
 ) {
     BaseModalPopup(
         stateModal = stateModal
@@ -110,13 +113,21 @@ internal fun ProfileUser.ProfileColors.ModalCreateCustomColor(
                 .height(400.dp)
                 .shadow(24.dp, RoundedCornerShape(4.dp))
         ) {
-            ModalCreateCustomColorContent(stateModal = stateModal)
+            ModalCreateCustomColorContent {
+                stateModal.value = false
+                listColors.add(it)
+            }
         }
     }
 }
 
+/**
+ * Filling the custom color creation form with content
+ *
+ * @param action Actions on button click. Takes on color to elevate the event
+ */
 @Composable
-private fun ModalCreateCustomColorContent(stateModal: MutableState<Boolean>) {
+private fun ModalCreateCustomColorContent(action: (Color) -> Unit) {
     var red by remember { mutableStateOf(150f) }
     var green by remember { mutableStateOf(150f) }
     var blue by remember { mutableStateOf(150f) }
@@ -195,8 +206,7 @@ private fun ModalCreateCustomColorContent(stateModal: MutableState<Boolean>) {
                     .fillMaxWidth()
                     .pointerHoverIcon(PointerIcon.Hand),
                 onClick = {
-                    stateModal.value = false
-                    println("Create color")
+                    action(color)
                 }
             ) {
                 Text("Create")
