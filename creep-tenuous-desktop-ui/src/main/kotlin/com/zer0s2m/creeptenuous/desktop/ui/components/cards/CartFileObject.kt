@@ -24,7 +24,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.menu.DropdownMenuAdvanced
 import com.zer0s2m.creeptenuous.desktop.ui.components.menu.DropdownMenuItemAdvanced
 import com.zer0s2m.creeptenuous.desktop.core.errors.ComponentException
-import com.zer0s2m.creeptenuous.desktop.common.enums.Colors
+import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 
 /**

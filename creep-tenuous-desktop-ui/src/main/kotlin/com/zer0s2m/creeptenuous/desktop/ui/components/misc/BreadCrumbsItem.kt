@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseBreadCrumbs
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseBreadCrumbsItem
-import com.zer0s2m.creeptenuous.desktop.common.enums.Colors
+import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 
 /**
  * Basic navigation element component for [BaseBreadCrumbs]

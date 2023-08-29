@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.common.enums
+package com.zer0s2m.creeptenuous.desktop.ui.misc
 
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color

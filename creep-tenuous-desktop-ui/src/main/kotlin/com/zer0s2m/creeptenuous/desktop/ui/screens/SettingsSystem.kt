@@ -19,7 +19,7 @@ import com.zer0s2m.creeptenuous.desktop.core.validation.PositiveNumberValidator
 import com.zer0s2m.creeptenuous.desktop.common.dto.SettingsSystemModel
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
-import com.zer0s2m.creeptenuous.desktop.common.enums.dp
+import com.zer0s2m.creeptenuous.desktop.ui.misc.dp
 import kotlinx.coroutines.launch
 
 class SettingsSystem {
