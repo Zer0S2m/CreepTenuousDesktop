@@ -61,6 +61,7 @@ fun ProfileUser.ProfileCategories.render() {
                 items(listCategories.size) { index ->
                     ItemCategory(listCategories[index].title) {
                         listCategories.removeAt(index)
+                        ReactiveUser.customCategories.removeAtReactive(index)
                     }
                 }
             }
@@ -74,7 +75,10 @@ fun ProfileUser.ProfileCategories.render() {
                 val data = UserCategory(
                     title = dataForm["title"].toString()
                 )
-                listCategories.add(UserCategory(title = data.title))
+
+                val newCategory = UserCategory(title = data.title)
+                listCategories.add(newCategory)
+                ReactiveUser.customCategories.addReactive(newCategory)
             }
         }
     }

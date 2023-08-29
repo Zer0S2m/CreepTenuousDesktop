@@ -12,12 +12,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.ConverterColor
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserColor
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveUser
@@ -60,6 +62,7 @@ fun ProfileUser.ProfileColors.render() {
                 items(listColors.size) { index ->
                     ColorItem(listColors[index]) {
                         listColors.removeAt(index)
+                        ReactiveUser.userColors.removeAtReactive(index)
                     }
                 }
             }
@@ -116,6 +119,9 @@ internal fun ProfileUser.ProfileColors.ModalCreateCustomColor(
             ModalCreateCustomColorContent {
                 stateModal.value = false
                 listColors.add(it)
+                ReactiveUser.userColors.addReactive(UserColor(
+                    color = "#${Integer.toHexString(it.toArgb()).substring(2)}"
+                ))
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.core.reactive.collections
+package com.zer0s2m.creeptenuous.desktop.core.reactive
 
 import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTrigger
 
@@ -15,13 +15,11 @@ interface ReactiveMutableList<E> : MutableList<E> {
      * The trigger is fired when a new element is added to the collection.
      */
     val triggerAdd: ReactiveTrigger<E>?
-        get() = null
 
     /**
      * The trigger is fired when an item is removed from the collection.
      */
-    val riggerRemove: ReactiveTrigger<E>?
-        get() = null
+    val triggerRemove: ReactiveTrigger<E>?
 
     /**
      * Adds the specified element to the collection in a reactive way and
@@ -30,8 +28,7 @@ interface ReactiveMutableList<E> : MutableList<E> {
      * @return `true` if the element has been added, `false` if the collection does not support duplicates
      * and the element is already contained in the collection.
      */
-    fun addReactive(element: E): Boolean
-    {
+    fun addReactive(element: E): Boolean {
         val isAdded = add(element)
         if (isAdded) {
             triggerAdd?.execution(element)
@@ -41,17 +38,28 @@ interface ReactiveMutableList<E> : MutableList<E> {
 
     /**
      * Removes one instance of the specified element from this collection in a
-     * reactive manner, calling the [riggerRemove] trigger, if present.
+     * reactive manner, calling the [triggerRemove] trigger, if present.
      *
      * @return `true` if the element has been successfully removed; `false` if it was not present in the collection.
      */
-    fun removeReactive(element: E): Boolean
-    {
+    fun removeReactive(element: E): Boolean {
         val isRemoved = remove(element)
         if (isRemoved) {
-            triggerAdd?.execution(element)
+            triggerRemove?.execution(element)
         }
         return isRemoved
+    }
+
+    /**
+     * Removes the element at the specified [index] from the list in a reactive
+     * manner while calling a [triggerRemove].
+     *
+     * @return the element that has been removed.
+     */
+    fun removeAtReactive(index: Int): E {
+        val element = removeAt(index)
+        triggerRemove?.execution(element)
+        return element;
     }
 
 }
@@ -60,11 +68,11 @@ interface ReactiveMutableList<E> : MutableList<E> {
  * Reactive collection based on triggers
  *
  * @param triggerAdd The trigger is fired when a new element is added to the collection.
- * @param riggerRemove The trigger is fired when an item is removed from the collection.
+ * @param triggerRemove The trigger is fired when an item is removed from the collection.
  */
 class ReactiveArrayList<E>(
     override val triggerAdd: ReactiveTrigger<E>? = null,
-    override val riggerRemove: ReactiveTrigger<E>? = null
+    override val triggerRemove: ReactiveTrigger<E>? = null
 ) :
     ReactiveMutableList<E>,
     RandomAccess,
@@ -74,18 +82,24 @@ class ReactiveArrayList<E>(
  * Returns an empty new [ReactiveMutableList].
  *
  * @param triggerAdd The trigger is fired when a new element is added to the collection.
- * @param riggerRemove The trigger is fired when an item is removed from the collection.
+ * @param triggerRemove The trigger is fired when an item is removed from the collection.
  */
 fun <T> mutableReactiveListOf(
     triggerAdd: ReactiveTrigger<T>? = null,
-    riggerRemove: ReactiveTrigger<T>? = null
-): ReactiveMutableList<T> = ReactiveArrayList(triggerAdd, riggerRemove)
+    triggerRemove: ReactiveTrigger<T>? = null
+): ReactiveMutableList<T> = ReactiveArrayList(triggerAdd, triggerRemove)
 
 /**
  * Returns a new [ReactiveMutableList] filled with all elements of this collection.
+ *
+ * @param triggerAdd The trigger is fired when a new element is added to the collection.
+ * @param triggerRemove The trigger is fired when an item is removed from the collection.
  */
-fun <T> Collection<T>.toReactiveMutableList(): ReactiveMutableList<T> {
-    val newList: ReactiveMutableList<T> = ReactiveArrayList()
+fun <T> Collection<T>.toReactiveMutableList(
+    triggerAdd: ReactiveTrigger<T>? = null,
+    triggerRemove: ReactiveTrigger<T>? = null
+): ReactiveMutableList<T> {
+    val newList: ReactiveMutableList<T> = ReactiveArrayList(triggerAdd, triggerRemove)
     newList.addAll(this)
     return newList
 }

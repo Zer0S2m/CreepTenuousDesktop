@@ -2,8 +2,6 @@ package com.zer0s2m.creeptenuous.desktop.core.reactive
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.*
 import com.zer0s2m.creeptenuous.desktop.core.handlers.*
-import com.zer0s2m.creeptenuous.desktop.core.reactive.collections.ReactiveMutableList
-import com.zer0s2m.creeptenuous.desktop.core.reactive.collections.mutableReactiveListOf
 
 /**
  * `Reactive` behavior user model

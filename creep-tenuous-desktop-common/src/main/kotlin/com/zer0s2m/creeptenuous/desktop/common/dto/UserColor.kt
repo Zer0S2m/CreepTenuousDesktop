@@ -10,6 +10,6 @@ data class UserColor(
 
     val color: String,
 
-    val id: Int
+    val id: Int? = null
 
 )

@@ -3,8 +3,12 @@ package com.zer0s2m.creeptenuous.desktop.core.handlers
 import com.zer0s2m.creeptenuous.desktop.common.dto.*
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
-import com.zer0s2m.creeptenuous.desktop.core.reactive.collections.ReactiveMutableList
-import com.zer0s2m.creeptenuous.desktop.core.reactive.collections.toReactiveMutableList
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
+import com.zer0s2m.creeptenuous.desktop.core.reactive.toReactiveMutableList
+import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTriggerUserCategoryAdd
+import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTriggerUserCategoryRemove
+import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTriggerUserColorAdd
+import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTriggerUserColorRemove
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse
@@ -39,7 +43,10 @@ object HandlerReactiveUserCustomCategories : ReactiveHandler<ReactiveMutableList
      */
     override suspend fun handler(): ReactiveMutableList<UserCategory> {
         val data: MutableCollection<UserCategory> = HttpClient.client.get("/api/v1/user/category").body()
-        return data.toReactiveMutableList()
+        return data.toReactiveMutableList(
+            triggerAdd = ReactiveTriggerUserCategoryAdd(),
+            triggerRemove = ReactiveTriggerUserCategoryRemove()
+        )
     }
 
 }
@@ -105,7 +112,10 @@ object HandlerReactiveUserColor : ReactiveHandler<ReactiveMutableList<UserColor>
      */
     override suspend fun handler(): ReactiveMutableList<UserColor> {
         val data: MutableCollection<UserColor> = HttpClient.client.get("/api/v1/user/customization/color").body()
-        return data.toReactiveMutableList()
+        return data.toReactiveMutableList(
+            triggerAdd = ReactiveTriggerUserColorAdd(),
+            triggerRemove = ReactiveTriggerUserColorRemove()
+        )
     }
 
 }
