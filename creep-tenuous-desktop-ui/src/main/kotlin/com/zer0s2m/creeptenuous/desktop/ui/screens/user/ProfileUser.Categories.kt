@@ -14,7 +14,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.*
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen

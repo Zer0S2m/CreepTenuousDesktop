@@ -1,14 +1,14 @@
-package com.zer0s2m.creeptenuous.desktop.core.handlers
+package com.zer0s2m.creeptenuous.desktop.reactive.handlers
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.*
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.core.reactive.toReactiveMutableList
-import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTriggerUserCategoryAdd
-import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTriggerUserCategoryRemove
-import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTriggerUserColorAdd
-import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTriggerUserColorRemove
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategoryAdd
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategoryRemove
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorAdd
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorRemove
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse

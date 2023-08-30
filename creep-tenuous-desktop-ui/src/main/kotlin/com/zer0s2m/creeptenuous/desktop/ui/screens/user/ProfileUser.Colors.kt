@@ -22,7 +22,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.ConverterColor
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserColor
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 
 /**

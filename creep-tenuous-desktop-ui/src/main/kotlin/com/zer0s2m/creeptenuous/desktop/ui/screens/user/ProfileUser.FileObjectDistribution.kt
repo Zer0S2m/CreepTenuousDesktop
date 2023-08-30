@@ -16,8 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveCommon
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen

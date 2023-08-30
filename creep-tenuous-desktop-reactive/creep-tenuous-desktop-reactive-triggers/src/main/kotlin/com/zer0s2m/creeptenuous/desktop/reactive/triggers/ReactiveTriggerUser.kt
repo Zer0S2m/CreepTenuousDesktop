@@ -1,7 +1,8 @@
-package com.zer0s2m.creeptenuous.desktop.core.triggers
+package com.zer0s2m.creeptenuous.desktop.reactive.triggers
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserColor
+import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTrigger
 
 /**
  * Reactive trigger to add new custom category
