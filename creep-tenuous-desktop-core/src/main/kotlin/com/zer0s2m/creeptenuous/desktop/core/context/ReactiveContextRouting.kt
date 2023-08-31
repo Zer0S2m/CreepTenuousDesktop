@@ -3,11 +3,10 @@ package com.zer0s2m.creeptenuous.desktop.core.context
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Lazy
-import com.zer0s2m.creeptenuous.desktop.core.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Loader
 
 /**
- * Main context for loading [Reactive] and [Lazy] properties via navigation elements [NavigationController]
+ * Main context for loading [Reactive] and [Lazy] properties via navigation elements
  */
 object ReactiveContextRouting : BaseReactiveContextRouting {
 
@@ -18,7 +17,7 @@ object ReactiveContextRouting : BaseReactiveContextRouting {
     private val map: MutableMap<Screen, Collection<String>> = mutableMapOf()
 
     /**
-     * Load data when navigating to a new screen via a navigation element [NavigationController.navigate]
+     * Load data when navigating to a new screen via a navigation element
      *
      * @param screen Screen for which data will be loaded
      */

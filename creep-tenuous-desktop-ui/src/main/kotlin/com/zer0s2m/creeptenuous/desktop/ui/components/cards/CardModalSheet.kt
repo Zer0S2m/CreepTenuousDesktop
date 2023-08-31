@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setAnimateColorAsStateInCard
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInCard
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardModalSheet
-import com.zer0s2m.creeptenuous.desktop.common.enums.Colors
+import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 
 /**
  * The map component for the modal sheet.

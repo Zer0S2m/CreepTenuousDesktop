@@ -18,8 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.enums.*
-import com.zer0s2m.creeptenuous.desktop.common.enums.Colors
-import com.zer0s2m.creeptenuous.desktop.core.actions.reactiveNavigationScreen
+import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CartFileObject
@@ -31,7 +30,9 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.misc.SwitchPanelDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.modals.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
-import com.zer0s2m.creeptenuous.desktop.core.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
+import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

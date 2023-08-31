@@ -10,7 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.material.Card
 import androidx.compose.ui.graphics.Color
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDropdownMenuItem
-import com.zer0s2m.creeptenuous.desktop.common.enums.Colors
+import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 
 /**
  * Set hover event on component [Card] - listens for events [HoverInteraction]

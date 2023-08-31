@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseComponent
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
-import com.zer0s2m.creeptenuous.desktop.common.enums.float
+import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 
 /**
  * The modifier to be applied to the [Row]

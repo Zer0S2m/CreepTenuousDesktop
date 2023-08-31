@@ -19,12 +19,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import com.zer0s2m.creeptenuous.desktop.common.enums.*
-import com.zer0s2m.creeptenuous.desktop.common.enums.Colors
+import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.core.context.BaseContextScreen
-import com.zer0s2m.creeptenuous.desktop.core.actions.reactiveNavigationScreen
-import com.zer0s2m.creeptenuous.desktop.core.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
+import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.*
 import kotlinx.coroutines.launch
 

@@ -14,7 +14,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.*
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
@@ -30,7 +30,6 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 @Composable
 fun ProfileUser.ProfileCategories.render() {
     val openModalCreateCategory: MutableState<Boolean> = remember { mutableStateOf(false) }
-
     val listCategories: MutableList<UserCategory> = remember {
         ReactiveUser.customCategories.toMutableStateList()
     }
@@ -55,13 +54,14 @@ fun ProfileUser.ProfileCategories.render() {
                 .fillMaxSize()
         ) {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(5),
+                columns = GridCells.Fixed(4),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(listCategories.size) { index ->
                     ItemCategory(listCategories[index].title) {
                         listCategories.removeAt(index)
+                        ReactiveUser.customCategories.removeAtReactive(index)
                     }
                 }
             }
@@ -75,7 +75,10 @@ fun ProfileUser.ProfileCategories.render() {
                 val data = UserCategory(
                     title = dataForm["title"].toString()
                 )
-                listCategories.add(UserCategory(title = data.title))
+
+                val newCategory = UserCategory(title = data.title)
+                listCategories.add(newCategory)
+                ReactiveUser.customCategories.addReactive(newCategory)
             }
         }
     }
@@ -94,7 +97,7 @@ private val stateForm: MutableState<BaseFormState> = mutableStateOf(FormState())
  * @param action The lambda to be invoked when this icon is pressed
  */
 @Composable
-internal fun ProfileUser.ProfileCategories.ItemCategory(
+internal fun ItemCategory(
     text: String,
     action: () -> Unit
 ) {
@@ -102,7 +105,11 @@ internal fun ProfileUser.ProfileCategories.ItemCategory(
         Text(
             text = text
         )
-        IconButtonDelete(onClick = action)
+
+        Row {
+            IconButtonEdit(onClick = {})
+            IconButtonDelete(onClick = action)
+        }
     }
 }
 
@@ -113,7 +120,7 @@ internal fun ProfileUser.ProfileCategories.ItemCategory(
  * @param action [Button] click event
  */
 @Composable
-internal fun ProfileUser.ProfileCategories.ModalCreateCategory(
+internal fun ModalCreateCategory(
     stateModal: MutableState<Boolean>,
     action: () -> Unit
 ) {

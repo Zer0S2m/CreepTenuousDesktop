@@ -1,19 +1,25 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive
 
 import com.zer0s2m.creeptenuous.desktop.core.errors.ReactiveLoaderException
+import com.zer0s2m.creeptenuous.desktop.core.reactive.backend.Ktor
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
 import kotlin.reflect.full.*
 
 /**
- * the main storage of values that will be loaded or will be loaded
+ * The main storage of values that will be loaded or will be loaded
  */
-private val map: MutableMap<String, ReactiveLazy> = mutableMapOf()
+private val mapReactiveLazyObjects: MutableMap<String, ReactiveLazy> = mutableMapOf()
+
+/**
+ * Core node storage for reactive and lazy properties
+ */
+private val mapNodes: MutableMap<String, MutableCollection<ReactiveLazyNode>> = mutableMapOf()
 
 /**
  * A class that stores information about a reactive or lazy object
  */
-private data class ReactiveLazy(
+internal data class ReactiveLazy(
 
     val isLazy: Boolean,
 
@@ -30,9 +36,23 @@ private data class ReactiveLazy(
 )
 
 /**
+ * The main class for storing information about the [Node]
+ */
+private data class ReactiveLazyNode(
+
+    val title: String,
+
+    val type: NodeType,
+
+    val reactiveLazyObject: ReactiveLazy,
+
+    val handler: ReactiveHandlerKtor? = null
+)
+
+/**
  * The name of the method for inverting a reactive property. [ReactiveHandler.handler]
  */
-private const val HANDLER_NAME = "handler"
+internal const val HANDLER_NAME = "handler"
 
 /**
  * Main data loader
@@ -45,7 +65,7 @@ object Loader {
      * @param nameProperty The name of the lazy behavior property is specified using an annotation [Lazy]
      */
     suspend fun load(nameProperty: String) {
-        val lazyObject: ReactiveLazy? = map[nameProperty]
+        val lazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
         if (lazyObject != null && !lazyObject.isLoad) {
             setReactiveValue(reactiveLazyObject = lazyObject)
             lazyObject.isLoad = true
@@ -65,26 +85,42 @@ suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
             val annotationLazy = kProperty.findAnnotation<Lazy<Any>>()
             val annotationReactive = kProperty.findAnnotation<Reactive<Any>>()
             if (annotationLazy != null) {
-                map[kProperty.name] = ReactiveLazy(
+                val propertyNode: Node = annotationLazy.node
+
+                @Suppress("NAME_SHADOWING")
+                val reactiveLazyObject = ReactiveLazy(
                     isLazy = true,
                     isReactive = false,
                     field = reactiveLazyObject::class.java.getDeclaredField(kProperty.name),
                     reactiveLazyObject = reactiveLazyObject,
                     handler = annotationLazy.handler
                 )
+                mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
+                if (propertyNode.type != NodeType.NONE) {
+                    collectNodes(propertyNode, reactiveLazyObject)
+                }
             } else if (annotationReactive != null) {
-                map[kProperty.name] = ReactiveLazy(
+                val propertyNode: Node = annotationReactive.node
+
+                @Suppress("NAME_SHADOWING")
+                val reactiveLazyObject = ReactiveLazy(
                     isLazy = false,
                     isReactive = true,
                     field = reactiveLazyObject::class.java.getDeclaredField(kProperty.name),
                     reactiveLazyObject = reactiveLazyObject,
                     handler = annotationReactive.handler
                 )
+                mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
+                if (propertyNode.type != NodeType.NONE) {
+                    collectNodes(propertyNode, reactiveLazyObject)
+                }
             } else if (kProperty.hasAnnotation<Lazy<Any>>() && kProperty.hasAnnotation<Reactive<Any>>()) {
                 throw ReactiveLoaderException("Parameter [${kProperty.name}] must have only one annotation")
             }
         }
     }
+
+    loadNode()
 
     setReactiveValues(
         isReactive = true,
@@ -93,14 +129,71 @@ suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
 }
 
 /**
+ * Assembling nodes into a map
+ */
+private fun collectNodes(node: Node, reactiveLazyObject: ReactiveLazy) {
+    val reactiveLazyNodeObject = ReactiveLazyNode(
+        title = node.unit,
+        type = node.type,
+        reactiveLazyObject = reactiveLazyObject,
+        handler = reactiveLazyObject.handler.objectInstance
+    )
+    if (!mapNodes.containsKey(node.unit)) {
+        mapNodes[node.unit] = mutableListOf(reactiveLazyNodeObject)
+    } else {
+        mapNodes[node.unit]?.add(reactiveLazyNodeObject)
+    }
+}
+
+private suspend fun loadNode() {
+    mapNodes.forEach { (_, nodes) ->
+        val nodesTypeKtor: MutableList<ReactiveLazyNode> = findNodes(nodes = nodes, type = NodeType.KTOR)
+        val reactiveLazyObject: MutableList<ReactiveLazy> = mutableListOf()
+
+        nodesTypeKtor.forEach {
+            reactiveLazyObject.add(it.reactiveLazyObject)
+        }
+
+        if (nodesTypeKtor.isNotEmpty()) {
+            nodesTypeKtor[0].handler?.let {
+                Ktor.load(reactiveLazyObject = reactiveLazyObject, handler = it)
+            }
+        }
+    }
+}
+
+/**
+ * Finds all reactive properties with a specific node type
+ *
+ * @param nodes dirty reactive properties
+ * @param type node type
+ *
+ * @return filtered reactive properties
+ */
+private fun findNodes(
+    nodes: MutableCollection<ReactiveLazyNode>,
+    type: NodeType
+): MutableList<ReactiveLazyNode> {
+    val nodesTypeKtor: MutableList<ReactiveLazyNode> = mutableListOf()
+
+    nodes.forEach { node ->
+        if (node.type == type) {
+            nodesTypeKtor.add(node)
+        }
+    }
+
+    return nodesTypeKtor
+}
+
+/**
  * Set reactive values via map
  */
 private suspend fun setReactiveValues(isReactive: Boolean, isLazy: Boolean) {
-    map.forEach { (_, value) ->
-        if (isReactive && value.isReactive) {
+    mapReactiveLazyObjects.forEach { (_, value) ->
+        if (isReactive && value.isReactive && !value.isLoad) {
             setReactiveValue(reactiveLazyObject = value)
         }
-        if (isLazy && value.isLazy) {
+        if (isLazy && value.isLazy && !value.isLoad) {
             setReactiveValue(reactiveLazyObject = value)
         }
     }
@@ -116,10 +209,12 @@ private suspend fun setReactiveValue(reactiveLazyObject: ReactiveLazy) {
     }
     if (method != null) {
         field.isAccessible = true
+
         field.set(
             reactiveLazyObject.reactiveLazyObject,
             method.callSuspend(reactiveLazyObject.handler.objectInstance)
         )
+
         reactiveLazyObject.isLoad = true
     }
 }

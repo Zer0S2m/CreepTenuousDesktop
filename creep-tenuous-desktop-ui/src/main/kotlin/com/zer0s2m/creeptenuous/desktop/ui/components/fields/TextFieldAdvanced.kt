@@ -17,7 +17,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseField
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.core.validation.Validator
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
-import com.zer0s2m.creeptenuous.desktop.common.enums.dp
+import com.zer0s2m.creeptenuous.desktop.ui.misc.dp
 
 /**
  * Text field. Renders the component [TextField]

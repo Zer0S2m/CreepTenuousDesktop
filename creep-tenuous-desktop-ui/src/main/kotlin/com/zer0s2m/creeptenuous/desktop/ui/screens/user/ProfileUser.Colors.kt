@@ -12,12 +12,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.dto.ConverterColor
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserColor
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 
 /**
@@ -26,17 +31,8 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 @Composable
 fun ProfileUser.ProfileColors.render() {
     val stateModal: MutableState<Boolean> = remember { mutableStateOf(false) }
-
     val listColors: MutableList<Color> = remember {
-        listOf(
-            Color(140, 150, 33),
-            Color(3, 2, 33),
-            Color(33, 1, 33),
-            Color(2, 22, 23),
-            Color(12, 150, 123),
-            Color(12, 22, 33),
-            Color(32, 123, 33)
-        ).toMutableStateList()
+        getUserColorRgbFromHex().toMutableStateList()
     }
 
     Column(
@@ -59,29 +55,31 @@ fun ProfileUser.ProfileColors.render() {
                 .fillMaxSize()
         ) {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(5),
+                columns = GridCells.Fixed(4),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(listColors.size) { index ->
                     ColorItem(listColors[index]) {
                         listColors.removeAt(index)
+                        ReactiveUser.userColors.removeAtReactive(index)
                     }
                 }
             }
         }
     }
 
-    ModalCreateCustomColor(stateModal = stateModal)
+    ModalCreateCustomColor(stateModal = stateModal, listColors = listColors)
 }
 
 /**
  * Custom color base card
  *
  * @param color Color
+ * @param action Detailed documentation щт [IconButtonDelete] in the argument `onClick`
  */
 @Composable
-internal fun ProfileUser.ProfileColors.ColorItem(
+internal fun ColorItem(
     color: Color,
     action: () -> Unit
 ) {
@@ -93,7 +91,10 @@ internal fun ProfileUser.ProfileColors.ColorItem(
                 .width(80.dp)
         )
 
-        IconButtonDelete(onClick = action)
+        Row {
+            IconButtonEdit(onClick = {})
+            IconButtonDelete(onClick = action)
+        }
     }
 }
 
@@ -101,10 +102,12 @@ internal fun ProfileUser.ProfileColors.ColorItem(
  * Modal window for creating a custom category
  *
  * @param stateModal Modal window states for category creation
+ * @param listColors Collection of custom flowers. Required to create a new color
 */
 @Composable
-internal fun ProfileUser.ProfileColors.ModalCreateCustomColor(
-    stateModal: MutableState<Boolean>
+internal fun ModalCreateCustomColor(
+    stateModal: MutableState<Boolean>,
+    listColors: MutableList<Color>
 ) {
     BaseModalPopup(
         stateModal = stateModal
@@ -116,13 +119,24 @@ internal fun ProfileUser.ProfileColors.ModalCreateCustomColor(
                 .height(400.dp)
                 .shadow(24.dp, RoundedCornerShape(4.dp))
         ) {
-            ModalCreateCustomColorContent(stateModal = stateModal)
+            ModalCreateCustomColorContent {
+                stateModal.value = false
+                listColors.add(it)
+                ReactiveUser.userColors.addReactive(UserColor(
+                    color = "#${Integer.toHexString(it.toArgb()).substring(2)}"
+                ))
+            }
         }
     }
 }
 
+/**
+ * Filling the custom color creation form with content
+ *
+ * @param action Actions on button click. Takes on color to elevate the event
+ */
 @Composable
-private fun ModalCreateCustomColorContent(stateModal: MutableState<Boolean>) {
+private fun ModalCreateCustomColorContent(action: (Color) -> Unit) {
     var red by remember { mutableStateOf(150f) }
     var green by remember { mutableStateOf(150f) }
     var blue by remember { mutableStateOf(150f) }
@@ -201,8 +215,7 @@ private fun ModalCreateCustomColorContent(stateModal: MutableState<Boolean>) {
                     .fillMaxWidth()
                     .pointerHoverIcon(PointerIcon.Hand),
                 onClick = {
-                    stateModal.value = false
-                    println("Create color")
+                    action(color)
                 }
             ) {
                 Text("Create")
@@ -228,4 +241,20 @@ private fun ButtonCreateCustomColor(stateModal: MutableState<Boolean>) {
     ) {
         Text("Create color")
     }
+}
+
+private fun getUserColorRgbFromHex(): Collection<Color> {
+    val colors: MutableList<Color> = mutableListOf()
+
+    ReactiveUser.userColors.forEach {
+        val convertedColor: ConverterColor = colorConvertHexToRgb(it.color)
+
+        colors.add(Color(
+            red = convertedColor.red,
+            green = convertedColor.green,
+            blue = convertedColor.blue
+        ))
+    }
+
+    return colors
 }
