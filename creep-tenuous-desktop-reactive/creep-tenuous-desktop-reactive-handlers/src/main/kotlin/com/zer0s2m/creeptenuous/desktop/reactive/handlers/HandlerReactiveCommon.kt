@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.core.handlers
+package com.zer0s2m.creeptenuous.desktop.reactive.handlers
 
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandler

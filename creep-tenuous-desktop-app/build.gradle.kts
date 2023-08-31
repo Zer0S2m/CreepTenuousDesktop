@@ -1,6 +1,5 @@
 plugins {
-    kotlin("jvm")
-    id("org.jetbrains.compose") version "1.4.1"
+    id("org.jetbrains.compose")
 }
 
 dependencies {
@@ -8,7 +7,5 @@ dependencies {
 
     implementation(project(":creep-tenuous-desktop-ui"))
     implementation(project(":creep-tenuous-desktop-core"))
+    implementation(project(":creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-models"))
 }
-
-group = "com.zer0s2m.creeptenuous.desktop.app"
-version = "0.0.1-SNAPSHOT"

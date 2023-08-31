@@ -11,9 +11,9 @@ import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenProfil
 import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenSettingsSystem
 import com.zer0s2m.creeptenuous.desktop.ui.theme.darkColors
 import com.zer0s2m.creeptenuous.desktop.core.navigation.runtime.rememberNavigationController
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveCommon
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.core.reactive.collectLoader
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import kotlinx.coroutines.launch
 

@@ -6,6 +6,8 @@ plugins {
     id("org.jetbrains.compose") version "1.4.1"
 }
 
+val ktorVersion = "2.3.2"
+
 group = "com.zer0s2m.creeptenuous.desktop"
 version = "0.0.1-SNAPSHOT"
 
@@ -34,6 +36,8 @@ allprojects {
 
     group = "com.zer0s2m.creeptenuous.desktop"
     version = "0.0.1-SNAPSHOT"
+
+    project.ext.set("ktorVersion", ktorVersion)
 
     runTasks()
 }
@@ -70,6 +74,7 @@ compose.desktop {
 dependencies {
     implementation(project(":creep-tenuous-desktop-common"))
     implementation(project(":creep-tenuous-desktop-core"))
+    implementation(project(":creep-tenuous-desktop-reactive"))
     implementation(project(":creep-tenuous-desktop-ui"))
     implementation(project(":creep-tenuous-desktop-app"))
 

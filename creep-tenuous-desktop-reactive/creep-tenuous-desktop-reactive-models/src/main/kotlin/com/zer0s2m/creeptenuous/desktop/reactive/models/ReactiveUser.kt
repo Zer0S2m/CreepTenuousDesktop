@@ -1,7 +1,12 @@
-package com.zer0s2m.creeptenuous.desktop.core.reactive
+package com.zer0s2m.creeptenuous.desktop.reactive.models
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.*
-import com.zer0s2m.creeptenuous.desktop.core.handlers.*
+import com.zer0s2m.creeptenuous.desktop.reactive.handlers.*
+import com.zer0s2m.creeptenuous.desktop.core.reactive.*
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategoryAdd
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategoryRemove
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorAdd
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorRemove
 
 /**
  * `Reactive` behavior user model
@@ -11,10 +16,13 @@ object ReactiveUser : ReactiveLazyObject {
     /**
      * Custom categories for the user
      */
-    @Reactive<MutableCollection<UserCategory>>(
+    @Reactive<ReactiveMutableList<UserCategory>>(
         handler = HandlerReactiveUserCustomCategories::class
     )
-    var customCategories: MutableCollection<UserCategory> = mutableListOf()
+    var customCategories: ReactiveMutableList<UserCategory> = mutableReactiveListOf(
+        triggerAdd = ReactiveTriggerUserCategoryAdd(),
+        triggerRemove = ReactiveTriggerUserCategoryRemove()
+    )
 
     /**
      * Basic parameters for the user
@@ -31,10 +39,13 @@ object ReactiveUser : ReactiveLazyObject {
     /**
      * Custom colors
      */
-    @Reactive<MutableCollection<UserColor>>(
+    @Reactive<ReactiveMutableList<UserColor>>(
         handler = HandlerReactiveUserColor::class
     )
-    var userColors: MutableCollection<UserColor> = mutableListOf()
+    var userColors: ReactiveMutableList<UserColor> = mutableReactiveListOf(
+        triggerAdd = ReactiveTriggerUserColorAdd(),
+        triggerRemove = ReactiveTriggerUserColorRemove()
+    )
 
     /**
      * Storage of user settings

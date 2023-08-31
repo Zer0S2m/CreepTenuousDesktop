@@ -12,15 +12,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.ConverterColor
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserColor
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 
 /**
@@ -53,13 +55,14 @@ fun ProfileUser.ProfileColors.render() {
                 .fillMaxSize()
         ) {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(5),
+                columns = GridCells.Fixed(4),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(listColors.size) { index ->
                     ColorItem(listColors[index]) {
                         listColors.removeAt(index)
+                        ReactiveUser.userColors.removeAtReactive(index)
                     }
                 }
             }
@@ -76,7 +79,7 @@ fun ProfileUser.ProfileColors.render() {
  * @param action Detailed documentation щт [IconButtonDelete] in the argument `onClick`
  */
 @Composable
-internal fun ProfileUser.ProfileColors.ColorItem(
+internal fun ColorItem(
     color: Color,
     action: () -> Unit
 ) {
@@ -88,7 +91,10 @@ internal fun ProfileUser.ProfileColors.ColorItem(
                 .width(80.dp)
         )
 
-        IconButtonDelete(onClick = action)
+        Row {
+            IconButtonEdit(onClick = {})
+            IconButtonDelete(onClick = action)
+        }
     }
 }
 
@@ -99,7 +105,7 @@ internal fun ProfileUser.ProfileColors.ColorItem(
  * @param listColors Collection of custom flowers. Required to create a new color
 */
 @Composable
-internal fun ProfileUser.ProfileColors.ModalCreateCustomColor(
+internal fun ModalCreateCustomColor(
     stateModal: MutableState<Boolean>,
     listColors: MutableList<Color>
 ) {
@@ -116,6 +122,9 @@ internal fun ProfileUser.ProfileColors.ModalCreateCustomColor(
             ModalCreateCustomColorContent {
                 stateModal.value = false
                 listColors.add(it)
+                ReactiveUser.userColors.addReactive(UserColor(
+                    color = "#${Integer.toHexString(it.toArgb()).substring(2)}"
+                ))
             }
         }
     }
