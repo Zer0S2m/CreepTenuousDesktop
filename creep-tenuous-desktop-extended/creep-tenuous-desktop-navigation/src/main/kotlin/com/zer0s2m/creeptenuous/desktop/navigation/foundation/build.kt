@@ -1,7 +1,7 @@
-package com.zer0s2m.creeptenuous.desktop.core.navigation.foundation
+package com.zer0s2m.creeptenuous.desktop.navigation.foundation
 
 import androidx.compose.runtime.Composable
-import com.zer0s2m.creeptenuous.desktop.core.navigation.NavigationHost
+import com.zer0s2m.creeptenuous.desktop.navigation.NavigationHost
 
 @Composable
 fun NavigationHost.NavigationGraphBuilder.composable(

@@ -1,10 +1,10 @@
-package com.zer0s2m.creeptenuous.desktop.core.navigation
+package com.zer0s2m.creeptenuous.desktop.navigation
 
 import androidx.compose.runtime.Composable
 
 class NavigationHost(
     val navigationController: NavigationController,
-    val contents: @Composable NavigationHost.NavigationGraphBuilder.() -> Unit
+    val contents: @Composable NavigationGraphBuilder.() -> Unit
 ) {
 
     @Composable

@@ -3,16 +3,15 @@ package com.zer0s2m.creeptenuous.desktop.core.context
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Lazy
-import com.zer0s2m.creeptenuous.desktop.core.navigation.NavigationController
 
 /**
  * Interface to implement the main context for loading [Reactive] and [Lazy] properties
- * via navigation elements [NavigationController]
+ * via navigation elements
  */
 interface BaseReactiveContextRouting {
 
     /**
-     * Load data when navigating to a new screen via a navigation element [NavigationController.navigate]
+     * Load data when navigating to a new screen via a navigation element
      *
      * @param screen Screen for which data will be loaded
      */

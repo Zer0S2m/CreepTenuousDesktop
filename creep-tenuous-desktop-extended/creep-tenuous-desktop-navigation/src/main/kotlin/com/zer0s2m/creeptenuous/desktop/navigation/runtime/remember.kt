@@ -1,10 +1,10 @@
-package com.zer0s2m.creeptenuous.desktop.core.navigation.runtime
+package com.zer0s2m.creeptenuous.desktop.navigation.runtime
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.zer0s2m.creeptenuous.desktop.core.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 
 @Composable
 fun rememberNavigationController(

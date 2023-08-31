@@ -8,7 +8,7 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.zer0s2m.creeptenuous.desktop.core.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 
 /**
  * The base interface for implementing a dashboard that is divided into

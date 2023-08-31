@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.core.actions
+package com.zer0s2m.creeptenuous.desktop.core.navigation.actions
 
 import com.zer0s2m.creeptenuous.desktop.core.context.ReactiveContextRouting
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive

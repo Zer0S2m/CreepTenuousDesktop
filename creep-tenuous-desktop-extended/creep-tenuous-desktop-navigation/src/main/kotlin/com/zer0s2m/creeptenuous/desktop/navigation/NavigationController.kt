@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.core.navigation
+package com.zer0s2m.creeptenuous.desktop.navigation
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf

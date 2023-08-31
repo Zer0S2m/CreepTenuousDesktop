@@ -1,8 +1,8 @@
-package com.zer0s2m.creeptenuous.desktop.core.actions
+package com.zer0s2m.creeptenuous.desktop.core.navigation.actions
 
 import androidx.compose.runtime.State
-import com.zer0s2m.creeptenuous.desktop.core.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import kotlinx.coroutines.CoroutineScope
 
 /**

@@ -1,9 +1,4 @@
-plugins {
-    id("org.jetbrains.compose")
-}
-
 dependencies {
-    implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
 
     implementation("io.ktor:ktor-client-core:${project.ext.get("ktorVersion")}")

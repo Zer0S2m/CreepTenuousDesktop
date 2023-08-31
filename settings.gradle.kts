@@ -13,14 +13,10 @@ include(
     "creep-tenuous-desktop-reactive",
     "creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-models",
     "creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-handlers",
-    "creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-triggers"
+    "creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-triggers",
+    "creep-tenuous-desktop-extended",
+    "creep-tenuous-desktop-extended:creep-tenuous-desktop-navigation",
+    "creep-tenuous-desktop-extended:creep-tenuous-desktop-core-navigation"
 )
-
-findProject(":creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-handlers")?.name =
-    "creep-tenuous-desktop-reactive-handlers"
-findProject(":creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-models")?.name =
-    "creep-tenuous-desktop-reactive-models"
-findProject(":creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-triggers")?.name =
-    "creep-tenuous-desktop-reactive-triggers"
 
 rootProject.name = "CreepTenuousDesktop"
