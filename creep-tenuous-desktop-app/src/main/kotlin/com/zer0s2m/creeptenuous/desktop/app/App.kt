@@ -15,6 +15,7 @@ import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.navigation.runtime.rememberNavigationController
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import kotlinx.coroutines.launch
 
 @Composable
@@ -40,7 +41,8 @@ fun App() {
                 ReactiveUser,
                 ReactiveUser.UserSettings,
                 ReactiveUser.GrantedRights,
-                ReactiveCommon
+                ReactiveCommon,
+                ReactiveFileObject
             )
         )
     }
