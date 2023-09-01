@@ -2,6 +2,7 @@ package com.zer0s2m.creeptenuous.desktop.common.utils
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.ConverterColor
 import com.zer0s2m.creeptenuous.desktop.common.exceptions.InvalidFormatHerColorException
+import kotlin.math.roundToInt
 
 /**
  * Convert color from `hex` to `rgb` format
@@ -32,4 +33,18 @@ fun colorConvertHexToRgb(hex: String): ConverterColor {
     }
 
     throw InvalidFormatHerColorException("Invalid color format - hex")
+}
+
+/**
+ * Change color with rounding
+ *
+ * @param color Start color
+ * @param factor Multiplier factor
+ */
+fun manipulateColor(color: ConverterColor, factor: Double): ConverterColor {
+    return ConverterColor(
+        red = (color.red * factor).roundToInt(),
+        green = (color.green * factor).roundToInt(),
+        blue = (color.blue * factor).roundToInt()
+    )
 }

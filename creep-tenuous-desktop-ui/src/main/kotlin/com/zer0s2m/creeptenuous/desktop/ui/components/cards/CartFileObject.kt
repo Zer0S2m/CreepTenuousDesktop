@@ -6,8 +6,14 @@ import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,14 +24,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
+import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
+import com.zer0s2m.creeptenuous.desktop.common.utils.manipulateColor
+import com.zer0s2m.creeptenuous.desktop.core.errors.ComponentException
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setAnimateColorAsStateInCard
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInCard
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.menu.DropdownMenuAdvanced
 import com.zer0s2m.creeptenuous.desktop.ui.components.menu.DropdownMenuItemAdvanced
-import com.zer0s2m.creeptenuous.desktop.core.errors.ComponentException
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
-import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 
 /**
  * Base class for implementing work with file objects.
@@ -36,12 +44,14 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
  * @param isFile File object type designation - file
  * @param text Display text when rendering
  * @param isAnimation Set background change animation for a component
+ * @param color Color palette for file object type - directory
  */
 class CartFileObject(
     override val isDirectory: Boolean,
     override val isFile: Boolean,
     override val text: String = "",
-    override val isAnimation: Boolean = true
+    override val isAnimation: Boolean = true,
+    override val color: String? = null
 ) : BaseCardFileObject {
 
     /**
@@ -105,12 +115,32 @@ class CartFileObject(
     private fun renderBase(content: @Composable () -> Unit) {
         val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
         val isHover: MutableState<Boolean> = remember { mutableStateOf(false) }
-        val animatedCardColor = setAnimateColorAsStateInCard(isHover = isHover)
+        var animatedCardColor = setAnimateColorAsStateInCard(isHover = isHover)
 
         if (isAnimation) {
             setHoverInCard(
                 interactionSource = interactionSource,
                 isHover = isHover
+            )
+        }
+
+        if (color != null) {
+            val converterColor = colorConvertHexToRgb(color)
+            val backgroundHoverColor = manipulateColor(converterColor, 0.95)
+            val newColor = Color(
+                red = converterColor.red,
+                green = converterColor.green,
+                blue = converterColor.blue
+            )
+
+            animatedCardColor = setAnimateColorAsStateInCard(
+                isHover = isHover,
+                backgroundColor = newColor,
+                backgroundHover = Color(
+                    red = backgroundHoverColor.red,
+                    green = backgroundHoverColor.green,
+                    blue = backgroundHoverColor.blue
+                )
             )
         }
 

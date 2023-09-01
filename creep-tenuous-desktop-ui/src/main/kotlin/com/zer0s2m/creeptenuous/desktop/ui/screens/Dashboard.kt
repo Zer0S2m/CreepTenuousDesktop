@@ -4,11 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.Divider
+import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -17,8 +17,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zer0s2m.creeptenuous.desktop.common.enums.*
-import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
+import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
+import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
+import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
+import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
+import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
+import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
+import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
+import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CartFileObject
@@ -28,10 +37,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbs
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.SwitchPanelDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.modals.ModalRightSheetLayout
-import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
-import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
-import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
-import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -160,8 +166,21 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
                         .background(Color.White),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val list1 = (1..8).map { "Folder $it" }
-                    val list2 = (1..6).map { "File $it" }
+                    val fileObjects: MutableState<ManagerFileObject?> = rememberSaveable {
+                        mutableStateOf(ReactiveFileObject.managerFileSystemObjects)
+                    }
+                    val folders: MutableState<MutableList<FileObject>> = rememberSaveable {
+                        mutableStateOf(mutableListOf())
+                    }
+                    val files: MutableState<MutableList<FileObject>> = rememberSaveable {
+                        mutableStateOf(mutableListOf())
+                    }
+                    if (fileObjects.value != null) {
+                        fileObjects.value!!.objects.forEach {
+                            if (it.isDirectory) folders.value.add(it)
+                            else if (it.isFile) files.value.add(it)
+                        }
+                    }
 
                     Column(
                         modifier = Modifier
@@ -171,34 +190,35 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
                             modifier = Modifier
                                 .padding(bottom = 28.dp)
                         ) {
-                            TitleCategoryFileObject("Folders", list1.size)
+                            TitleCategoryFileObject("Folders", folders.value.size)
                             LazyVerticalGrid(
                                 columns = GridCells.Adaptive(160.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(list1.size) { index ->
+                                items(folders.value.size) { index ->
                                     CartFileObject(
                                         isDirectory = true,
                                         isFile = false,
-                                        text = list1[index]
+                                        text = folders.value[index].realName,
+                                        color = folders.value[index].color
                                     ).render()
                                 }
                             }
                         }
 
                         Column {
-                            TitleCategoryFileObject("Files", list2.size)
+                            TitleCategoryFileObject("Files", files.value.size)
                             LazyVerticalGrid(
                                 columns = GridCells.Adaptive(160.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(list2.size) { index ->
+                                items(files.value.size) { index ->
                                     CartFileObject(
                                         isDirectory = false,
                                         isFile = true,
-                                        text = list2[index]
+                                        text = files.value[index].realName
                                     ).render()
                                 }
                             }

@@ -25,4 +25,10 @@ interface BaseCardFileObject : BaseComponent, BaseAnimation {
     val text: String
         get() = ""
 
+    /**
+     * Color palette for file object type - directory
+     */
+    val color: String?
+        get() = null
+
 }
