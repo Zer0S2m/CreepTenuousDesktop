@@ -31,6 +31,8 @@ internal data class ReactiveLazy(
 
     val handler: KClass<out ReactiveHandler<Any>>,
 
+    val handlerAfter: KClass<out ReactiveHandlerAfter>,
+
     var isLoad: Boolean = false
 
 )
@@ -53,6 +55,11 @@ private data class ReactiveLazyNode(
  * The name of the method for inverting a reactive property. [ReactiveHandler.handler]
  */
 internal const val HANDLER_NAME = "handler"
+
+/**
+ * The name of the method for inverting a reactive property. [ReactiveHandlerAfter.action]
+ */
+internal const val HANDLER_AFTER_NAME = "action"
 
 /**
  * Main data loader
@@ -93,7 +100,8 @@ suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
                     isReactive = false,
                     field = reactiveLazyObject::class.java.getDeclaredField(kProperty.name),
                     reactiveLazyObject = reactiveLazyObject,
-                    handler = annotationLazy.handler
+                    handler = annotationLazy.handler,
+                    handlerAfter = annotationLazy.handlerAfter
                 )
                 mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
                 if (propertyNode.type != NodeType.NONE) {
@@ -108,7 +116,8 @@ suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
                     isReactive = true,
                     field = reactiveLazyObject::class.java.getDeclaredField(kProperty.name),
                     reactiveLazyObject = reactiveLazyObject,
-                    handler = annotationReactive.handler
+                    handler = annotationReactive.handler,
+                    handlerAfter = annotationReactive.handlerAfter,
                 )
                 mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
                 if (propertyNode.type != NodeType.NONE) {
@@ -204,17 +213,26 @@ private suspend fun setReactiveValues(isReactive: Boolean, isLazy: Boolean) {
  */
 private suspend fun setReactiveValue(reactiveLazyObject: ReactiveLazy) {
     val field = reactiveLazyObject.field
-    val method = reactiveLazyObject.handler.declaredMemberFunctions.find {
+    val methodHandler = reactiveLazyObject.handler.declaredMemberFunctions.find {
         it.name == HANDLER_NAME
     }
-    if (method != null) {
+    val methodHandlerAfter = reactiveLazyObject.handlerAfter.declaredMemberFunctions.find {
+        it.name == HANDLER_AFTER_NAME
+    }
+
+    if (methodHandler != null) {
         field.isAccessible = true
 
         field.set(
             reactiveLazyObject.reactiveLazyObject,
-            method.callSuspend(reactiveLazyObject.handler.objectInstance)
+            methodHandler.callSuspend(reactiveLazyObject.handler.objectInstance)
         )
 
         reactiveLazyObject.isLoad = true
+    }
+
+    if (methodHandlerAfter != null
+        && reactiveLazyObject.handlerAfter.objectInstance != null) {
+        methodHandlerAfter.callSuspend(reactiveLazyObject.handlerAfter.objectInstance)
     }
 }
