@@ -8,7 +8,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -60,6 +59,19 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
         "Images" to Resources.ICON_IMAGE.path,
         "Musics" to Resources.ICON_MUSIC.path
     )
+
+    // TODO: Remove the crutch and make the package "creep-tenuous-desktop-core" normal so that
+    //  you can update the properties and not change the whole package
+    internal companion object {
+
+        private val managerFileObject: MutableState<ManagerFileObject> =
+            mutableStateOf(ReactiveFileObject.managerFileSystemObjects)
+
+        internal fun setManagerFileObject(managerFileObject: ManagerFileObject) {
+            this.managerFileObject.value = managerFileObject
+        }
+
+    }
 
     /**
      * Event when clicking on the button to go to the section of an individual user profile
@@ -166,20 +178,17 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
                         .background(Color.White),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val fileObjects: MutableState<ManagerFileObject?> = rememberSaveable {
-                        mutableStateOf(ReactiveFileObject.managerFileSystemObjects)
-                    }
-                    val folders: MutableState<MutableList<FileObject>> = rememberSaveable {
+                    val fileObjects: MutableState<ManagerFileObject> = remember { managerFileObject }
+                    val folders: MutableState<MutableList<FileObject>> = remember {
                         mutableStateOf(mutableListOf())
                     }
-                    val files: MutableState<MutableList<FileObject>> = rememberSaveable {
+                    val files: MutableState<MutableList<FileObject>> = remember {
                         mutableStateOf(mutableListOf())
                     }
-                    if (fileObjects.value != null) {
-                        fileObjects.value!!.objects.forEach {
-                            if (it.isDirectory) folders.value.add(it)
-                            else if (it.isFile) files.value.add(it)
-                        }
+
+                    fileObjects.value.objects.forEach {
+                        if (it.isDirectory) folders.value.add(it)
+                        else if (it.isFile) files.value.add(it)
                     }
 
                     Column(
@@ -242,6 +251,9 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
         }
     }
 
+    /**
+     * Renders a popup modal window to navigate to the screen state - user settings [Screen.PROFILE_SCREEN]
+     */
     @Composable
     private fun renderContentModalRightSheet() {
         val baseModifierCard: Modifier = Modifier

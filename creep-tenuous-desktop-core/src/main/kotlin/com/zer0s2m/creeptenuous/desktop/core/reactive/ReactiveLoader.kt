@@ -64,7 +64,7 @@ internal const val HANDLER_AFTER_NAME = "action"
 /**
  * Main data loader
  */
-object Loader {
+object ReactiveLoader {
 
     /**
      * Load a single property of lazy behavior from the map of objects that are collected with [collectLoader]

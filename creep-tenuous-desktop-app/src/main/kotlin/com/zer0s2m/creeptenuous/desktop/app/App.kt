@@ -22,19 +22,8 @@ import kotlinx.coroutines.launch
 @Composable
 @Preview
 fun App() {
-    val navigationController by rememberNavigationController(Screen.LOGIN_SCREEN.name)
+    val navigationController by rememberNavigationController(Screen.DASHBOARD_SCREEN.name)
     val coroutineScope = rememberCoroutineScope()
-
-    MaterialTheme(
-        colors = darkColors()
-    ) {
-        Surface {
-            CollectScreenLoginUser(navigationController)
-            CollectScreenSettingsSystem(navigationController)
-            CollectScreenDashboard(navigationController)
-            CollectScreenProfileUser(navigationController)
-        }
-    }
 
     coroutineScope.launch {
         collectLoader(
@@ -46,5 +35,16 @@ fun App() {
                 ReactiveFileObject
             )
         )
+    }
+
+    MaterialTheme(
+        colors = darkColors()
+    ) {
+        Surface {
+            CollectScreenLoginUser(navigationController)
+            CollectScreenSettingsSystem(navigationController)
+            CollectScreenDashboard(navigationController)
+            CollectScreenProfileUser(navigationController)
+        }
     }
 }

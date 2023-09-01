@@ -1,9 +1,9 @@
 package com.zer0s2m.creeptenuous.desktop.core.context
 
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
-import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Lazy
-import com.zer0s2m.creeptenuous.desktop.core.reactive.Loader
+import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 
 /**
  * Main context for loading [Reactive] and [Lazy] properties via navigation elements
@@ -24,7 +24,7 @@ object ReactiveContextRouting : BaseReactiveContextRouting {
     override suspend fun load(screen: Screen) {
         if (map.containsKey(screen) && map[screen]?.isNotEmpty() == true) {
             map[screen]?.forEach {
-                Loader.load(it)
+                ReactiveLoader.load(it)
             }
             map.remove(screen)
         }

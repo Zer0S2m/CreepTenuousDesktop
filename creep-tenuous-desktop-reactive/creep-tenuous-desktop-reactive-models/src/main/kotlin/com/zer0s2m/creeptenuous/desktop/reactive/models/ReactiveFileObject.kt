@@ -16,6 +16,10 @@ object ReactiveFileObject : ReactiveLazyObject {
     @Reactive<ManagerFileObject>(
         handler = HandlerReactiveFileObjectManagerFileSystemObjects::class
     )
-    var managerFileSystemObjects: ManagerFileObject? = null
+    var managerFileSystemObjects: ManagerFileObject = ManagerFileObject(
+        systemParents = listOf(),
+        level = 0,
+        objects = listOf()
+    )
 
 }

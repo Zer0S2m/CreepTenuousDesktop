@@ -4,7 +4,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandler
 import io.ktor.client.call.*
-import io.ktor.client.request.get
+import io.ktor.client.request.*
 
 /**
  * Reactive handler for getting information about file objects in different nesting spans
