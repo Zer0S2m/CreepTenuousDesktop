@@ -1,6 +1,8 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive
 
 import com.zer0s2m.creeptenuous.desktop.core.errors.ReactiveLoaderException
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.reactive.backend.Ktor
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
@@ -32,6 +34,10 @@ internal data class ReactiveLazy(
     val handler: KClass<out ReactiveHandler<Any>>,
 
     val handlerAfter: KClass<out ReactiveHandlerAfter>,
+
+    val injectionClass: KClass<out ReactiveInjectionClass>? = null,
+
+    val injectionMethod: String = "",
 
     var isLoad: Boolean = false
 
@@ -85,14 +91,42 @@ object ReactiveLoader {
  * Collect all reactive classes for loading data and building an auxiliary map for loading data
  *
  * @param classes Reactive classes for collecting data
+ * @param injectionClasses Map of classes to which reactive and lazy properties will be
+ * implemented through the specified methods
  */
-suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
+suspend fun collectLoader(
+    classes: Collection<ReactiveLazyObject>,
+    injectionClasses: HashMap<KClass<out ReactiveInjectionClass>, Collection<String>> = hashMapOf()
+) {
+    var injectionClass: KClass<out ReactiveInjectionClass>? = null
+    var injectionMethod = ""
+
+    /**
+     * Sets the mentee for dependency injection
+     *
+     * @param injection Information about the injection
+     */
+    fun setReactiveInjection(injection: ReactiveInjection) {
+        if (injection.method.isNotEmpty()) {
+            val filteredInjectionClasses = injectionClasses.filterValues {
+                it.contains(injection.method)
+            }
+
+            val (key, _) = filteredInjectionClasses.entries.iterator().next()
+
+            injectionClass = key
+            injectionMethod = injection.method
+        }
+    }
+
     classes.forEach { reactiveLazyObject ->
         reactiveLazyObject::class.memberProperties.forEach { kProperty ->
             val annotationLazy = kProperty.findAnnotation<Lazy<Any>>()
             val annotationReactive = kProperty.findAnnotation<Reactive<Any>>()
             if (annotationLazy != null) {
                 val propertyNode: Node = annotationLazy.node
+
+                setReactiveInjection(annotationLazy.injection)
 
                 @Suppress("NAME_SHADOWING")
                 val reactiveLazyObject = ReactiveLazy(
@@ -101,7 +135,9 @@ suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
                     field = reactiveLazyObject::class.java.getDeclaredField(kProperty.name),
                     reactiveLazyObject = reactiveLazyObject,
                     handler = annotationLazy.handler,
-                    handlerAfter = annotationLazy.handlerAfter
+                    handlerAfter = annotationLazy.handlerAfter,
+                    injectionClass = injectionClass,
+                    injectionMethod = injectionMethod
                 )
                 mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
                 if (propertyNode.type != NodeType.NONE) {
@@ -109,6 +145,8 @@ suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
                 }
             } else if (annotationReactive != null) {
                 val propertyNode: Node = annotationReactive.node
+
+                setReactiveInjection(annotationReactive.injection)
 
                 @Suppress("NAME_SHADOWING")
                 val reactiveLazyObject = ReactiveLazy(
@@ -118,6 +156,8 @@ suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
                     reactiveLazyObject = reactiveLazyObject,
                     handler = annotationReactive.handler,
                     handlerAfter = annotationReactive.handlerAfter,
+                    injectionClass = injectionClass,
+                    injectionMethod = injectionMethod
                 )
                 mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
                 if (propertyNode.type != NodeType.NONE) {
@@ -127,6 +167,9 @@ suspend fun collectLoader(classes: Collection<ReactiveLazyObject>) {
                 throw ReactiveLoaderException("Parameter [${kProperty.name}] must have only one annotation")
             }
         }
+
+        injectionClass = null
+        injectionMethod = ""
     }
 
     loadNode()
@@ -179,6 +222,7 @@ private suspend fun loadNode() {
  *
  * @return filtered reactive properties
  */
+@Suppress("SameParameterValue")
 private fun findNodes(
     nodes: MutableCollection<ReactiveLazyNode>,
     type: NodeType
@@ -223,16 +267,24 @@ private suspend fun setReactiveValue(reactiveLazyObject: ReactiveLazy) {
     if (methodHandler != null) {
         field.isAccessible = true
 
-        field.set(
-            reactiveLazyObject.reactiveLazyObject,
-            methodHandler.callSuspend(reactiveLazyObject.handler.objectInstance)
-        )
+        val objectFromHandler = methodHandler.callSuspend(reactiveLazyObject.handler.objectInstance)
+
+        field.set(reactiveLazyObject.reactiveLazyObject, objectFromHandler)
 
         reactiveLazyObject.isLoad = true
-    }
 
-    if (methodHandlerAfter != null
-        && reactiveLazyObject.handlerAfter.objectInstance != null) {
-        methodHandlerAfter.callSuspend(reactiveLazyObject.handlerAfter.objectInstance)
+        if (methodHandlerAfter != null
+            && reactiveLazyObject.handlerAfter.objectInstance != null) {
+            methodHandlerAfter.callSuspend(reactiveLazyObject.handlerAfter.objectInstance)
+        }
+
+        if (reactiveLazyObject.injectionClass != null && reactiveLazyObject.injectionMethod.isNotEmpty()) {
+            val compObject = reactiveLazyObject.injectionClass.companionObject
+            if (compObject != null) {
+                compObject.functions.find {
+                    it.name == reactiveLazyObject.injectionMethod
+                }?.call(reactiveLazyObject.injectionClass.companionObjectInstance, objectFromHandler)
+            }
+        }
     }
 }

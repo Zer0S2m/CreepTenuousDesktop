@@ -16,9 +16,16 @@ import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenDashbo
 import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenLoginUser
 import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenProfileUser
 import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenSettingsSystem
+import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import com.zer0s2m.creeptenuous.desktop.ui.theme.darkColors
 import kotlinx.coroutines.launch
 
+/**
+ * Application launch
+ *
+ * Classes and their methods for dependency injection:
+ * 1) [Dashboard.setManagerFileObject]
+ */
 @Composable
 @Preview
 fun App() {
@@ -33,6 +40,9 @@ fun App() {
                 ReactiveUser.GrantedRights,
                 ReactiveCommon,
                 ReactiveFileObject
+            ),
+            injectionClasses = hashMapOf(
+                Dashboard::class to listOf("setManagerFileObject")
             )
         )
     }

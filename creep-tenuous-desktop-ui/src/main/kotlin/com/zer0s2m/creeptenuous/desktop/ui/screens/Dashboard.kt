@@ -23,6 +23,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
@@ -46,7 +47,7 @@ import kotlinx.coroutines.launch
  *
  * @param navigation Handler for the navigation host for changing the current screen state
  */
-class Dashboard(override var navigation: NavigationController) : BaseDashboard {
+class Dashboard(override var navigation: NavigationController) : BaseDashboard, ReactiveInjectionClass {
 
     private val navigationState: State<NavigationController> = mutableStateOf(navigation)
 
@@ -60,15 +61,36 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
         "Musics" to Resources.ICON_MUSIC.path
     )
 
-    // TODO: Remove the crutch and make the package "creep-tenuous-desktop-core" normal so that
-    //  you can update the properties and not change the whole package
     internal companion object {
 
+        /**
+         * Information about the directory at a certain segment of the nesting level
+         */
         private val managerFileObject: MutableState<ManagerFileObject> =
             mutableStateOf(ReactiveFileObject.managerFileSystemObjects)
 
+        private val managerFileObject_Folders: MutableState<MutableList<FileObject>> =
+            mutableStateOf(mutableListOf())
+
+        private val managerFileObject_Files: MutableState<MutableList<FileObject>> =
+            mutableStateOf(mutableListOf())
+
+        /**
+         * Set information about file objects by nesting level
+         */
         internal fun setManagerFileObject(managerFileObject: ManagerFileObject) {
             this.managerFileObject.value = managerFileObject
+
+            val folders: MutableList<FileObject> = mutableListOf()
+            val files: MutableList<FileObject> = mutableListOf()
+
+            this.managerFileObject.value.objects.forEach {
+                if (it.isDirectory) folders.add(it)
+                else if (it.isFile) files.add(it)
+            }
+
+            managerFileObject_Folders.value = folders
+            managerFileObject_Files.value = files
         }
 
     }
@@ -178,19 +200,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
                         .background(Color.White),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val fileObjects: MutableState<ManagerFileObject> = remember { managerFileObject }
-                    val folders: MutableState<MutableList<FileObject>> = remember {
-                        mutableStateOf(mutableListOf())
-                    }
-                    val files: MutableState<MutableList<FileObject>> = remember {
-                        mutableStateOf(mutableListOf())
-                    }
-
-                    fileObjects.value.objects.forEach {
-                        if (it.isDirectory) folders.value.add(it)
-                        else if (it.isFile) files.value.add(it)
-                    }
-
                     Column(
                         modifier = Modifier
                             .padding(16.dp)
@@ -199,35 +208,35 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
                             modifier = Modifier
                                 .padding(bottom = 28.dp)
                         ) {
-                            TitleCategoryFileObject("Folders", folders.value.size)
+                            TitleCategoryFileObject("Folders", managerFileObject_Folders.value.size)
                             LazyVerticalGrid(
                                 columns = GridCells.Adaptive(160.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(folders.value.size) { index ->
+                                items(managerFileObject_Folders.value.size) { index ->
                                     CartFileObject(
                                         isDirectory = true,
                                         isFile = false,
-                                        text = folders.value[index].realName,
-                                        color = folders.value[index].color
+                                        text = managerFileObject_Folders.value[index].realName,
+                                        color = managerFileObject_Folders.value[index].color
                                     ).render()
                                 }
                             }
                         }
 
                         Column {
-                            TitleCategoryFileObject("Files", files.value.size)
+                            TitleCategoryFileObject("Files", managerFileObject_Files.value.size)
                             LazyVerticalGrid(
                                 columns = GridCells.Adaptive(160.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(files.value.size) { index ->
+                                items(managerFileObject_Files.value.size) { index ->
                                     CartFileObject(
                                         isDirectory = false,
                                         isFile = true,
-                                        text = files.value[index].realName
+                                        text = managerFileObject_Files.value[index].realName
                                     ).render()
                                 }
                             }
@@ -384,3 +393,4 @@ private fun TitleInSectionForCardsModalSheet(text: String = ""): Unit = Text(
     color = Colors.TEXT.color,
     fontWeight = FontWeight.Bold
 )
+
