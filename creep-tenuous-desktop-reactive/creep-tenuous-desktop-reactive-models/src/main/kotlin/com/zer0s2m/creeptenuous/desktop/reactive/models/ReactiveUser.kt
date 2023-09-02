@@ -42,7 +42,8 @@ object ReactiveUser : ReactiveLazyObject {
     )
     var userColors: ReactiveMutableList<UserColor> = mutableReactiveListOf(
         triggerAdd = ReactiveTriggerUserColorAdd(),
-        triggerRemove = ReactiveTriggerUserColorRemove()
+        triggerRemove = ReactiveTriggerUserColorRemove(),
+        triggerSet = ReactiveTriggerUserColorSet()
     )
 
     /**

@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
+import androidx.compose.ui.window.PopupProperties
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
 import java.awt.event.KeyEvent
@@ -109,18 +110,16 @@ internal fun BaseModalPopup(
     content: @Composable () -> Unit
 ) {
     if (stateModal.value) {
-        Popup(
-            popupPositionProvider = object : PopupPositionProvider {
-                override fun calculatePosition(
-                    anchorBounds: IntRect,
-                    windowSize: IntSize,
-                    layoutDirection: LayoutDirection,
-                    popupContentSize: IntSize
-                ): IntOffset = IntOffset.Zero
-            },
-            focusable = true,
+        Popup(popupPositionProvider = object : PopupPositionProvider {
+            override fun calculatePosition(
+                anchorBounds: IntRect,
+                windowSize: IntSize,
+                layoutDirection: LayoutDirection,
+                popupContentSize: IntSize
+            ): IntOffset = IntOffset.Zero
+        },
             onDismissRequest = { stateModal.value = false },
-            onKeyEvent = {
+            properties = PopupProperties(focusable = true), onPreviewKeyEvent = { false }, onKeyEvent = {
                 if (it.type == KeyEventType.KeyDown && it.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
                     stateModal.value = false
                     true

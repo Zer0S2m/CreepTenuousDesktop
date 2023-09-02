@@ -37,7 +37,7 @@ open class ReactiveTriggerUserCategoryRemove : ReactiveTrigger<UserCategory> {
 }
 
 /**
- * Reactive trigger to insert custom category
+ * Reactive trigger to update custom category
  */
 open class ReactiveTriggerUserCategorySet : ReactiveTrigger<UserCategory> {
 
@@ -72,6 +72,22 @@ open class ReactiveTriggerUserColorAdd : ReactiveTrigger<UserColor> {
  * Reactive trigger to remove custom color
  */
 open class ReactiveTriggerUserColorRemove : ReactiveTrigger<UserColor> {
+
+    /**
+     * Trigger execution
+     *
+     * @param value The new value of a property or object
+     */
+    override fun execution(value: UserColor) {
+        println(value)
+    }
+
+}
+
+/**
+ * Reactive trigger to update custom color
+ */
+open class ReactiveTriggerUserColorSet : ReactiveTrigger<UserColor> {
 
     /**
      * Trigger execution

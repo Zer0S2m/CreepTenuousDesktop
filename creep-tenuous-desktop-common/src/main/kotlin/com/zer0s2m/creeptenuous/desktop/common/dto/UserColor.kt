@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserColor(
 
-    val color: String,
+    var color: String,
 
     val id: Int? = null
 
