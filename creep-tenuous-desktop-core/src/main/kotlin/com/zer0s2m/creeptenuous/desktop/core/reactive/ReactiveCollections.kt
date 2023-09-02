@@ -22,6 +22,12 @@ interface ReactiveMutableList<E> : MutableList<E> {
     val triggerRemove: ReactiveTrigger<E>?
 
     /**
+     * The trigger is called when the element at the specified position in
+     * this list is replaced by the specified element.
+     */
+    val triggerSet: ReactiveTrigger<E>?
+
+    /**
      * Adds the specified element to the collection in a reactive way and
      * invokes the specified [triggerAdd].
      *
@@ -59,7 +65,19 @@ interface ReactiveMutableList<E> : MutableList<E> {
     fun removeAtReactive(index: Int): E {
         val element = removeAt(index)
         triggerRemove?.execution(element)
-        return element;
+        return element
+    }
+
+    /**
+     * Replaces the element at the specified position in this list with the
+     * specified [element] in a reactive manner by calling a [triggerSet].
+     *
+     * @return the element previously at the specified position.
+     */
+    fun setReactive(index: Int, element: E): E {
+        val newElement = set(index, element)
+        triggerSet?.execution(element)
+        return newElement
     }
 
 }
@@ -69,10 +87,13 @@ interface ReactiveMutableList<E> : MutableList<E> {
  *
  * @param triggerAdd The trigger is fired when a new element is added to the collection.
  * @param triggerRemove The trigger is fired when an item is removed from the collection.
+ * @param triggerSet The trigger is called when the element at the specified position
+ * in this list is replaced by the specified element.
  */
 class ReactiveArrayList<E>(
     override val triggerAdd: ReactiveTrigger<E>? = null,
-    override val triggerRemove: ReactiveTrigger<E>? = null
+    override val triggerRemove: ReactiveTrigger<E>? = null,
+    override val triggerSet: ReactiveTrigger<E>? = null
 ) :
     ReactiveMutableList<E>,
     RandomAccess,
@@ -83,23 +104,37 @@ class ReactiveArrayList<E>(
  *
  * @param triggerAdd The trigger is fired when a new element is added to the collection.
  * @param triggerRemove The trigger is fired when an item is removed from the collection.
+ * @param triggerSet The trigger is called when the element at the specified position
+ * in this list is replaced by the specified element.
  */
 fun <T> mutableReactiveListOf(
     triggerAdd: ReactiveTrigger<T>? = null,
-    triggerRemove: ReactiveTrigger<T>? = null
-): ReactiveMutableList<T> = ReactiveArrayList(triggerAdd, triggerRemove)
+    triggerRemove: ReactiveTrigger<T>? = null,
+    triggerSet: ReactiveTrigger<T>? = null
+): ReactiveMutableList<T> = ReactiveArrayList(
+    triggerAdd = triggerAdd,
+    triggerRemove = triggerRemove,
+    triggerSet = triggerSet
+)
 
 /**
  * Returns a new [ReactiveMutableList] filled with all elements of this collection.
  *
  * @param triggerAdd The trigger is fired when a new element is added to the collection.
  * @param triggerRemove The trigger is fired when an item is removed from the collection.
+ * @param triggerSet The trigger is called when the element at the specified position
+ * in this list is replaced by the specified element.
  */
 fun <T> Collection<T>.toReactiveMutableList(
     triggerAdd: ReactiveTrigger<T>? = null,
-    triggerRemove: ReactiveTrigger<T>? = null
+    triggerRemove: ReactiveTrigger<T>? = null,
+    triggerSet: ReactiveTrigger<T>? = null
 ): ReactiveMutableList<T> {
-    val newList: ReactiveMutableList<T> = ReactiveArrayList(triggerAdd, triggerRemove)
+    val newList: ReactiveMutableList<T> = ReactiveArrayList(
+        triggerAdd = triggerAdd,
+        triggerRemove = triggerRemove,
+        triggerSet = triggerSet
+    )
     newList.addAll(this)
     return newList
 }
