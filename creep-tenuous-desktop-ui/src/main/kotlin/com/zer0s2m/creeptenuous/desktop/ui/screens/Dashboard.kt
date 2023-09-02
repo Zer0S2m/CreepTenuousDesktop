@@ -4,11 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.Divider
+import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -17,8 +16,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zer0s2m.creeptenuous.desktop.common.enums.*
-import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
+import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
+import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
+import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
+import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
+import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
+import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
+import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
+import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CartFileObject
@@ -28,10 +37,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbs
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.SwitchPanelDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.modals.ModalRightSheetLayout
-import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
-import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
-import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
-import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -41,7 +47,7 @@ import kotlinx.coroutines.launch
  *
  * @param navigation Handler for the navigation host for changing the current screen state
  */
-class Dashboard(override var navigation: NavigationController) : BaseDashboard {
+class Dashboard(override var navigation: NavigationController) : BaseDashboard, ReactiveInjectionClass {
 
     private val navigationState: State<NavigationController> = mutableStateOf(navigation)
 
@@ -54,6 +60,40 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
         "Images" to Resources.ICON_IMAGE.path,
         "Musics" to Resources.ICON_MUSIC.path
     )
+
+    internal companion object {
+
+        /**
+         * Information about the directory at a certain segment of the nesting level
+         */
+        private val managerFileObject: MutableState<ManagerFileObject> =
+            mutableStateOf(ReactiveFileObject.managerFileSystemObjects)
+
+        private val managerFileObject_Folders: MutableState<MutableList<FileObject>> =
+            mutableStateOf(mutableListOf())
+
+        private val managerFileObject_Files: MutableState<MutableList<FileObject>> =
+            mutableStateOf(mutableListOf())
+
+        /**
+         * Set information about file objects by nesting level
+         */
+        internal fun setManagerFileObject(managerFileObject: ManagerFileObject) {
+            this.managerFileObject.value = managerFileObject
+
+            val folders: MutableList<FileObject> = mutableListOf()
+            val files: MutableList<FileObject> = mutableListOf()
+
+            this.managerFileObject.value.objects.forEach {
+                if (it.isDirectory) folders.add(it)
+                else if (it.isFile) files.add(it)
+            }
+
+            managerFileObject_Folders.value = folders
+            managerFileObject_Files.value = files
+        }
+
+    }
 
     /**
      * Event when clicking on the button to go to the section of an individual user profile
@@ -160,9 +200,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
                         .background(Color.White),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val list1 = (1..8).map { "Folder $it" }
-                    val list2 = (1..6).map { "File $it" }
-
                     Column(
                         modifier = Modifier
                             .padding(16.dp)
@@ -171,34 +208,35 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
                             modifier = Modifier
                                 .padding(bottom = 28.dp)
                         ) {
-                            TitleCategoryFileObject("Folders", list1.size)
+                            TitleCategoryFileObject("Folders", managerFileObject_Folders.value.size)
                             LazyVerticalGrid(
                                 columns = GridCells.Adaptive(160.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(list1.size) { index ->
+                                items(managerFileObject_Folders.value.size) { index ->
                                     CartFileObject(
                                         isDirectory = true,
                                         isFile = false,
-                                        text = list1[index]
+                                        text = managerFileObject_Folders.value[index].realName,
+                                        color = managerFileObject_Folders.value[index].color
                                     ).render()
                                 }
                             }
                         }
 
                         Column {
-                            TitleCategoryFileObject("Files", list2.size)
+                            TitleCategoryFileObject("Files", managerFileObject_Files.value.size)
                             LazyVerticalGrid(
                                 columns = GridCells.Adaptive(160.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(list2.size) { index ->
+                                items(managerFileObject_Files.value.size) { index ->
                                     CartFileObject(
                                         isDirectory = false,
                                         isFile = true,
-                                        text = list2[index]
+                                        text = managerFileObject_Files.value[index].realName
                                     ).render()
                                 }
                             }
@@ -222,6 +260,9 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard {
         }
     }
 
+    /**
+     * Renders a popup modal window to navigate to the screen state - user settings [Screen.PROFILE_SCREEN]
+     */
     @Composable
     private fun renderContentModalRightSheet() {
         val baseModifierCard: Modifier = Modifier
@@ -352,3 +393,4 @@ private fun TitleInSectionForCardsModalSheet(text: String = ""): Unit = Text(
     color = Colors.TEXT.color,
     fontWeight = FontWeight.Bold
 )
+

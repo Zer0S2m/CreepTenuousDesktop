@@ -6,9 +6,11 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationHost
 import com.zer0s2m.creeptenuous.desktop.navigation.foundation.composable
-import com.zer0s2m.creeptenuous.desktop.ui.screens.*
+import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
+import com.zer0s2m.creeptenuous.desktop.ui.screens.LoginUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
-import com.zer0s2m.creeptenuous.desktop.ui.screens.user.*
+import com.zer0s2m.creeptenuous.desktop.ui.screens.SettingsSystem
+import com.zer0s2m.creeptenuous.desktop.ui.screens.user.render
 
 /**
  * Building a screen and passing it to the navigation host where the context is changed and rendered
