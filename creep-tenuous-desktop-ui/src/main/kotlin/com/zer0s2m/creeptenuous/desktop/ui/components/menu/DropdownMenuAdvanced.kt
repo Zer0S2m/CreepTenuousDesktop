@@ -38,9 +38,7 @@ class DropdownMenuAdvanced(
                 expanded.value = false
             }
         ) {
-            items.forEach { item ->
-                item.render()
-            }
+            items.forEach { it.render() }
         }
     }
 
