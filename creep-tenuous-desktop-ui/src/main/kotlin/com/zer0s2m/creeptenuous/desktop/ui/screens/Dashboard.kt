@@ -173,9 +173,24 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
                     BreadCrumbs(
                         items = listOf(
-                            BreadCrumbsItem(text = "Folder 1"),
-                            BreadCrumbsItem(text = "Folder 2"),
-                            BreadCrumbsItem(text = "Folder 3")
+                            BreadCrumbsItem(
+                                text = "Folder 1",
+                                action = {
+                                    println(true)
+                                }
+                            ),
+                            BreadCrumbsItem(
+                                text = "Folder 2",
+                                action = {
+                                    println(true)
+                                }
+                            ),
+                            BreadCrumbsItem(
+                                text = "Folder 3",
+                                action = {
+                                    println(true)
+                                }
+                            )
                         ),
                         modifier = Modifier
                             .height(40.dp)
