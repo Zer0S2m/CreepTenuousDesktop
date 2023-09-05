@@ -15,6 +15,11 @@ interface BaseBreadCrumbsItem : BaseComponent {
         get() = ""
 
     /**
+     * Will be called when the user clicks the button
+     */
+    val action: () -> Unit
+
+    /**
      * Set the spacing between navigation items, set to [BaseBreadCrumbs.separatorPadding]
      *
      * @param separator [BaseBreadCrumbs.separatorPadding]

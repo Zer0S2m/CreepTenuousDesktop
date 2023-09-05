@@ -45,13 +45,25 @@ import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
  * @param text Display text when rendering
  * @param isAnimation Set background change animation for a component
  * @param color Color palette for file object type - directory
+ * @param actionDownload Action called when a file object is downloaded
+ * @param actionRename Action called when a file object is renamed
+ * @param actionCopy Action called when a file object is copied
+ * @param actionMove Action called when a file object is moved
+ * @param actionSetCategory Action called when a custom category is set on a file object
+ * @param actionSetColor Action called when a custom color is set on a file object
  */
 class CartFileObject(
     override val isDirectory: Boolean,
     override val isFile: Boolean,
     override val text: String = "",
     override val isAnimation: Boolean = true,
-    override val color: String? = null
+    override val color: String? = null,
+    override val actionDownload: () -> Unit = {},
+    override val actionRename: () -> Unit = {},
+    override val actionCopy: () -> Unit = {},
+    override val actionMove: () -> Unit = {},
+    override val actionSetCategory: () -> Unit = {},
+    override val actionSetColor: () -> Unit = {},
 ) : BaseCardFileObject {
 
     /**
@@ -272,31 +284,63 @@ class CartFileObject(
         val items: Iterable<DropdownMenuItemAdvanced> = listOf(
             DropdownMenuItemAdvanced(
                 text = "Download",
-                expanded = expanded,
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu
+                contentPadding = contentPaddingMenu,
+                action = {
+                    expandedMenu.value = false
+                    actionDownload()
+                }
             ),
             DropdownMenuItemAdvanced(
                 text = "Rename",
-                expanded = expanded,
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu
+                contentPadding = contentPaddingMenu,
+                action = {
+                    expandedMenu.value = false
+                    actionRename()
+                }
             ),
             DropdownMenuItemAdvanced(
                 text = "Copy",
-                expanded = expanded,
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu
+                contentPadding = contentPaddingMenu,
+                action = {
+                    expandedMenu.value = false
+                    actionCopy()
+                }
             ),
             DropdownMenuItemAdvanced(
                 text = "Move",
-                expanded = expanded,
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu
+                contentPadding = contentPaddingMenu,
+                action = {
+                    expandedMenu.value = false
+                    actionMove()
+                }
+            ),
+            DropdownMenuItemAdvanced(
+                text = "Set category",
+                colorText = Color.Black,
+                modifierMenu = modifierMenu,
+                contentPadding = contentPaddingMenu,
+                action = {
+                    expandedMenu.value = false
+                    actionSetCategory()
+                }
+            ),
+            DropdownMenuItemAdvanced(
+                text = "Set color",
+                colorText = Color.Black,
+                modifierMenu = modifierMenu,
+                contentPadding = contentPaddingMenu,
+                action = {
+                    expandedMenu.value = false
+                    actionSetColor()
+                }
             )
         )
 

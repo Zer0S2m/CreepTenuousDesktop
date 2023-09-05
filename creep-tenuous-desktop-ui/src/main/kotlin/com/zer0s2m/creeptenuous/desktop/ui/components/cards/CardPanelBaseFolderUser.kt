@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -20,9 +21,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setAnimateColorAsStateInCard
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInCard
-import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardPanelBaseFolderUser
 
 /**
@@ -32,12 +33,14 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardPanelBaseFold
  * @param isAnimation Set background change animation for a component
  * @param isIcon Set an icon for a component
  * @param iconPath Path to icons [Resources]
+ * @param action Callback to be called when the [Card] is clicked
  */
 class CardPanelBaseFolderUser(
     override val text: String = "",
     override val isAnimation: Boolean = true,
     override val isIcon: Boolean = false,
-    override val iconPath: String? = null
+    override val iconPath: String? = null,
+    override val action: () -> Unit
 ) : BaseCardPanelBaseFolderUser {
 
     /**
@@ -48,6 +51,7 @@ class CardPanelBaseFolderUser(
     /**
      * Component rendering
      */
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun render() {
         val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
@@ -72,7 +76,8 @@ class CardPanelBaseFolderUser(
                 .pointerHoverIcon(icon = PointerIcon.Hand),
             elevation = 0.dp,
             shape = RoundedCornerShape(0.dp),
-            contentColor = Color.Black
+            contentColor = Color.Black,
+            onClick = action
         ) {
             Column(
                 modifier = Modifier
