@@ -14,7 +14,6 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.Lazy
  *
  * @param T The type of the variable that will take [ReactiveTrigger.execution]
  */
-
 interface ReactiveTrigger<T> {
 
     /**
