@@ -1,22 +1,32 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.user
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.dto.ConverterColor
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
+import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFormState
@@ -184,7 +194,7 @@ internal fun ModalCreateCategory(
             contentColor = contentColorFor(MaterialTheme.colors.surface),
             modifier = Modifier
                 .width(360.dp)
-                .height(200.dp)
+                .height(240.dp)
                 .shadow(24.dp, RoundedCornerShape(4.dp))
         ) {
             ModalCreateCategoryContent(
@@ -225,7 +235,7 @@ private fun ModalCreateCategoryContent(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "Create a category",
+            text = if (isExists) "Edit a category" else "Create a category",
             fontSize = 20.sp
         )
         Column(
@@ -247,6 +257,11 @@ private fun ModalCreateCategoryContent(
                     )
                 )
             )
+            Spacer(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+            )
+            SelectColorForCategory()
         }
         Row(
             horizontalArrangement = Arrangement.Center
@@ -279,3 +294,104 @@ private fun ButtonCreateCategory(action: () -> Unit) {
         Text("Create category")
     }
 }
+
+/**
+ * component responsible for choosing a color for binding to a custom category.
+ */
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun SelectColorForCategory() {
+    val expandedState: MutableState<Boolean> = remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .onClick {
+                expandedState.value = true
+            }
+            .border(0.5.dp, MaterialTheme.colors.secondary, RoundedCornerShape(4.dp))
+            .pointerHoverIcon(PointerIcon.Hand)
+    ) {
+        Row(
+            modifier = Modifier
+                .pointerHoverIcon(PointerIcon.Hand)
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Color...",
+                color = Color(255, 255, 255, 160),
+            )
+
+            Icon(
+                painter = painterResource(resourcePath = Resources.ICON_ARROW.path),
+                contentDescription = contentDescriptionIconArrow,
+                tint = Color.White,
+                modifier = Modifier
+                    .size(16.dp)
+            )
+        }
+
+        DropdownMenuSelectColorForCategory(
+            expandedState = expandedState
+        )
+    }
+}
+
+/**
+ * The main component for choosing a color is a dropdown list.
+ *
+ * Extends a component [DropdownMenu]
+ */
+@Composable
+private fun DropdownMenuSelectColorForCategory(
+    expandedState: MutableState<Boolean>
+) {
+    DropdownMenu(
+        expanded = expandedState.value,
+        onDismissRequest = {
+            expandedState.value = false
+        },
+        modifier = Modifier
+            .width(baseWidthColumnSelectColor)
+    ) {
+        ReactiveUser.userColors.forEach {
+            val convertedColor: ConverterColor = colorConvertHexToRgb(it.color)
+
+            DropdownMenuItem(
+                onClick = {
+                    expandedState.value = false
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .pointerHoverIcon(PointerIcon.Hand),
+                contentPadding = PaddingValues(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(
+                            red = convertedColor.red,
+                            green = convertedColor.green,
+                            blue = convertedColor.blue
+                        ))
+                        .padding(16.dp)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Text used by accessibility services to describe what this image represents
+ */
+@get:ReadOnlyComposable
+private val contentDescriptionIconArrow: String get() = "Open color list"
+
+/**
+ * Width of color selection area from list
+ */
+@get:ReadOnlyComposable
+private val baseWidthColumnSelectColor: Dp get() = 328.dp
