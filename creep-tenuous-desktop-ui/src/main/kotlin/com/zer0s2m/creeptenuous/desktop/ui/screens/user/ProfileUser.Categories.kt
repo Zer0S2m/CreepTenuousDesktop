@@ -35,6 +35,8 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 
+val newColorForCategory: MutableState<String?> = mutableStateOf(null)
+
 /**
  * Rendering part of the user profile screen [Screen.PROFILE_CATEGORY_SCREEN]
  */
@@ -65,6 +67,8 @@ fun ProfileUser.ProfileCategories.render() {
             ButtonCreateCategory {
                 currentIndexUserCategory.value = -1
                 currentUserCategory.value.title = ""
+                newColorForCategory.value = null
+                currentUserCategory.value.color = null
                 isEditCategory.value = false
                 openModalCreateCategory.value = true
             }
@@ -87,9 +91,11 @@ fun ProfileUser.ProfileCategories.render() {
                             currentIndexUserCategory.value = index
                             currentUserCategory.value = UserCategory(
                                 id = listCategories[index].id,
-                                title = listCategories[index].title
+                                title = listCategories[index].title,
+                                color = listCategories[index].color
                             )
                             openModalCreateCategory.value = true
+                            newColorForCategory.value = null
                         },
                         actionDelete = {
                             listCategories.removeAt(index)
@@ -109,13 +115,15 @@ fun ProfileUser.ProfileCategories.render() {
                     openModalCreateCategory.value = false
 
                     val dataForm = stateForm.value.getData()
-                    val data = UserCategory(
-                        title = dataForm["title"].toString().trim()
+                    val newCategory = UserCategory(
+                        title = dataForm["title"].toString().trim(),
+                        color = newColorForCategory.value
                     )
-                    val newCategory = UserCategory(title = data.title)
 
                     listCategories.add(newCategory)
                     ReactiveUser.customCategories.addReactive(newCategory)
+
+                    newColorForCategory.value = null
                 }
             },
             actionEdit = {
@@ -126,13 +134,16 @@ fun ProfileUser.ProfileCategories.render() {
                     val dataForm = stateForm.value.getData()
                     val newCategory = UserCategory(
                         id = currentUserCategory.value.id,
-                        title = dataForm["title"].toString().trim()
+                        title = dataForm["title"].toString().trim(),
+                        color = newColorForCategory.value
                     )
 
                     listCategories[currentIndexUserCategory.value] = newCategory
                     ReactiveUser.customCategories.setReactive(currentIndexUserCategory.value, newCategory)
 
                     currentUserCategory.value.title = ""
+                    currentUserCategory.value.color = null
+                    newColorForCategory.value = null
                 }
             }
         )
@@ -242,6 +253,7 @@ private fun ModalCreateCategoryContent(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
+            // TODO: Make form state for all kinds of components
             Form(
                 state = stateForm.value,
                 fields = listOf(
@@ -261,7 +273,7 @@ private fun ModalCreateCategoryContent(
                 modifier = Modifier
                     .padding(top = 12.dp)
             )
-            SelectColorForCategory()
+            SelectColorForCategory(stateUserCategory = stateUserCategory)
         }
         Row(
             horizontalArrangement = Arrangement.Center
@@ -297,11 +309,28 @@ private fun ButtonCreateCategory(action: () -> Unit) {
 
 /**
  * component responsible for choosing a color for binding to a custom category.
+ *
+ * @param stateUserCategory The current state of the custom category.
  */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-private fun SelectColorForCategory() {
+private fun SelectColorForCategory(stateUserCategory: UserCategory) {
     val expandedState: MutableState<Boolean> = remember { mutableStateOf(false) }
+    val currentColor: MutableState<Color> = remember {
+        mutableStateOf(Color(0, 0, 0))
+    }
+    val isSetColor: MutableState<Boolean> = remember { mutableStateOf(false) }
+
+    if (stateUserCategory.color != null && !isSetColor.value) {
+        val convertedColor: ConverterColor = colorConvertHexToRgb(stateUserCategory.color!!)
+        isSetColor.value = true
+        currentColor.value = Color(
+            red = convertedColor.red,
+            green = convertedColor.green,
+            blue = convertedColor.blue
+        )
+        newColorForCategory.value = stateUserCategory.color
+    }
 
     Row(
         modifier = Modifier
@@ -320,10 +349,19 @@ private fun SelectColorForCategory() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = "Color...",
-                color = Color(255, 255, 255, 160),
-            )
+            if (!isSetColor.value) {
+                Text(
+                    text = "Color...",
+                    color = Color(255, 255, 255, 160),
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(24.dp)
+                        .background(currentColor.value, RoundedCornerShape(4.dp))
+                )
+            }
 
             Icon(
                 painter = painterResource(resourcePath = Resources.ICON_ARROW.path),
@@ -335,7 +373,13 @@ private fun SelectColorForCategory() {
         }
 
         DropdownMenuSelectColorForCategory(
-            expandedState = expandedState
+            expandedState = expandedState,
+            action = { colorStr, color ->
+                expandedState.value = false
+                currentColor.value = color
+                isSetColor.value = true
+                newColorForCategory.value = colorStr
+            }
         )
     }
 }
@@ -344,10 +388,14 @@ private fun SelectColorForCategory() {
  * The main component for choosing a color is a dropdown list.
  *
  * Extends a component [DropdownMenu]
+ *
+ * @param expandedState Whether the menu is currently open and visible to the user
+ * @param action Call an action when an element is clicked [DropdownMenuItem]
  */
 @Composable
 private fun DropdownMenuSelectColorForCategory(
-    expandedState: MutableState<Boolean>
+    expandedState: MutableState<Boolean>,
+    action: (String, Color) -> Unit
 ) {
     DropdownMenu(
         expanded = expandedState.value,
@@ -359,10 +407,15 @@ private fun DropdownMenuSelectColorForCategory(
     ) {
         ReactiveUser.userColors.forEach {
             val convertedColor: ConverterColor = colorConvertHexToRgb(it.color)
+            val color = Color(
+                red = convertedColor.red,
+                green = convertedColor.green,
+                blue = convertedColor.blue
+            )
 
             DropdownMenuItem(
                 onClick = {
-                    expandedState.value = false
+                    action(it.color, color)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -372,11 +425,7 @@ private fun DropdownMenuSelectColorForCategory(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(
-                            red = convertedColor.red,
-                            green = convertedColor.green,
-                            blue = convertedColor.blue
-                        ))
+                        .background(color, RoundedCornerShape(4.dp))
                         .padding(16.dp)
                 )
             }
