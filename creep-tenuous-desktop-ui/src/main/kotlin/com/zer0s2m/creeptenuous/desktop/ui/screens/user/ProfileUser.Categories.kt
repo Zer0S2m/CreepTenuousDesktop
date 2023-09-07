@@ -35,6 +35,9 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 
+/**
+ * Set the color palette when editing or creating a custom category.
+ */
 val newColorForCategory: MutableState<String?> = mutableStateOf(null)
 
 /**
@@ -79,13 +82,13 @@ fun ProfileUser.ProfileCategories.render() {
                 .fillMaxSize()
         ) {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
+                columns = GridCells.Fixed(3),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(listCategories.size) { index ->
                     ItemCategory(
-                        text = listCategories[index].title,
+                        userCategory = listCategories[index],
                         actionEdit = {
                             isEditCategory.value = true
                             currentIndexUserCategory.value = index
@@ -159,22 +162,45 @@ private val stateForm: MutableState<BaseFormState> = mutableStateOf(FormState())
 /**
  * Custom category card. Extends a component [Card]
  *
- * @param text Display text
+ * @param userCategory User category information
  * @param actionEdit The lambda to be invoked when this icon is pressed - event edit
  * @param actionDelete The lambda to be invoked when this icon is pressed - event delete
  */
 @Composable
 internal fun ItemCategory(
-    text: String,
+    userCategory: UserCategory,
     actionEdit: () -> Unit,
     actionDelete: () -> Unit
 ) {
     BaseCardItemGrid {
         Text(
-            text = text
+            text = userCategory.title
         )
 
-        Row {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (userCategory.color != null) {
+                val convertedColor: ConverterColor = colorConvertHexToRgb(userCategory.color!!)
+                Column(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(60.dp)
+                            .height(32.dp)
+                            .background(
+                                color = Color(
+                                    red = convertedColor.red,
+                                    green = convertedColor.green,
+                                    blue = convertedColor.blue
+                                ),
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                    )
+                }
+            }
             IconButtonEdit(onClick = actionEdit)
             IconButtonDelete(onClick = actionDelete)
         }
