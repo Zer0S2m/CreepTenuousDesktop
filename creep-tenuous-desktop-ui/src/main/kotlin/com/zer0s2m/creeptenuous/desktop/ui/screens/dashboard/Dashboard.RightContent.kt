@@ -20,11 +20,14 @@ import kotlinx.coroutines.CoroutineScope
  *
  * @param directories file objects with type - directory
  * @param files file objects with type - file
+ * @param expandedStateSetCategoryPopup Current state of the modal
+ * [PopupSetUserCategoryInFileObject] when setting a custom category
  */
 @Composable
 internal fun RenderLayoutFilesObject(
     directories: MutableState<MutableList<FileObject>>,
-    files: MutableState<MutableList<FileObject>>
+    files: MutableState<MutableList<FileObject>>,
+    expandedStateSetCategoryPopup: MutableState<Boolean>
 ) {
     Column(
         modifier = Modifier
@@ -34,8 +37,14 @@ internal fun RenderLayoutFilesObject(
             modifier = Modifier
                 .padding(bottom = 28.dp)
         ) {
-            RenderLayoutDirectories(directories)
-            RenderLayoutFiles(files)
+            RenderLayoutDirectories(
+                directories = directories,
+                expandedStateSetCategoryPopup = expandedStateSetCategoryPopup
+            )
+            RenderLayoutFiles(
+                files = files,
+                expandedStateSetCategoryPopup = expandedStateSetCategoryPopup
+            )
         }
     }
 }
@@ -44,9 +53,14 @@ internal fun RenderLayoutFilesObject(
  * Content renderer responsible for file objects with type - category
  *
  * @param directories file objects with type - directory
+ * @param expandedStateSetCategoryPopup Current state of the modal
+ * [PopupSetUserCategoryInFileObject] when setting a custom category
  */
 @Composable
-internal fun RenderLayoutDirectories(directories: MutableState<MutableList<FileObject>>) {
+internal fun RenderLayoutDirectories(
+    directories: MutableState<MutableList<FileObject>>,
+    expandedStateSetCategoryPopup: MutableState<Boolean>
+) {
     Column(
         modifier = Modifier
             .padding(bottom = 28.dp)
@@ -63,7 +77,10 @@ internal fun RenderLayoutDirectories(directories: MutableState<MutableList<FileO
                     isFile = false,
                     text = directories.value[index].realName,
                     color = directories.value[index].color,
-                    categoryId = directories.value[index].categoryId
+                    categoryId = directories.value[index].categoryId,
+                    actionSetCategory = {
+                        expandedStateSetCategoryPopup.value = true
+                    }
                 ).render()
             }
         }
@@ -74,9 +91,14 @@ internal fun RenderLayoutDirectories(directories: MutableState<MutableList<FileO
  * Content renderer responsible for file objects with type - file
  *
  * @param files file objects with type - file
+ * @param expandedStateSetCategoryPopup Current state of the modal [PopupSetUserCategoryInFileObject]
+ * when setting a custom category
  */
 @Composable
-internal fun RenderLayoutFiles(files: MutableState<MutableList<FileObject>>) {
+internal fun RenderLayoutFiles(
+    files: MutableState<MutableList<FileObject>>,
+    expandedStateSetCategoryPopup: MutableState<Boolean>
+) {
     Column {
         TitleCategoryFileObject("Files", files.value.size)
         LazyVerticalGrid(
@@ -89,7 +111,10 @@ internal fun RenderLayoutFiles(files: MutableState<MutableList<FileObject>>) {
                     isDirectory = false,
                     isFile = true,
                     text = files.value[index].realName,
-                    categoryId = files.value[index].categoryId
+                    categoryId = files.value[index].categoryId,
+                    actionSetCategory = {
+                        expandedStateSetCategoryPopup.value = true
+                    }
                 ).render()
             }
         }

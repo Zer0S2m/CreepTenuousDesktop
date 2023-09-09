@@ -34,6 +34,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInCard
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.menu.DropdownMenuAdvanced
 import com.zer0s2m.creeptenuous.desktop.ui.components.menu.DropdownMenuItemAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 
 /**
@@ -276,20 +277,7 @@ class CartFileObject(
                         .padding(0.dp)
                 ) {
                     if (userCategory.color != null) {
-                        val converterColor = colorConvertHexToRgb(userCategory.color!!)
-
-                        Box(
-                            modifier = Modifier
-                                .size(10.dp)
-                                .background(
-                                    Color(
-                                        red = converterColor.red,
-                                        green = converterColor.green,
-                                        blue = converterColor.blue,
-                                    ),
-                                    RoundedCornerShape(50)
-                                )
-                        )
+                        CircleCategoryBox(userCategory.color!!, 10.dp)
                     }
                     Text(
                         text = userCategory.title,

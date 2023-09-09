@@ -25,7 +25,7 @@ import java.awt.event.KeyEvent
 /**
  * The base layout for the modal window. Extends a component [Popup]
  *
- * @param stateModal Modal window states for category creation
+ * @param stateModal Modal window states
  * @param content The inner content of the modal window
  */
 @Composable

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Divider
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
@@ -34,6 +35,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.modals.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupSetUserCategoryInFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLayoutFilesObject
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLeftContentDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.TopPanelDashboard
@@ -58,6 +60,11 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         "Images" to Resources.ICON_IMAGE.path,
         "Musics" to Resources.ICON_MUSIC.path
     )
+
+    /**
+     * Current state of the modal [PopupSetUserCategoryInFileObject] when setting a custom category
+     */
+    private val expandedStateModalSetCategoryPopup: MutableState<Boolean> = mutableStateOf(false)
 
     internal companion object {
 
@@ -91,6 +98,20 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             managerFileObject_Files.value = files
         }
 
+    }
+
+    /**
+     * Splitter render for splitting the screen into two parts
+     *
+     * @param scaffoldState State of this scaffold widget.
+     */
+    @Composable
+    override fun render(scaffoldState: ScaffoldState) {
+        super.render(scaffoldState)
+
+        PopupSetUserCategoryInFileObject(
+            expandedState = expandedStateModalSetCategoryPopup
+        )
     }
 
     /**
@@ -168,7 +189,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                 ) {
                     RenderLayoutFilesObject(
                         directories = managerFileObject_Directories,
-                        files = managerFileObject_Files
+                        files = managerFileObject_Files,
+                        expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup
                     )
 
                     BreadCrumbs(
