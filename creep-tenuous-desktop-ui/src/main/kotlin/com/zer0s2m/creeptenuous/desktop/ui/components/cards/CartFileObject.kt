@@ -28,6 +28,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.common.utils.manipulateColor
 import com.zer0s2m.creeptenuous.desktop.core.errors.ComponentException
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setAnimateColorAsStateInCard
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInCard
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardFileObject
@@ -45,6 +46,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
  * @param text Display text when rendering
  * @param isAnimation Set background change animation for a component
  * @param color Color palette for file object type - directory
+ * @param categoryId The user category to which the file object is linked
  * @param actionDownload Action called when a file object is downloaded
  * @param actionRename Action called when a file object is renamed
  * @param actionCopy Action called when a file object is copied
@@ -58,6 +60,7 @@ class CartFileObject(
     override val text: String = "",
     override val isAnimation: Boolean = true,
     override val color: String? = null,
+    override val categoryId: Int? = null,
     override val actionDownload: () -> Unit = {},
     override val actionRename: () -> Unit = {},
     override val actionCopy: () -> Unit = {},
@@ -160,23 +163,28 @@ class CartFileObject(
             backgroundColor = animatedCardColor.value,
             modifier = Modifier
                 .fillMaxWidth()
+                .height(80.dp)
                 .hoverable(interactionSource = interactionSource)
                 .pointerHoverIcon(icon = PointerIcon.Hand),
             elevation = 0.dp,
             shape = RoundedCornerShape(8.dp)
         ) {
             Column(
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .padding(12.dp, 8.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .padding(12.dp, 8.dp)
                         .fillMaxWidth()
+                        .height(40.dp)
                 ) {
                     content()
                 }
+
+                renderCategoryLayout()
             }
         }
     }
@@ -196,18 +204,23 @@ class CartFileObject(
      */
     @Composable
     private fun renderDirectoryContent() {
-        Image(
-            painter = painterResource(resourcePath = Resources.ICON_FOLDER.path),
-            contentDescription = contentDescriptionFolder
-        )
-        Text(
-            text = textComp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(12.dp, 0.dp),
-            color = Colors.TEXT.color,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Image(
+                painter = painterResource(resourcePath = Resources.ICON_FOLDER.path),
+                contentDescription = contentDescriptionFolder
+            )
+            Text(
+                text = textComp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(start = 8.dp, end = 4.dp),
+                color = Colors.TEXT.color,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            )
+        }
         renderIconMenu()
     }
 
@@ -226,19 +239,69 @@ class CartFileObject(
      */
     @Composable
     private fun renderFileContent() {
-        Image(
-            painter = painterResource(resourcePath = Resources.ICON_FILE.path),
-            contentDescription = contentDescriptionFile
-        )
-        Text(
-            text = textComp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(12.dp, 0.dp),
-            color = Colors.TEXT.color,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Image(
+                painter = painterResource(resourcePath = Resources.ICON_FILE.path),
+                contentDescription = contentDescriptionFile
+            )
+            Text(
+                text = textComp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(start = 8.dp, end = 4.dp),
+                color = Colors.TEXT.color,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            )
+        }
         renderIconMenu()
+    }
+
+    /**
+     * Rendering the component responsible for binding a custom category to a file object
+     */
+    @Composable
+    private fun renderCategoryLayout() {
+        if (categoryId != null) {
+            val userCategory = ReactiveUser.customCategories.find {
+                it.id == categoryId
+            }
+            if (userCategory != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .padding(0.dp)
+                ) {
+                    if (userCategory.color != null) {
+                        val converterColor = colorConvertHexToRgb(userCategory.color!!)
+
+                        Box(
+                            modifier = Modifier
+                                .size(10.dp)
+                                .background(
+                                    Color(
+                                        red = converterColor.red,
+                                        green = converterColor.green,
+                                        blue = converterColor.blue,
+                                    ),
+                                    RoundedCornerShape(50)
+                                )
+                        )
+                    }
+                    Text(
+                        text = userCategory.title,
+                        color = Color.Black,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = if (userCategory.color != null) Modifier
+                            .padding(start = 8.dp) else Modifier
+                    )
+                }
+            }
+        }
     }
 
     /**
@@ -248,7 +311,7 @@ class CartFileObject(
     private fun renderIconMenu() {
         Box(
             modifier = Modifier
-                .fillMaxHeight(1f)
+                .fillMaxHeight()
         ) {
             IconButton(
                 onClick = {

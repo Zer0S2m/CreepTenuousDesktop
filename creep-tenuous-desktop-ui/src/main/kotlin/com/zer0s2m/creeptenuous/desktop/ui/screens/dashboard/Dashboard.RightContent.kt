@@ -62,7 +62,8 @@ internal fun RenderLayoutDirectories(directories: MutableState<MutableList<FileO
                     isDirectory = true,
                     isFile = false,
                     text = directories.value[index].realName,
-                    color = directories.value[index].color
+                    color = directories.value[index].color,
+                    categoryId = directories.value[index].categoryId
                 ).render()
             }
         }
@@ -87,7 +88,8 @@ internal fun RenderLayoutFiles(files: MutableState<MutableList<FileObject>>) {
                 CartFileObject(
                     isDirectory = false,
                     isFile = true,
-                    text = files.value[index].realName
+                    text = files.value[index].realName,
+                    categoryId = files.value[index].categoryId
                 ).render()
             }
         }

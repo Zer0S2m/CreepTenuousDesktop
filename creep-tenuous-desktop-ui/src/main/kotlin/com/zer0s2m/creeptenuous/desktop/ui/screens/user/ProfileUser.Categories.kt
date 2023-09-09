@@ -34,6 +34,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.fields.TextFieldAdvanced
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
+import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 
 /**
  * Set the color palette when editing or creating a custom category.
@@ -44,6 +45,7 @@ val newColorForCategory: MutableState<String?> = mutableStateOf(null)
  * Rendering part of the user profile screen [Screen.PROFILE_CATEGORY_SCREEN]
  */
 @Composable
+@Suppress("UnusedReceiverParameter")
 fun ProfileUser.ProfileCategories.render() {
     val openModalCreateCategory: MutableState<Boolean> = remember { mutableStateOf(false) }
     val isEditCategory: MutableState<Boolean> = remember { mutableStateOf(false) }

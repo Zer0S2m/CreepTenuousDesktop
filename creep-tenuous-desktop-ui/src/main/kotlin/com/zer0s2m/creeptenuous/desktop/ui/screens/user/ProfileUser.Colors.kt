@@ -24,11 +24,13 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
+import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 
 /**
  * Rendering part of the user profile screen [Screen.PROFILE_COLORS_SCREEN]
  */
 @Composable
+@Suppress("UnusedReceiverParameter")
 fun ProfileUser.ProfileColors.render() {
     val stateModal: MutableState<Boolean> = remember { mutableStateOf(false) }
     val currentUserColor: MutableState<Color> = remember {
@@ -215,7 +217,7 @@ private fun ModalCreateCustomColorContent(
             },
     ) {
         Text(
-            text = "Create a custom color",
+            text = if (isExists) "Edit a custom color" else "Create a custom color",
             fontSize = 20.sp
         )
 

@@ -321,4 +321,3 @@ private fun TitleInSectionForCardsModalSheet(text: String = ""): Unit = Text(
     color = Colors.TEXT.color,
     fontWeight = FontWeight.Bold
 )
-
