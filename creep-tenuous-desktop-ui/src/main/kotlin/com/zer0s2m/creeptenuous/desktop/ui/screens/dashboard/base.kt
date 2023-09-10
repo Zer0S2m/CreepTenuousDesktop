@@ -48,10 +48,12 @@ internal fun TitleCategoryFileObject(text: String, size: Int = 0): Unit = Text(
  * Modal window for selecting a custom category and subsequent binding to a file object
  *
  * @param expandedState Modal window states
+ * @param actionSetCategory Event occurs when setting a custom category to a file object
  */
 @Composable
 internal fun PopupSetUserCategoryInFileObject(
-    expandedState: MutableState<Boolean>
+    expandedState: MutableState<Boolean>,
+    actionSetCategory: (ManagerFileObject) -> Unit
 ) {
     val expandedStateDropDownMenu: MutableState<Boolean> = remember { mutableStateOf(false) }
 
@@ -105,6 +107,7 @@ internal fun PopupSetUserCategoryInFileObject(
                         }
 
                         ReactiveFileObject.managerFileSystemObjects = newManagerFileObject
+                        actionSetCategory(ReactiveFileObject.managerFileSystemObjects)
                         Dashboard.setManagerFileObject(newManagerFileObject)
                     }
                 )

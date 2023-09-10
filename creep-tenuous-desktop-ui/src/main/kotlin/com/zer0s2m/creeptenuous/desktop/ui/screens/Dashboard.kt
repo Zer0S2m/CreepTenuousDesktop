@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Divider
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
@@ -123,20 +122,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
     }
 
     /**
-     * Splitter render for splitting the screen into two parts
-     *
-     * @param scaffoldState State of this scaffold widget.
-     */
-    @Composable
-    override fun render(scaffoldState: ScaffoldState) {
-        super.render(scaffoldState)
-
-        PopupSetUserCategoryInFileObject(
-            expandedState = expandedStateModalSetCategoryPopup
-        )
-    }
-
-    /**
      * Event when clicking on the button to go to the section of an individual user profile
      *
      * @param screen Internal profile screen to go to
@@ -172,6 +157,22 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     @Composable
     override fun renderRightContent() {
+        val directories: MutableState<MutableList<FileObject>> = remember {
+            managerFileObject_Directories
+        }
+        val files: MutableState<MutableList<FileObject>> = remember {
+            managerFileObject_Files
+        }
+
+        PopupSetUserCategoryInFileObject(
+            expandedState = expandedStateModalSetCategoryPopup,
+            actionSetCategory = {
+                // TODO: A crutch for forcing layout reflow
+                directories.value = mutableListOf()
+                files.value = mutableListOf()
+            }
+        )
+
         val scaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
 
@@ -210,8 +211,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     RenderLayoutFilesObject(
-                        directories = managerFileObject_Directories,
-                        files = managerFileObject_Files,
+                        directories = directories,
+                        files = files,
                         expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup
                     )
 

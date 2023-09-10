@@ -46,7 +46,7 @@ fun CollectScreenSettingsSystem(navigationController: NavigationController) {
 fun CollectScreenDashboard(navigationController: NavigationController) {
     NavigationHost(navigationController) {
         composable(Screen.DASHBOARD_SCREEN.name) {
-            Dashboard(navigationController).render(scaffoldState = rememberScaffoldState())
+            Dashboard(navigationController).render()
         }
     }.build()
 }
