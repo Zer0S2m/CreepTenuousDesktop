@@ -18,6 +18,6 @@ data class FileObject(
 
     val color: String? = null,
 
-    val categoryId: Int? = null
+    var categoryId: Int? = null
 
 )

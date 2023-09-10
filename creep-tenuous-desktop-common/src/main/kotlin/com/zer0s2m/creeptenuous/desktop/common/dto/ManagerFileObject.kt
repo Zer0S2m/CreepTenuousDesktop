@@ -12,6 +12,6 @@ data class ManagerFileObject(
 
     val level: Int,
 
-    val objects: List<FileObject>
+    val objects: MutableList<FileObject>
 
 )

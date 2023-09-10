@@ -13,6 +13,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CartFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.fields.FieldSearch
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
+import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import kotlinx.coroutines.CoroutineScope
 
 /**
@@ -72,13 +73,20 @@ internal fun RenderLayoutDirectories(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(directories.value.size) { index ->
+                val categoryId: Int? = directories.value[index].categoryId
                 CartFileObject(
                     isDirectory = true,
                     isFile = false,
                     text = directories.value[index].realName,
                     color = directories.value[index].color,
-                    categoryId = directories.value[index].categoryId,
+                    categoryId = categoryId,
                     actionSetCategory = {
+                        Dashboard.setCurrentFileObjectSetCategory(directories.value[index].systemName)
+                        if (categoryId != null) {
+                            Dashboard.setCategoryIdEditFileObject(categoryId)
+                        } else {
+                            Dashboard.setCategoryIdEditFileObject(-1)
+                        }
                         expandedStateSetCategoryPopup.value = true
                     }
                 ).render()
@@ -107,12 +115,19 @@ internal fun RenderLayoutFiles(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(files.value.size) { index ->
+                val categoryId: Int? = files.value[index].categoryId
                 CartFileObject(
                     isDirectory = false,
                     isFile = true,
                     text = files.value[index].realName,
-                    categoryId = files.value[index].categoryId,
+                    categoryId = categoryId,
                     actionSetCategory = {
+                        Dashboard.setCurrentFileObjectSetCategory(files.value[index].systemName)
+                        if (categoryId != null) {
+                            Dashboard.setCategoryIdEditFileObject(categoryId)
+                        } else {
+                            Dashboard.setCategoryIdEditFileObject(-1)
+                        }
                         expandedStateSetCategoryPopup.value = true
                     }
                 ).render()

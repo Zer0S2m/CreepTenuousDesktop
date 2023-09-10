@@ -66,6 +66,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     private val expandedStateModalSetCategoryPopup: MutableState<Boolean> = mutableStateOf(false)
 
+    // TODO: Reproduce the functionality in a more beautiful form.
+    //  For example, in the context state of each screen
     internal companion object {
 
         /**
@@ -96,6 +98,26 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
             managerFileObject_Directories.value = folders
             managerFileObject_Files.value = files
+        }
+
+        private val categoryIdEditFileObject: MutableState<Int> = mutableStateOf(-1)
+
+        internal fun setCategoryIdEditFileObject(categoryId: Int = -1) {
+            categoryIdEditFileObject.value = categoryId
+        }
+
+        internal fun getCategoryIdEditFileObject(): Int {
+            return categoryIdEditFileObject.value
+        }
+
+        private val currentFileObjectSetCategory: MutableState<String> = mutableStateOf("")
+
+        internal fun setCurrentFileObjectSetCategory(fileObject: String) {
+            currentFileObjectSetCategory.value = fileObject
+        }
+
+        internal fun getCurrentFileObjectSetCategory(): String {
+            return currentFileObjectSetCategory.value
         }
 
     }

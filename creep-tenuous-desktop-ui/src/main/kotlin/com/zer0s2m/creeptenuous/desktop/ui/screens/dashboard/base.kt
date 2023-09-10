@@ -20,9 +20,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
+import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 
 /**
@@ -58,7 +62,7 @@ internal fun PopupSetUserCategoryInFileObject(
             contentColor = contentColorFor(MaterialTheme.colors.surface),
             modifier = Modifier
                 .width(360.dp)
-                .height(136.dp)
+                .height(180.dp)
                 .shadow(24.dp, RoundedCornerShape(4.dp))
         ) {
             Column(
@@ -80,10 +84,30 @@ internal fun PopupSetUserCategoryInFileObject(
                 )
 
                 SelectUserCategoryForFileObject(
-                    expandedState = expandedStateDropDownMenu
-                ) {
+                    expandedState = expandedStateDropDownMenu,
+                    actionDropdownItem = {
+                        Dashboard.setCategoryIdEditFileObject(categoryId = it)
+                    },
+                    actionSet = {
+                        expandedState.value = false
 
-                }
+                        val newManagerFileObject = ManagerFileObject(
+                            systemParents = ReactiveFileObject.managerFileSystemObjects.systemParents,
+                            level = ReactiveFileObject.managerFileSystemObjects.level,
+                            objects = ReactiveFileObject.managerFileSystemObjects.objects
+                        )
+
+                        newManagerFileObject.objects.forEachIndexed { index, fileObject ->
+                            if (fileObject.systemName == Dashboard.getCurrentFileObjectSetCategory()) {
+                                fileObject.categoryId = Dashboard.getCategoryIdEditFileObject()
+                                newManagerFileObject.objects[index] = fileObject
+                            }
+                        }
+
+                        ReactiveFileObject.managerFileSystemObjects = newManagerFileObject
+                        Dashboard.setManagerFileObject(newManagerFileObject)
+                    }
+                )
             }
         }
     }
@@ -93,13 +117,15 @@ internal fun PopupSetUserCategoryInFileObject(
  * Component for selecting a custom category
  *
  * @param expandedState Modal window states
- * @param action Call an action when an element is clicked
+ * @param actionDropdownItem Call an action when an element is clicked [DropdownMenuItem]
+ * @param actionSet Will be called when the user clicks the [Button]
  */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 internal fun SelectUserCategoryForFileObject(
     expandedState: MutableState<Boolean>,
-    action: () -> Unit
+    actionDropdownItem: (Int) -> Unit,
+    actionSet: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -118,10 +144,19 @@ internal fun SelectUserCategoryForFileObject(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = "Category...",
-                color = Color(255, 255, 255, 160),
-            )
+            if (Dashboard.getCategoryIdEditFileObject() != -1) {
+                val userCategory = ReactiveUser.customCategories.find {
+                    it.id == Dashboard.getCategoryIdEditFileObject()
+                }
+                if (userCategory != null) {
+                    RenderLayoutUserCategory(userCategory)
+                }
+            } else {
+                Text(
+                    text = "Category...",
+                    color = Color(255, 255, 255, 160),
+                )
+            }
 
             Icon(
                 painter = painterResource(resourcePath = Resources.ICON_ARROW.path),
@@ -144,28 +179,31 @@ internal fun SelectUserCategoryForFileObject(
                 DropdownMenuItem(
                     onClick = {
                         expandedState.value = false
-                        action()
+                        it.id?.let { id -> actionDropdownItem(id) }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .pointerHoverIcon(PointerIcon.Hand),
                     contentPadding = PaddingValues(12.dp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        if (it.color != null) {
-                            CircleCategoryBox(it.color!!, 16.dp)
-                        }
-                        Text(
-                            text = it.title,
-                            modifier = if (it.color != null) Modifier
-                                .padding(start = 8.dp) else Modifier
-                        )
-                    }
+                    RenderLayoutUserCategory(userCategory = it)
                 }
             }
+        }
+    }
+
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .padding(top = 12.dp)
+    ) {
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .pointerHoverIcon(PointerIcon.Hand),
+            onClick = actionSet
+        ) {
+            Text("Set category")
         }
     }
 }
@@ -181,3 +219,25 @@ private val baseWidthColumnSelectCategory: Dp get() = 328.dp
  */
 @get:ReadOnlyComposable
 private val contentDescriptionIconArrow: String get() = "Open categories list"
+
+/**
+ * Component responsible for minimal information about the user category
+ *
+ * @param userCategory User category information
+ */
+@Composable
+private fun RenderLayoutUserCategory(userCategory: UserCategory) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        if (userCategory.color != null) {
+            CircleCategoryBox(userCategory.color!!, 16.dp)
+        }
+        Text(
+            text = userCategory.title,
+            modifier = if (userCategory.color != null) Modifier
+                .padding(start = 8.dp) else Modifier
+        )
+    }
+}
