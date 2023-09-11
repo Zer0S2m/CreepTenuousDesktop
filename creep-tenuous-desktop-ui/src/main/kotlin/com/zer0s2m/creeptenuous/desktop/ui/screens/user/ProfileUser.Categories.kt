@@ -1,13 +1,10 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.user
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -18,13 +15,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.ConverterColor
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
-import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
@@ -35,6 +30,8 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
+import com.zer0s2m.creeptenuous.desktop.ui.screens.base.DropdownMenuSelectColor
+import com.zer0s2m.creeptenuous.desktop.ui.screens.base.InputSelectColor
 
 /**
  * Set the color palette when editing or creating a custom category.
@@ -341,7 +338,6 @@ private fun ButtonCreateCategory(action: () -> Unit) {
  * @param stateUserCategory The current state of the custom category.
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun SelectColorForCategory(stateUserCategory: UserCategory) {
     val expandedState: MutableState<Boolean> = remember { mutableStateOf(false) }
     val currentColor: MutableState<Color> = remember {
@@ -360,112 +356,25 @@ private fun SelectColorForCategory(stateUserCategory: UserCategory) {
         newColorForCategory.value = stateUserCategory.color
     }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .onClick {
-                expandedState.value = true
-            }
-            .border(0.5.dp, MaterialTheme.colors.secondary, RoundedCornerShape(4.dp))
-            .pointerHoverIcon(PointerIcon.Hand)
-    ) {
-        Row(
-            modifier = Modifier
-                .pointerHoverIcon(PointerIcon.Hand)
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            if (!isSetColor.value) {
-                Text(
-                    text = "Color...",
-                    color = Color(255, 255, 255, 160),
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .width(120.dp)
-                        .height(24.dp)
-                        .background(currentColor.value, RoundedCornerShape(4.dp))
-                )
-            }
-
-            Icon(
-                painter = painterResource(resourcePath = Resources.ICON_ARROW.path),
-                contentDescription = contentDescriptionIconArrow,
-                tint = Color.White,
-                modifier = Modifier
-                    .size(16.dp)
-            )
+    InputSelectColor(
+        isSetColor = isSetColor,
+        currentColor = currentColor,
+        action = {
+            expandedState.value = true
         }
-
-        DropdownMenuSelectColorForCategory(
-            expandedState = expandedState,
-            action = { colorStr, color ->
-                expandedState.value = false
-                currentColor.value = color
-                isSetColor.value = true
-                newColorForCategory.value = colorStr
-            }
-        )
-    }
-}
-
-/**
- * The main component for choosing a color is a dropdown list.
- *
- * Extends a component [DropdownMenu]
- *
- * @param expandedState Whether the menu is currently open and visible to the user
- * @param action Call an action when an element is clicked [DropdownMenuItem]
- */
-@Composable
-private fun DropdownMenuSelectColorForCategory(
-    expandedState: MutableState<Boolean>,
-    action: (String, Color) -> Unit
-) {
-    DropdownMenu(
-        expanded = expandedState.value,
-        onDismissRequest = {
+    )
+    DropdownMenuSelectColor(
+        expandedState = expandedState,
+        modifier = Modifier
+            .width(baseWidthColumnSelectColor),
+        action = { colorStr, color ->
             expandedState.value = false
-        },
-        modifier = Modifier
-            .width(baseWidthColumnSelectColor)
-    ) {
-        ReactiveUser.userColors.forEach {
-            val convertedColor: ConverterColor = colorConvertHexToRgb(it.color)
-            val color = Color(
-                red = convertedColor.red,
-                green = convertedColor.green,
-                blue = convertedColor.blue
-            )
-
-            DropdownMenuItem(
-                onClick = {
-                    action(it.color, color)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .pointerHoverIcon(PointerIcon.Hand),
-                contentPadding = PaddingValues(12.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color, RoundedCornerShape(4.dp))
-                        .padding(16.dp)
-                )
-            }
+            currentColor.value = color
+            isSetColor.value = true
+            newColorForCategory.value = colorStr
         }
-    }
+    )
 }
-
-/**
- * Text used by accessibility services to describe what this image represents
- */
-@get:ReadOnlyComposable
-private val contentDescriptionIconArrow: String get() = "Open color list"
 
 /**
  * Width of color selection area from list
