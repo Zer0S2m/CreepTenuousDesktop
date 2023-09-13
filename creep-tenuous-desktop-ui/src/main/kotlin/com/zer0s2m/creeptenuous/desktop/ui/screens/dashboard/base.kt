@@ -15,14 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
-import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
@@ -31,6 +29,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.DropdownMenuSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.InputSelectColor
+import com.zer0s2m.creeptenuous.desktop.ui.screens.base.LayoutDeleteAndOpenInputSelect
 
 /**
  * Base title for file object category
@@ -90,6 +89,9 @@ internal fun PopupSetUserCategoryInFileObject(
 
                 SelectUserCategoryForFileObject(
                     expandedState = expandedStateDropDownMenu,
+                    actionDelete = {
+                        Dashboard.setCategoryIdEditFileObject(categoryId = -1)
+                    },
                     actionDropdownItem = {
                         Dashboard.setCategoryIdEditFileObject(categoryId = it)
                     }
@@ -115,7 +117,11 @@ internal fun PopupSetUserCategoryInFileObject(
 
                             newManagerFileObject.objects.forEachIndexed { index, fileObject ->
                                 if (fileObject.systemName == Dashboard.getCurrentFileObjectSetCategory()) {
-                                    fileObject.categoryId = Dashboard.getCategoryIdEditFileObject()
+                                    if (Dashboard.getCategoryIdEditFileObject() == -1) {
+                                        fileObject.categoryId = null
+                                    } else {
+                                        fileObject.categoryId = Dashboard.getCategoryIdEditFileObject()
+                                    }
                                     newManagerFileObject.objects[index] = fileObject
                                 }
                             }
@@ -134,16 +140,18 @@ internal fun PopupSetUserCategoryInFileObject(
 }
 
 /**
- * Component for selecting a custom category
+ * Component for selecting a custom category.
  *
- * @param expandedState Modal window states
- * @param actionDropdownItem Call an action when an element is clicked [DropdownMenuItem]
+ * @param expandedState Modal window states.
+ * @param actionDropdownItem Call an action when an element is clicked [DropdownMenuItem].
+ * @param actionDelete Call an action when deleting a category.
  */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 internal fun SelectUserCategoryForFileObject(
     expandedState: MutableState<Boolean>,
-    actionDropdownItem: (Int) -> Unit
+    actionDropdownItem: (Int) -> Unit,
+    actionDelete: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -176,12 +184,8 @@ internal fun SelectUserCategoryForFileObject(
                 )
             }
 
-            Icon(
-                painter = painterResource(resourcePath = Resources.ICON_ARROW.path),
-                contentDescription = contentDescriptionIconArrow,
-                tint = Color.White,
-                modifier = Modifier
-                    .size(16.dp)
+            LayoutDeleteAndOpenInputSelect(
+                actionDelete = actionDelete
             )
         }
 
@@ -216,12 +220,6 @@ internal fun SelectUserCategoryForFileObject(
  */
 @get:ReadOnlyComposable
 private val baseWidthColumnSelectItem: Dp get() = 328.dp
-
-/**
- * Text used by accessibility services to describe what this image represents
- */
-@get:ReadOnlyComposable
-private val contentDescriptionIconArrow: String get() = "Open categories list"
 
 /**
  * Component responsible for minimal information about the user category

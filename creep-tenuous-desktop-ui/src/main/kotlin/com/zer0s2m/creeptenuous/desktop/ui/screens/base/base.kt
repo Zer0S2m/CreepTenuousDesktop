@@ -126,30 +126,9 @@ internal fun InputSelectColor(
                 )
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Icon(
-                    painter = painterResource(resourcePath = Resources.ICON_DELETE.path),
-                    contentDescription = contentDescriptionIconDelete,
-                    tint = Color.Red,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .padding(end = 8.dp)
-                        .onClick {
-                            actionDelete()
-                        }
-                )
-
-                Icon(
-                    painter = painterResource(resourcePath = Resources.ICON_ARROW.path),
-                    contentDescription = contentDescriptionIconArrow,
-                    tint = MaterialTheme.colors.secondary,
-                    modifier = Modifier
-                        .size(20.dp)
-                )
-            }
+            LayoutDeleteAndOpenInputSelect(
+                actionDelete = actionDelete
+            )
         }
 
         content()
@@ -210,10 +189,46 @@ internal fun DropdownMenuSelectColor(
  * Text used by accessibility services to describe what this image represents
  */
 @get:ReadOnlyComposable
-private val contentDescriptionIconArrow: String get() = "Open color list"
+private val contentDescriptionIconArrow: String get() = "Open select property"
 
 /**
  * Text used by accessibility services to describe what this image represents
  */
 @get:ReadOnlyComposable
-private val contentDescriptionIconDelete: String get() = "Delete color"
+private val contentDescriptionIconDelete: String get() = "Delete property"
+
+/**
+ * Field action call layout - delete and open
+ *
+ * @param actionDelete Configure component to receive clicks [Icon] (action delete).
+ */
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+internal fun LayoutDeleteAndOpenInputSelect(
+    actionDelete: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Icon(
+            painter = painterResource(resourcePath = Resources.ICON_DELETE.path),
+            contentDescription = contentDescriptionIconDelete,
+            tint = Color.Red,
+            modifier = Modifier
+                .size(32.dp)
+                .padding(end = 8.dp)
+                .onClick {
+                    actionDelete()
+                }
+        )
+
+        Icon(
+            painter = painterResource(resourcePath = Resources.ICON_ARROW.path),
+            contentDescription = contentDescriptionIconArrow,
+            tint = MaterialTheme.colors.secondary,
+            modifier = Modifier
+                .size(20.dp)
+        )
+    }
+}
