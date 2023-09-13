@@ -34,10 +34,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.modals.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
-import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupSetUserCategoryInFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLayoutFilesObject
-import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLeftContentDashboard
-import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.TopPanelDashboard
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -64,6 +61,11 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      * Current state of the modal [PopupSetUserCategoryInFileObject] when setting a custom category
      */
     private val expandedStateModalSetCategoryPopup: MutableState<Boolean> = mutableStateOf(false)
+
+    /**
+     * Current state of the modal [PopupSetUserColorInFileObject] when setting a custom color
+     */
+    private val expandedStateModalSetColorPopup: MutableState<Boolean> = mutableStateOf(false)
 
     // TODO: Reproduce the functionality in a more beautiful form.
     //  For example, in the context state of each screen
@@ -109,14 +111,24 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             return categoryIdEditFileObject.value
         }
 
-        private val currentFileObjectSetCategory: MutableState<String> = mutableStateOf("")
+        private val currentFileObjectSetProperty: MutableState<String> = mutableStateOf("")
 
-        internal fun setCurrentFileObjectSetCategory(fileObject: String) {
-            currentFileObjectSetCategory.value = fileObject
+        internal fun setCurrentFileObjectSetProperty(fileObject: String) {
+            currentFileObjectSetProperty.value = fileObject
         }
 
         internal fun getCurrentFileObjectSetCategory(): String {
-            return currentFileObjectSetCategory.value
+            return currentFileObjectSetProperty.value
+        }
+
+        private val colorEditFileObject: MutableState<String> = mutableStateOf("")
+
+        internal fun setColorEditFileObject(color: String = "") {
+            colorEditFileObject.value = color
+        }
+
+        internal fun getColorEditFileObject(): String {
+            return colorEditFileObject.value
         }
 
     }
@@ -172,6 +184,14 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                 files.value = mutableListOf()
             }
         )
+        PopupSetUserColorInFileObject(
+            expandedState = expandedStateModalSetColorPopup,
+            actionSetColor = {
+                // TODO: A crutch for forcing layout reflow
+                directories.value = mutableListOf()
+                files.value = mutableListOf()
+            }
+        )
 
         val scaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
@@ -213,7 +233,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                     RenderLayoutFilesObject(
                         directories = directories,
                         files = files,
-                        expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup
+                        expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
+                        expandedStateSetColorPopup = expandedStateModalSetColorPopup
                     )
 
                     BreadCrumbs(

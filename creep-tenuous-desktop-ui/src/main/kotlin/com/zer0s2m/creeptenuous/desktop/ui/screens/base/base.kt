@@ -87,8 +87,9 @@ internal fun BaseModalPopup(
 @OptIn(ExperimentalFoundationApi::class)
 internal fun InputSelectColor(
     isSetColor: MutableState<Boolean>,
-    currentColor: MutableState<Color>,
-    action: () -> Unit
+    currentColor: MutableState<Color?>,
+    action: () -> Unit,
+    content: @Composable () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -113,11 +114,12 @@ internal fun InputSelectColor(
                     color = Color(255, 255, 255, 160),
                 )
             } else {
+                val baseModifier = Modifier
+                    .width(120.dp)
+                    .height(24.dp)
                 Box(
-                    modifier = Modifier
-                        .width(120.dp)
-                        .height(24.dp)
-                        .background(currentColor.value, RoundedCornerShape(4.dp))
+                    modifier = if (currentColor.value == null) baseModifier
+                               else baseModifier.background(currentColor.value!!, RoundedCornerShape(4.dp))
                 )
             }
 
@@ -129,6 +131,8 @@ internal fun InputSelectColor(
                     .size(16.dp)
             )
         }
+
+        content()
     }
 }
 

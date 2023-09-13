@@ -16,7 +16,7 @@ data class FileObject(
 
     val isDirectory: Boolean,
 
-    val color: String? = null,
+    var color: String? = null,
 
     var categoryId: Int? = null
 

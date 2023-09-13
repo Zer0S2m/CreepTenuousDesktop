@@ -340,7 +340,7 @@ private fun ButtonCreateCategory(action: () -> Unit) {
 @Composable
 private fun SelectColorForCategory(stateUserCategory: UserCategory) {
     val expandedState: MutableState<Boolean> = remember { mutableStateOf(false) }
-    val currentColor: MutableState<Color> = remember {
+    val currentColor: MutableState<Color?> = remember {
         mutableStateOf(Color(0, 0, 0))
     }
     val isSetColor: MutableState<Boolean> = remember { mutableStateOf(false) }

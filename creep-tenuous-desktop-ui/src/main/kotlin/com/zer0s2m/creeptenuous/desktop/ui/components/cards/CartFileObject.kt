@@ -332,7 +332,7 @@ class CartFileObject(
             .pointerHoverIcon(icon = PointerIcon.Hand)
         val contentPaddingMenu = PaddingValues(12.dp, 4.dp)
 
-        val items: Iterable<DropdownMenuItemAdvanced> = listOf(
+        val items: MutableList<DropdownMenuItemAdvanced> = mutableListOf(
             DropdownMenuItemAdvanced(
                 text = "Download",
                 colorText = Color.Black,
@@ -382,8 +382,11 @@ class CartFileObject(
                     expandedMenu.value = false
                     actionSetCategory()
                 }
-            ),
-            DropdownMenuItemAdvanced(
+            )
+        )
+
+        if (isDirectoryComp) {
+            items.add(DropdownMenuItemAdvanced(
                 text = "Set color",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
@@ -392,8 +395,8 @@ class CartFileObject(
                     expandedMenu.value = false
                     actionSetColor()
                 }
-            )
-        )
+            ))
+        }
 
         DropdownMenuAdvanced(
             itemsComp = items,

@@ -23,11 +23,14 @@ import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
+import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
 import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
+import com.zer0s2m.creeptenuous.desktop.ui.screens.base.DropdownMenuSelectColor
+import com.zer0s2m.creeptenuous.desktop.ui.screens.base.InputSelectColor
 
 /**
  * Base title for file object category
@@ -89,28 +92,42 @@ internal fun PopupSetUserCategoryInFileObject(
                     expandedState = expandedStateDropDownMenu,
                     actionDropdownItem = {
                         Dashboard.setCategoryIdEditFileObject(categoryId = it)
-                    },
-                    actionSet = {
-                        expandedState.value = false
-
-                        val newManagerFileObject = ManagerFileObject(
-                            systemParents = ReactiveFileObject.managerFileSystemObjects.systemParents,
-                            level = ReactiveFileObject.managerFileSystemObjects.level,
-                            objects = ReactiveFileObject.managerFileSystemObjects.objects
-                        )
-
-                        newManagerFileObject.objects.forEachIndexed { index, fileObject ->
-                            if (fileObject.systemName == Dashboard.getCurrentFileObjectSetCategory()) {
-                                fileObject.categoryId = Dashboard.getCategoryIdEditFileObject()
-                                newManagerFileObject.objects[index] = fileObject
-                            }
-                        }
-
-                        ReactiveFileObject.managerFileSystemObjects = newManagerFileObject
-                        actionSetCategory(ReactiveFileObject.managerFileSystemObjects)
-                        Dashboard.setManagerFileObject(newManagerFileObject)
                     }
                 )
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .pointerHoverIcon(PointerIcon.Hand),
+                        onClick = {
+                            expandedState.value = false
+
+                            val newManagerFileObject = ManagerFileObject(
+                                systemParents = ReactiveFileObject.managerFileSystemObjects.systemParents,
+                                level = ReactiveFileObject.managerFileSystemObjects.level,
+                                objects = ReactiveFileObject.managerFileSystemObjects.objects
+                            )
+
+                            newManagerFileObject.objects.forEachIndexed { index, fileObject ->
+                                if (fileObject.systemName == Dashboard.getCurrentFileObjectSetCategory()) {
+                                    fileObject.categoryId = Dashboard.getCategoryIdEditFileObject()
+                                    newManagerFileObject.objects[index] = fileObject
+                                }
+                            }
+
+                            ReactiveFileObject.managerFileSystemObjects = newManagerFileObject
+                            actionSetCategory(ReactiveFileObject.managerFileSystemObjects)
+                            Dashboard.setManagerFileObject(ReactiveFileObject.managerFileSystemObjects)
+                        }
+                    ) {
+                        Text("Set category")
+                    }
+                }
             }
         }
     }
@@ -121,14 +138,12 @@ internal fun PopupSetUserCategoryInFileObject(
  *
  * @param expandedState Modal window states
  * @param actionDropdownItem Call an action when an element is clicked [DropdownMenuItem]
- * @param actionSet Will be called when the user clicks the [Button]
  */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 internal fun SelectUserCategoryForFileObject(
     expandedState: MutableState<Boolean>,
-    actionDropdownItem: (Int) -> Unit,
-    actionSet: () -> Unit
+    actionDropdownItem: (Int) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -176,7 +191,7 @@ internal fun SelectUserCategoryForFileObject(
                 expandedState.value = false
             },
             modifier = Modifier
-                .width(baseWidthColumnSelectCategory)
+                .width(baseWidthColumnSelectItem)
         ) {
             ReactiveUser.customCategories.forEach {
                 DropdownMenuItem(
@@ -194,28 +209,13 @@ internal fun SelectUserCategoryForFileObject(
             }
         }
     }
-
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .padding(top = 12.dp)
-    ) {
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .pointerHoverIcon(PointerIcon.Hand),
-            onClick = actionSet
-        ) {
-            Text("Set category")
-        }
-    }
 }
 
 /**
  * Width of category selection area from list
  */
 @get:ReadOnlyComposable
-private val baseWidthColumnSelectCategory: Dp get() = 328.dp
+private val baseWidthColumnSelectItem: Dp get() = 328.dp
 
 /**
  * Text used by accessibility services to describe what this image represents
@@ -242,5 +242,121 @@ private fun RenderLayoutUserCategory(userCategory: UserCategory) {
             modifier = if (userCategory.color != null) Modifier
                 .padding(start = 8.dp) else Modifier
         )
+    }
+}
+
+/**
+ * Modal window for selecting a custom color and subsequent binding to a file object
+ *
+ * @param expandedState Modal window states
+ * @param actionSetColor Event occurs when setting a custom color to a file object
+ */
+@Composable
+internal fun PopupSetUserColorInFileObject(
+    expandedState: MutableState<Boolean>,
+    actionSetColor: (ManagerFileObject) -> Unit
+) {
+    BaseModalPopup(
+        stateModal = expandedState
+    ) {
+        Surface(
+            contentColor = contentColorFor(MaterialTheme.colors.surface),
+            modifier = Modifier
+                .width(360.dp)
+                .height(180.dp)
+                .shadow(24.dp, RoundedCornerShape(4.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .pointerInput({}) {
+                        detectTapGestures(onPress = {
+                            // Workaround to disable clicks on Surface background
+                            // https://github.com/JetBrains/compose-jb/issues/2581
+                        })
+                    },
+            ) {
+                val expandedStateDropDownMenu: MutableState<Boolean> = remember { mutableStateOf(false) }
+                val isSetColor: MutableState<Boolean> = remember { mutableStateOf(false) }
+                val currentColor: MutableState<Color?> = remember { mutableStateOf(null) }
+
+                if (Dashboard.getColorEditFileObject().isNotEmpty()) {
+                    ReactiveUser.userColors.forEach {
+                        if (it.color == Dashboard.getColorEditFileObject()) {
+                            val converterColor = colorConvertHexToRgb(Dashboard.getColorEditFileObject())
+                            currentColor.value = Color(
+                                red = converterColor.red,
+                                green = converterColor.green,
+                                blue = converterColor.blue
+                            )
+                            isSetColor.value = true
+                        }
+                    }
+                }
+
+                Text(
+                    text = "Set color in file object",
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .padding(bottom = 20.dp)
+                )
+
+                InputSelectColor(
+                    isSetColor = isSetColor,
+                    currentColor = currentColor,
+                    action = {
+                        expandedStateDropDownMenu.value = true
+                    },
+                    content = {
+                        DropdownMenuSelectColor(
+                            expandedState = expandedStateDropDownMenu,
+                            modifier = Modifier
+                                .width(baseWidthColumnSelectItem),
+                            action = { colorStr, color ->
+                                expandedStateDropDownMenu.value = false
+                                currentColor.value = color
+                                isSetColor.value = true
+                                Dashboard.setColorEditFileObject(colorStr)
+                            }
+                        )
+                    }
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .pointerHoverIcon(PointerIcon.Hand),
+                        onClick = {
+                            expandedState.value = false
+
+                            val newManagerFileObject = ManagerFileObject(
+                                systemParents = ReactiveFileObject.managerFileSystemObjects.systemParents,
+                                level = ReactiveFileObject.managerFileSystemObjects.level,
+                                objects = ReactiveFileObject.managerFileSystemObjects.objects
+                            )
+
+                            newManagerFileObject.objects.forEachIndexed { index, fileObject ->
+                                if (fileObject.systemName == Dashboard.getCurrentFileObjectSetCategory()) {
+                                    fileObject.color = Dashboard.getColorEditFileObject()
+                                    newManagerFileObject.objects[index] = fileObject
+                                }
+                            }
+
+                            ReactiveFileObject.managerFileSystemObjects = newManagerFileObject
+                            actionSetColor(ReactiveFileObject.managerFileSystemObjects)
+                            Dashboard.setManagerFileObject(ReactiveFileObject.managerFileSystemObjects)
+                        }
+                    ) {
+                        Text("Set color")
+                    }
+                }
+            }
+        }
     }
 }

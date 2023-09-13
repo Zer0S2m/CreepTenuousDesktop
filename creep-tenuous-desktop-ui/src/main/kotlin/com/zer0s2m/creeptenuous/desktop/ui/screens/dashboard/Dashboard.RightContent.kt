@@ -23,12 +23,15 @@ import kotlinx.coroutines.CoroutineScope
  * @param files file objects with type - file
  * @param expandedStateSetCategoryPopup Current state of the modal
  * [PopupSetUserCategoryInFileObject] when setting a custom category
+ * @param expandedStateSetColorPopup Current state of the modal
+ * [PopupSetUserColorInFileObject] when setting a custom color
  */
 @Composable
 internal fun RenderLayoutFilesObject(
     directories: MutableState<MutableList<FileObject>>,
     files: MutableState<MutableList<FileObject>>,
-    expandedStateSetCategoryPopup: MutableState<Boolean>
+    expandedStateSetCategoryPopup: MutableState<Boolean>,
+    expandedStateSetColorPopup: MutableState<Boolean>
 ) {
     Column(
         modifier = Modifier
@@ -40,7 +43,8 @@ internal fun RenderLayoutFilesObject(
         ) {
             RenderLayoutDirectories(
                 directories = directories,
-                expandedStateSetCategoryPopup = expandedStateSetCategoryPopup
+                expandedStateSetCategoryPopup = expandedStateSetCategoryPopup,
+                expandedStateSetColorPopup = expandedStateSetColorPopup,
             )
             RenderLayoutFiles(
                 files = files,
@@ -56,11 +60,14 @@ internal fun RenderLayoutFilesObject(
  * @param directories file objects with type - directory
  * @param expandedStateSetCategoryPopup Current state of the modal
  * [PopupSetUserCategoryInFileObject] when setting a custom category
+ * @param expandedStateSetColorPopup Current state of the modal
+ * [PopupSetUserColorInFileObject] when setting a custom color
  */
 @Composable
 internal fun RenderLayoutDirectories(
     directories: MutableState<MutableList<FileObject>>,
-    expandedStateSetCategoryPopup: MutableState<Boolean>
+    expandedStateSetCategoryPopup: MutableState<Boolean>,
+    expandedStateSetColorPopup: MutableState<Boolean>,
 ) {
     Column(
         modifier = Modifier
@@ -74,6 +81,7 @@ internal fun RenderLayoutDirectories(
         ) {
             items(directories.value.size) { index ->
                 val categoryId: Int? = directories.value[index].categoryId
+                val color: String? = directories.value[index].color
                 CartFileObject(
                     isDirectory = true,
                     isFile = false,
@@ -81,13 +89,22 @@ internal fun RenderLayoutDirectories(
                     color = directories.value[index].color,
                     categoryId = categoryId,
                     actionSetCategory = {
-                        Dashboard.setCurrentFileObjectSetCategory(directories.value[index].systemName)
+                        Dashboard.setCurrentFileObjectSetProperty(directories.value[index].systemName)
                         if (categoryId != null) {
                             Dashboard.setCategoryIdEditFileObject(categoryId)
                         } else {
                             Dashboard.setCategoryIdEditFileObject(-1)
                         }
                         expandedStateSetCategoryPopup.value = true
+                    },
+                    actionSetColor = {
+                        Dashboard.setCurrentFileObjectSetProperty(directories.value[index].systemName)
+                        if (color != null) {
+                            Dashboard.setColorEditFileObject(color)
+                        } else {
+                            Dashboard.setColorEditFileObject()
+                        }
+                        expandedStateSetColorPopup.value = true
                     }
                 ).render()
             }
@@ -122,7 +139,7 @@ internal fun RenderLayoutFiles(
                     text = files.value[index].realName,
                     categoryId = categoryId,
                     actionSetCategory = {
-                        Dashboard.setCurrentFileObjectSetCategory(files.value[index].systemName)
+                        Dashboard.setCurrentFileObjectSetProperty(files.value[index].systemName)
                         if (categoryId != null) {
                             Dashboard.setCategoryIdEditFileObject(categoryId)
                         } else {
