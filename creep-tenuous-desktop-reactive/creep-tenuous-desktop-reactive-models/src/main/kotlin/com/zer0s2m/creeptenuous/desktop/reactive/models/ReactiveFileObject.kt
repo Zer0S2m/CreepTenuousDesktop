@@ -23,7 +23,7 @@ object ReactiveFileObject : ReactiveLazyObject {
     var managerFileSystemObjects: ManagerFileObject = ManagerFileObject(
         systemParents = listOf(),
         level = 0,
-        objects = listOf()
+        objects = mutableListOf()
     )
 
 }

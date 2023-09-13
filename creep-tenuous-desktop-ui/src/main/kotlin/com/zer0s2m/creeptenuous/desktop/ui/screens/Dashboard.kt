@@ -34,9 +34,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.modals.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
-import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLayoutFilesObject
-import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLeftContentDashboard
-import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.TopPanelDashboard
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -59,6 +57,18 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         "Musics" to Resources.ICON_MUSIC.path
     )
 
+    /**
+     * Current state of the modal [PopupSetUserCategoryInFileObject] when setting a custom category
+     */
+    private val expandedStateModalSetCategoryPopup: MutableState<Boolean> = mutableStateOf(false)
+
+    /**
+     * Current state of the modal [PopupSetUserColorInFileObject] when setting a custom color
+     */
+    private val expandedStateModalSetColorPopup: MutableState<Boolean> = mutableStateOf(false)
+
+    // TODO: Reproduce the functionality in a more beautiful form.
+    //  For example, in the context state of each screen
     internal companion object {
 
         /**
@@ -89,6 +99,36 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
             managerFileObject_Directories.value = folders
             managerFileObject_Files.value = files
+        }
+
+        private val categoryIdEditFileObject: MutableState<Int> = mutableStateOf(-1)
+
+        internal fun setCategoryIdEditFileObject(categoryId: Int = -1) {
+            categoryIdEditFileObject.value = categoryId
+        }
+
+        internal fun getCategoryIdEditFileObject(): Int {
+            return categoryIdEditFileObject.value
+        }
+
+        private val currentFileObjectSetProperty: MutableState<String> = mutableStateOf("")
+
+        internal fun setCurrentFileObjectSetProperty(fileObject: String) {
+            currentFileObjectSetProperty.value = fileObject
+        }
+
+        internal fun getCurrentFileObjectSetCategory(): String {
+            return currentFileObjectSetProperty.value
+        }
+
+        private val colorEditFileObject: MutableState<String?> = mutableStateOf(null)
+
+        internal fun setColorEditFileObject(color: String? = null) {
+            colorEditFileObject.value = color
+        }
+
+        internal fun getColorEditFileObject(): String? {
+            return colorEditFileObject.value
         }
 
     }
@@ -129,6 +169,30 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     @Composable
     override fun renderRightContent() {
+        val directories: MutableState<MutableList<FileObject>> = remember {
+            managerFileObject_Directories
+        }
+        val files: MutableState<MutableList<FileObject>> = remember {
+            managerFileObject_Files
+        }
+
+        PopupSetUserCategoryInFileObject(
+            expandedState = expandedStateModalSetCategoryPopup,
+            actionSetCategory = {
+                // TODO: A crutch for forcing layout reflow
+                directories.value = mutableListOf()
+                files.value = mutableListOf()
+            }
+        )
+        PopupSetUserColorInFileObject(
+            expandedState = expandedStateModalSetColorPopup,
+            actionSetColor = {
+                // TODO: A crutch for forcing layout reflow
+                directories.value = mutableListOf()
+                files.value = mutableListOf()
+            }
+        )
+
         val scaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
 
@@ -167,8 +231,10 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     RenderLayoutFilesObject(
-                        directories = managerFileObject_Directories,
-                        files = managerFileObject_Files
+                        directories = directories,
+                        files = files,
+                        expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
+                        expandedStateSetColorPopup = expandedStateModalSetColorPopup
                     )
 
                     BreadCrumbs(
@@ -321,4 +387,3 @@ private fun TitleInSectionForCardsModalSheet(text: String = ""): Unit = Text(
     color = Colors.TEXT.color,
     fontWeight = FontWeight.Bold
 )
-

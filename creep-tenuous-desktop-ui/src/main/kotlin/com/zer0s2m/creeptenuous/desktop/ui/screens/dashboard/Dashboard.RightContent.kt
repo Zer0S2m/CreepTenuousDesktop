@@ -13,6 +13,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CartFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.fields.FieldSearch
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
+import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import kotlinx.coroutines.CoroutineScope
 
 /**
@@ -20,11 +21,17 @@ import kotlinx.coroutines.CoroutineScope
  *
  * @param directories file objects with type - directory
  * @param files file objects with type - file
+ * @param expandedStateSetCategoryPopup Current state of the modal
+ * [PopupSetUserCategoryInFileObject] when setting a custom category
+ * @param expandedStateSetColorPopup Current state of the modal
+ * [PopupSetUserColorInFileObject] when setting a custom color
  */
 @Composable
 internal fun RenderLayoutFilesObject(
     directories: MutableState<MutableList<FileObject>>,
-    files: MutableState<MutableList<FileObject>>
+    files: MutableState<MutableList<FileObject>>,
+    expandedStateSetCategoryPopup: MutableState<Boolean>,
+    expandedStateSetColorPopup: MutableState<Boolean>
 ) {
     Column(
         modifier = Modifier
@@ -34,8 +41,15 @@ internal fun RenderLayoutFilesObject(
             modifier = Modifier
                 .padding(bottom = 28.dp)
         ) {
-            RenderLayoutDirectories(directories)
-            RenderLayoutFiles(files)
+            RenderLayoutDirectories(
+                directories = directories,
+                expandedStateSetCategoryPopup = expandedStateSetCategoryPopup,
+                expandedStateSetColorPopup = expandedStateSetColorPopup,
+            )
+            RenderLayoutFiles(
+                files = files,
+                expandedStateSetCategoryPopup = expandedStateSetCategoryPopup
+            )
         }
     }
 }
@@ -44,9 +58,17 @@ internal fun RenderLayoutFilesObject(
  * Content renderer responsible for file objects with type - category
  *
  * @param directories file objects with type - directory
+ * @param expandedStateSetCategoryPopup Current state of the modal
+ * [PopupSetUserCategoryInFileObject] when setting a custom category
+ * @param expandedStateSetColorPopup Current state of the modal
+ * [PopupSetUserColorInFileObject] when setting a custom color
  */
 @Composable
-internal fun RenderLayoutDirectories(directories: MutableState<MutableList<FileObject>>) {
+internal fun RenderLayoutDirectories(
+    directories: MutableState<MutableList<FileObject>>,
+    expandedStateSetCategoryPopup: MutableState<Boolean>,
+    expandedStateSetColorPopup: MutableState<Boolean>,
+) {
     Column(
         modifier = Modifier
             .padding(bottom = 28.dp)
@@ -58,11 +80,32 @@ internal fun RenderLayoutDirectories(directories: MutableState<MutableList<FileO
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(directories.value.size) { index ->
+                val categoryId: Int? = directories.value[index].categoryId
+                val color: String? = directories.value[index].color
                 CartFileObject(
                     isDirectory = true,
                     isFile = false,
                     text = directories.value[index].realName,
-                    color = directories.value[index].color
+                    color = directories.value[index].color,
+                    categoryId = categoryId,
+                    actionSetCategory = {
+                        Dashboard.setCurrentFileObjectSetProperty(directories.value[index].systemName)
+                        if (categoryId != null) {
+                            Dashboard.setCategoryIdEditFileObject(categoryId)
+                        } else {
+                            Dashboard.setCategoryIdEditFileObject(-1)
+                        }
+                        expandedStateSetCategoryPopup.value = true
+                    },
+                    actionSetColor = {
+                        Dashboard.setCurrentFileObjectSetProperty(directories.value[index].systemName)
+                        if (color != null) {
+                            Dashboard.setColorEditFileObject(color)
+                        } else {
+                            Dashboard.setColorEditFileObject()
+                        }
+                        expandedStateSetColorPopup.value = true
+                    }
                 ).render()
             }
         }
@@ -73,9 +116,14 @@ internal fun RenderLayoutDirectories(directories: MutableState<MutableList<FileO
  * Content renderer responsible for file objects with type - file
  *
  * @param files file objects with type - file
+ * @param expandedStateSetCategoryPopup Current state of the modal [PopupSetUserCategoryInFileObject]
+ * when setting a custom category
  */
 @Composable
-internal fun RenderLayoutFiles(files: MutableState<MutableList<FileObject>>) {
+internal fun RenderLayoutFiles(
+    files: MutableState<MutableList<FileObject>>,
+    expandedStateSetCategoryPopup: MutableState<Boolean>
+) {
     Column {
         TitleCategoryFileObject("Files", files.value.size)
         LazyVerticalGrid(
@@ -84,10 +132,21 @@ internal fun RenderLayoutFiles(files: MutableState<MutableList<FileObject>>) {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(files.value.size) { index ->
+                val categoryId: Int? = files.value[index].categoryId
                 CartFileObject(
                     isDirectory = false,
                     isFile = true,
-                    text = files.value[index].realName
+                    text = files.value[index].realName,
+                    categoryId = categoryId,
+                    actionSetCategory = {
+                        Dashboard.setCurrentFileObjectSetProperty(files.value[index].systemName)
+                        if (categoryId != null) {
+                            Dashboard.setCategoryIdEditFileObject(categoryId)
+                        } else {
+                            Dashboard.setCategoryIdEditFileObject(-1)
+                        }
+                        expandedStateSetCategoryPopup.value = true
+                    }
                 ).render()
             }
         }

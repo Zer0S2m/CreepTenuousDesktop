@@ -32,6 +32,12 @@ interface BaseCardFileObject : BaseComponent, BaseAnimation {
         get() = null
 
     /**
+     * The user category to which the file object is linked
+     */
+    val categoryId: Int?
+        get() = null
+
+    /**
      * Action called when a file object is downloaded
      */
     val actionDownload: () -> Unit
