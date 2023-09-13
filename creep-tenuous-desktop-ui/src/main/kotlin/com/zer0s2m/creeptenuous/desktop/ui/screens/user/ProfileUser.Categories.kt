@@ -111,7 +111,7 @@ fun ProfileUser.ProfileCategories.render() {
         ModalCreateCategory(
             isExists = isEditCategory.value,
             stateModal = openModalCreateCategory,
-            stateUserCategory = currentUserCategory.value,
+            stateUserCategory = currentUserCategory,
             actionCreate = {
                 if (stateForm.value.validateForm()) {
                     openModalCreateCategory.value = false
@@ -219,7 +219,7 @@ internal fun ItemCategory(
 internal fun ModalCreateCategory(
     isExists: Boolean,
     stateModal: MutableState<Boolean>,
-    stateUserCategory: UserCategory,
+    stateUserCategory: MutableState<UserCategory>,
     actionCreate: () -> Unit,
     actionEdit: () -> Unit
 ) {
@@ -254,7 +254,7 @@ internal fun ModalCreateCategory(
 @Composable
 private fun ModalCreateCategoryContent(
     isExists: Boolean,
-    stateUserCategory: UserCategory,
+    stateUserCategory: MutableState<UserCategory>,
     actionCreate: () -> Unit,
     actionEdit: () -> Unit
 ) {
@@ -283,7 +283,7 @@ private fun ModalCreateCategoryContent(
                 state = stateForm.value,
                 fields = listOf(
                     TextFieldAdvanced(
-                        textField = stateUserCategory.title,
+                        textField = stateUserCategory.value.title,
                         nameField = "title",
                         labelField = "Enter category title",
                         validators = listOf(
@@ -338,27 +338,37 @@ private fun ButtonCreateCategory(action: () -> Unit) {
  * @param stateUserCategory The current state of the custom category.
  */
 @Composable
-private fun SelectColorForCategory(stateUserCategory: UserCategory) {
+private fun SelectColorForCategory(stateUserCategory: MutableState<UserCategory>) {
     val expandedState: MutableState<Boolean> = remember { mutableStateOf(false) }
     val currentColor: MutableState<Color?> = remember {
         mutableStateOf(Color(0, 0, 0))
     }
     val isSetColor: MutableState<Boolean> = remember { mutableStateOf(false) }
 
-    if (stateUserCategory.color != null && !isSetColor.value) {
-        val convertedColor: ConverterColor = colorConvertHexToRgb(stateUserCategory.color!!)
+    if (stateUserCategory.value.color != null && !isSetColor.value) {
+        val convertedColor: ConverterColor = colorConvertHexToRgb(stateUserCategory.value.color!!)
         isSetColor.value = true
         currentColor.value = Color(
             red = convertedColor.red,
             green = convertedColor.green,
             blue = convertedColor.blue
         )
-        newColorForCategory.value = stateUserCategory.color
+        newColorForCategory.value = stateUserCategory.value.color
     }
 
     InputSelectColor(
         isSetColor = isSetColor,
         currentColor = currentColor,
+        actionDelete = {
+            stateUserCategory.value = UserCategory(
+                id = stateUserCategory.value.id,
+                color = null,
+                title = stateUserCategory.value.title
+            )
+            currentColor.value = null
+            isSetColor.value = false
+            newColorForCategory.value = null
+        },
         action = {
             expandedState.value = true
         }
