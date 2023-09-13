@@ -80,8 +80,10 @@ internal fun BaseModalPopup(
  * The component responsible for displaying the selected color palette from the component [DropdownMenuSelectColor].
  *
  * @param isSetColor Status: Is any color palette installed.
- * @param currentColor Current set color
+ * @param currentColor Current set color.
  * @param action Configure component to receive clicks [Row].
+ * @param actionDelete Configure component to receive clicks [Icon] (action delete).
+ * @param content Internal field content.
  */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
@@ -89,6 +91,7 @@ internal fun InputSelectColor(
     isSetColor: MutableState<Boolean>,
     currentColor: MutableState<Color?>,
     action: () -> Unit,
+    actionDelete: () -> Unit = {},
     content: @Composable () -> Unit = {}
 ) {
     Row(
@@ -123,13 +126,30 @@ internal fun InputSelectColor(
                 )
             }
 
-            Icon(
-                painter = painterResource(resourcePath = Resources.ICON_ARROW.path),
-                contentDescription = contentDescriptionIconArrow,
-                tint = Color.White,
-                modifier = Modifier
-                    .size(16.dp)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Icon(
+                    painter = painterResource(resourcePath = Resources.ICON_DELETE.path),
+                    contentDescription = contentDescriptionIconDelete,
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .padding(end = 8.dp)
+                        .onClick {
+                            actionDelete()
+                        }
+                )
+
+                Icon(
+                    painter = painterResource(resourcePath = Resources.ICON_ARROW.path),
+                    contentDescription = contentDescriptionIconArrow,
+                    tint = MaterialTheme.colors.secondary,
+                    modifier = Modifier
+                        .size(20.dp)
+                )
+            }
         }
 
         content()
@@ -191,3 +211,9 @@ internal fun DropdownMenuSelectColor(
  */
 @get:ReadOnlyComposable
 private val contentDescriptionIconArrow: String get() = "Open color list"
+
+/**
+ * Text used by accessibility services to describe what this image represents
+ */
+@get:ReadOnlyComposable
+private val contentDescriptionIconDelete: String get() = "Delete color"

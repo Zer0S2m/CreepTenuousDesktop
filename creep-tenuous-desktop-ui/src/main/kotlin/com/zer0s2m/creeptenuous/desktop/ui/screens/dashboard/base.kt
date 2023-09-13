@@ -281,15 +281,19 @@ internal fun PopupSetUserColorInFileObject(
                 val isSetColor: MutableState<Boolean> = remember { mutableStateOf(false) }
                 val currentColor: MutableState<Color?> = remember { mutableStateOf(null) }
 
-                if (Dashboard.getColorEditFileObject().isNotEmpty()) {
+                if (Dashboard.getColorEditFileObject() != null
+                    && Dashboard.getColorEditFileObject()?.isNotEmpty() == true) {
                     ReactiveUser.userColors.forEach {
                         if (it.color == Dashboard.getColorEditFileObject()) {
-                            val converterColor = colorConvertHexToRgb(Dashboard.getColorEditFileObject())
-                            currentColor.value = Color(
-                                red = converterColor.red,
-                                green = converterColor.green,
-                                blue = converterColor.blue
-                            )
+                            val converterColor = Dashboard.getColorEditFileObject()
+                                ?.let { it1 -> colorConvertHexToRgb(it1) }
+                            if (converterColor != null) {
+                                currentColor.value = Color(
+                                    red = converterColor.red,
+                                    green = converterColor.green,
+                                    blue = converterColor.blue
+                                )
+                            }
                             isSetColor.value = true
                         }
                     }
@@ -307,6 +311,11 @@ internal fun PopupSetUserColorInFileObject(
                     currentColor = currentColor,
                     action = {
                         expandedStateDropDownMenu.value = true
+                    },
+                    actionDelete = {
+                        currentColor.value = null
+                        isSetColor.value = false
+                        Dashboard.setColorEditFileObject()
                     },
                     content = {
                         DropdownMenuSelectColor(

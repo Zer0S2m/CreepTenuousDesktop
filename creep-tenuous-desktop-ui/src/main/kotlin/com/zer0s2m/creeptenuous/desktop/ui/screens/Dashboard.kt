@@ -121,13 +121,13 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             return currentFileObjectSetProperty.value
         }
 
-        private val colorEditFileObject: MutableState<String> = mutableStateOf("")
+        private val colorEditFileObject: MutableState<String?> = mutableStateOf(null)
 
-        internal fun setColorEditFileObject(color: String = "") {
+        internal fun setColorEditFileObject(color: String? = null) {
             colorEditFileObject.value = color
         }
 
-        internal fun getColorEditFileObject(): String {
+        internal fun getColorEditFileObject(): String? {
             return colorEditFileObject.value
         }
 
