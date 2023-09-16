@@ -6,9 +6,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseField
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFormState
-import com.zer0s2m.creeptenuous.desktop.ui.components.fields.TextFieldAdvanced
+
 
 /**
  * Basic form for drawing components and their subsequent validation

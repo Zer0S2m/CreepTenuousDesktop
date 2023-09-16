@@ -1,6 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.ui.components.base
 
-import com.zer0s2m.creeptenuous.desktop.ui.components.fields.TextFieldAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
 
 interface BaseFormState {
 

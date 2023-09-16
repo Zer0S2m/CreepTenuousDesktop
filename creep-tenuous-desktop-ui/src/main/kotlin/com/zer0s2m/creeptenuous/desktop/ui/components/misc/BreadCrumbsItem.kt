@@ -19,13 +19,15 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseBreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 
 /**
- * Basic navigation element component for [BaseBreadCrumbs]
+ * Basic navigation element component for [BaseBreadCrumbs].
  *
- * @param text Display text in the component
- * @param modifier Modifier to be applied to the button [OutlinedButton]
+ * @param text Display text in the component.
+ * @param action Will be called when the user clicks the button.
+ * @param modifier Modifier to be applied to the button [OutlinedButton].
  */
 class BreadCrumbsItem(
     override val text: String = "",
+    override val action: () -> Unit,
     private var modifier: Modifier = Modifier
 ) : BaseBreadCrumbsItem {
 
@@ -35,9 +37,7 @@ class BreadCrumbsItem(
     @Composable
     override fun render() {
         OutlinedButton(
-            onClick = {
-                println(true)
-            },
+            onClick = action,
             modifier = modifier
                 .pointerHoverIcon(icon = PointerIcon.Hand)
                 .padding(end = 8.dp),

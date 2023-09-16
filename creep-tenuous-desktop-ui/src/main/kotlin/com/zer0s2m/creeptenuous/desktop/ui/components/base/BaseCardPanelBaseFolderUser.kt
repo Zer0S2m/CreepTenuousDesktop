@@ -1,5 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.ui.components.base
 
+import androidx.compose.material.Card
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 
 /**
@@ -23,5 +24,10 @@ interface BaseCardPanelBaseFolderUser : BaseComponent, BaseAnimation {
      */
     val iconPath: String?
         get() = null
+
+    /**
+     * Callback to be called when the [Card] is clicked
+     */
+    val action: () -> Unit
 
 }

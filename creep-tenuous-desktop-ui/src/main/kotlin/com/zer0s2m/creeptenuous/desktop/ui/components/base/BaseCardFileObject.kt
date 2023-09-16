@@ -31,4 +31,40 @@ interface BaseCardFileObject : BaseComponent, BaseAnimation {
     val color: String?
         get() = null
 
+    /**
+     * The user category to which the file object is linked
+     */
+    val categoryId: Int?
+        get() = null
+
+    /**
+     * Action called when a file object is downloaded
+     */
+    val actionDownload: () -> Unit
+
+    /**
+     * Action called when a file object is renamed
+     */
+    val actionRename: () -> Unit
+
+    /**
+     * Action called when a file object is copied
+     */
+    val actionCopy: () -> Unit
+
+    /**
+     * Action called when a file object is moved
+     */
+    val actionMove: () -> Unit
+
+    /**
+     * Action called when a custom category is set on a file object
+     */
+    val actionSetCategory: () -> Unit
+
+    /**
+     * Action called when a custom color is set on a file object
+     */
+    val actionSetColor: () -> Unit
+
 }

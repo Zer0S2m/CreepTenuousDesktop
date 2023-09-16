@@ -28,17 +28,13 @@ import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigati
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
-import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardModalSheet
-import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardPanelBaseFolderUser
-import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CartFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.fields.FieldSearch
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
+import com.zer0s2m.creeptenuous.desktop.ui.components.CardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbs
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbsItem
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.SwitchPanelDashboard
-import com.zer0s2m.creeptenuous.desktop.ui.components.modals.ModalRightSheetLayout
+import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -61,6 +57,18 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         "Musics" to Resources.ICON_MUSIC.path
     )
 
+    /**
+     * Current state of the modal [PopupSetUserCategoryInFileObject] when setting a custom category
+     */
+    private val expandedStateModalSetCategoryPopup: MutableState<Boolean> = mutableStateOf(false)
+
+    /**
+     * Current state of the modal [PopupSetUserColorInFileObject] when setting a custom color
+     */
+    private val expandedStateModalSetColorPopup: MutableState<Boolean> = mutableStateOf(false)
+
+    // TODO: Reproduce the functionality in a more beautiful form.
+    //  For example, in the context state of each screen
     internal companion object {
 
         /**
@@ -69,7 +77,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         private val managerFileObject: MutableState<ManagerFileObject> =
             mutableStateOf(ReactiveFileObject.managerFileSystemObjects)
 
-        private val managerFileObject_Folders: MutableState<MutableList<FileObject>> =
+        private val managerFileObject_Directories: MutableState<MutableList<FileObject>> =
             mutableStateOf(mutableListOf())
 
         private val managerFileObject_Files: MutableState<MutableList<FileObject>> =
@@ -89,8 +97,38 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                 else if (it.isFile) files.add(it)
             }
 
-            managerFileObject_Folders.value = folders
+            managerFileObject_Directories.value = folders
             managerFileObject_Files.value = files
+        }
+
+        private val categoryIdEditFileObject: MutableState<Int> = mutableStateOf(-1)
+
+        internal fun setCategoryIdEditFileObject(categoryId: Int = -1) {
+            categoryIdEditFileObject.value = categoryId
+        }
+
+        internal fun getCategoryIdEditFileObject(): Int {
+            return categoryIdEditFileObject.value
+        }
+
+        private val currentFileObjectSetProperty: MutableState<String> = mutableStateOf("")
+
+        internal fun setCurrentFileObjectSetProperty(fileObject: String) {
+            currentFileObjectSetProperty.value = fileObject
+        }
+
+        internal fun getCurrentFileObjectSetCategory(): String {
+            return currentFileObjectSetProperty.value
+        }
+
+        private val colorEditFileObject: MutableState<String?> = mutableStateOf(null)
+
+        internal fun setColorEditFileObject(color: String? = null) {
+            colorEditFileObject.value = color
+        }
+
+        internal fun getColorEditFileObject(): String? {
+            return colorEditFileObject.value
         }
 
     }
@@ -121,24 +159,9 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     @Composable
     override fun renderLeftContent() {
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth(SizeComponents.LEFT_PANEL_DASHBOARD.float)
-        ) {
-            SwitchPanelDashboard()
-                .render()
-
-            Column {
-                baseFolderForUser.forEach { (folder, icon) ->
-                    CardPanelBaseFolderUser(
-                        text = folder,
-                        isIcon = true,
-                        iconPath = icon
-                    ).render()
-                }
-            }
-        }
+        RenderLeftContentDashboard(
+            systemBaseFolderForUser = baseFolderForUser
+        )
     }
 
     /**
@@ -146,6 +169,30 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     @Composable
     override fun renderRightContent() {
+        val directories: MutableState<MutableList<FileObject>> = remember {
+            managerFileObject_Directories
+        }
+        val files: MutableState<MutableList<FileObject>> = remember {
+            managerFileObject_Files
+        }
+
+        PopupSetUserCategoryInFileObject(
+            expandedState = expandedStateModalSetCategoryPopup,
+            actionSetCategory = {
+                // TODO: A crutch for forcing layout reflow
+                directories.value = mutableListOf()
+                files.value = mutableListOf()
+            }
+        )
+        PopupSetUserColorInFileObject(
+            expandedState = expandedStateModalSetColorPopup,
+            actionSetColor = {
+                // TODO: A crutch for forcing layout reflow
+                directories.value = mutableListOf()
+                files.value = mutableListOf()
+            }
+        )
+
         val scaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
 
@@ -172,27 +219,10 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                     modifier = Modifier
                         .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth(0.94f)
-                                .padding(0.dp, 12.dp, 12.dp, 12.dp)
-                        ) {
-                            FieldSearch().render()
-                        }
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(0.dp, 12.dp, 12.dp, 12.dp)
-                        ) {
-                            Avatar(
-                                stateScaffold = scaffoldState,
-                                scope = scope
-                            ).render()
-                        }
-                    }
+                    TopPanelDashboard(
+                        scaffoldState = scaffoldState,
+                        scope = scope
+                    )
                 }
                 Column(
                     modifier = Modifier
@@ -200,54 +230,33 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                         .background(Color.White),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(bottom = 28.dp)
-                        ) {
-                            TitleCategoryFileObject("Folders", managerFileObject_Folders.value.size)
-                            LazyVerticalGrid(
-                                columns = GridCells.Adaptive(160.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                items(managerFileObject_Folders.value.size) { index ->
-                                    CartFileObject(
-                                        isDirectory = true,
-                                        isFile = false,
-                                        text = managerFileObject_Folders.value[index].realName,
-                                        color = managerFileObject_Folders.value[index].color
-                                    ).render()
-                                }
-                            }
-                        }
-
-                        Column {
-                            TitleCategoryFileObject("Files", managerFileObject_Files.value.size)
-                            LazyVerticalGrid(
-                                columns = GridCells.Adaptive(160.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                items(managerFileObject_Files.value.size) { index ->
-                                    CartFileObject(
-                                        isDirectory = false,
-                                        isFile = true,
-                                        text = managerFileObject_Files.value[index].realName
-                                    ).render()
-                                }
-                            }
-                        }
-                    }
+                    RenderLayoutFilesObject(
+                        directories = directories,
+                        files = files,
+                        expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
+                        expandedStateSetColorPopup = expandedStateModalSetColorPopup
+                    )
 
                     BreadCrumbs(
                         items = listOf(
-                            BreadCrumbsItem(text = "Folder 1"),
-                            BreadCrumbsItem(text = "Folder 2"),
-                            BreadCrumbsItem(text = "Folder 3")
+                            BreadCrumbsItem(
+                                text = "Folder 1",
+                                action = {
+                                    println(true)
+                                }
+                            ),
+                            BreadCrumbsItem(
+                                text = "Folder 2",
+                                action = {
+                                    println(true)
+                                }
+                            ),
+                            BreadCrumbsItem(
+                                text = "Folder 3",
+                                action = {
+                                    println(true)
+                                }
+                            )
                         ),
                         modifier = Modifier
                             .height(40.dp)
@@ -353,21 +362,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 }
 
 /**
- * Base title for file object category
- *
- * @param text The text to be displayed
- * @param size Count objects
- */
-@Composable
-private fun TitleCategoryFileObject(text: String, size: Int = 0): Unit = Text(
-    text = "$text ($size)",
-    fontWeight = FontWeight.SemiBold,
-    color = Color.Black,
-    modifier = Modifier
-        .padding(bottom = 12.dp)
-)
-
-/**
  * Text for user profile navigation element
  *
  * @param text The text to be displayed.
@@ -393,4 +387,3 @@ private fun TitleInSectionForCardsModalSheet(text: String = ""): Unit = Text(
     color = Colors.TEXT.color,
     fontWeight = FontWeight.Bold
 )
-

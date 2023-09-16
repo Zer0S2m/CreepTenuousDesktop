@@ -10,6 +10,8 @@ data class UserCategory(
 
     val id: Int? = null,
 
-    var title: String
+    var title: String,
+
+    var color: String? = null
 
 )
