@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.ui.components.fields
+package com.zer0s2m.creeptenuous.desktop.ui.components
 
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,12 +11,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
+import com.zer0s2m.creeptenuous.desktop.core.validation.Validator
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseField
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
-import com.zer0s2m.creeptenuous.desktop.core.validation.Validator
-import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.ui.misc.dp
 
 /**

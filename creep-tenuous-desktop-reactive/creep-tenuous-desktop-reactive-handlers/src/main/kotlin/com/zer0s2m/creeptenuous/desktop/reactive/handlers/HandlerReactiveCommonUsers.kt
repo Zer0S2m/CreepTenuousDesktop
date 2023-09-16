@@ -1,10 +1,10 @@
 package com.zer0s2m.creeptenuous.desktop.reactive.handlers
 
+import com.zer0s2m.creeptenuous.desktop.common.dto.User
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandler
-import com.zer0s2m.creeptenuous.desktop.common.dto.User
 import io.ktor.client.call.*
-import io.ktor.client.request.get
+import io.ktor.client.request.*
 
 /**
  * Reactive behavior handler to get list of system users

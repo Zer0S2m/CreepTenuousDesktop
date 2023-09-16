@@ -1,8 +1,12 @@
-package com.zer0s2m.creeptenuous.desktop.ui.components.modals
+package com.zer0s2m.creeptenuous.desktop.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -11,6 +15,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseModalRightSheetLayout
+
 
 /**
  * Modal right sheet. Extends a component [Scaffold]

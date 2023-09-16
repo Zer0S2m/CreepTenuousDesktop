@@ -1,12 +1,14 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-plugins {
-    kotlin("jvm") version "1.8.0"
-    id("org.jetbrains.compose") version "1.4.1"
-}
-
 val ktorVersion = "2.3.2"
+val jvmVersion = "1.9.0"
+
+plugins {
+    kotlin("jvm") version "1.9.0"
+    id("org.jetbrains.compose") version "1.5.0"
+}
 
 group = "com.zer0s2m.creeptenuous.desktop"
 version = "0.0.1-SNAPSHOT"
@@ -19,30 +21,59 @@ repositories {
 
 fun runTasks() {
     tasks.withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
+        sourceCompatibility to JavaVersion.VERSION_17
+        targetCompatibility to JavaVersion.VERSION_17
     }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "17"
+            jvmTarget to JavaVersion.VERSION_17
+        }
+
+        compilerOptions {
+            jvmTarget to JavaVersion.VERSION_17
+        }
+    }
+
+    tasks.withType<KaptGenerateStubsTask> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget to JavaVersion.VERSION_17
+        }
+
+        compilerOptions {
+            jvmTarget to JavaVersion.VERSION_17
         }
     }
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 allprojects {
+    runTasks()
+
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     group = "com.zer0s2m.creeptenuous.desktop"
     version = "0.0.1-SNAPSHOT"
 
     project.ext.set("ktorVersion", ktorVersion)
+    project.ext.set("jvmVersion", jvmVersion)
 
-    runTasks()
 }
 
 subprojects {
+    runTasks()
+
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     repositories {
@@ -56,8 +87,6 @@ subprojects {
             implementation(project(":creep-tenuous-desktop-common"))
         }
     }
-
-    runTasks()
 }
 
 compose.desktop {

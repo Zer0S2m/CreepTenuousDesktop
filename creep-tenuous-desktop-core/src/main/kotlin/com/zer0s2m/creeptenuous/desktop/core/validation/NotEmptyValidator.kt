@@ -23,7 +23,7 @@ open class NotEmptyValidator(
      */
     override fun validate(value: Any): Boolean {
         if (value is String) {
-            return value.toString().isNotEmpty()
+            return value.toString().trim().isNotEmpty()
         }
         return true
     }

@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.ui.components.fields
+package com.zer0s2m.creeptenuous.desktop.ui.components.misc
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,8 +20,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFieldSearch
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFieldSearch
 
 /**
  * Search text field class. Extends the component [BasicTextField]

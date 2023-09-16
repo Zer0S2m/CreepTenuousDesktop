@@ -13,4 +13,9 @@ interface BaseDropdownMenuItem : BaseComponent, BaseAnimation {
     val text: String
         get() = ""
 
+    /**
+     * Call an action when an element is clicked
+     */
+    val action: () -> Unit
+
 }

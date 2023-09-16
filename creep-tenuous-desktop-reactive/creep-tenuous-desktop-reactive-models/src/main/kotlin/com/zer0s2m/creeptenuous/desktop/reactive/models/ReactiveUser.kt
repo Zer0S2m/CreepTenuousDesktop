@@ -1,12 +1,9 @@
 package com.zer0s2m.creeptenuous.desktop.reactive.models
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.*
-import com.zer0s2m.creeptenuous.desktop.reactive.handlers.*
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategoryAdd
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategoryRemove
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorAdd
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorRemove
+import com.zer0s2m.creeptenuous.desktop.reactive.handlers.*
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.*
 
 /**
  * `Reactive` behavior user model
@@ -21,7 +18,8 @@ object ReactiveUser : ReactiveLazyObject {
     )
     var customCategories: ReactiveMutableList<UserCategory> = mutableReactiveListOf(
         triggerAdd = ReactiveTriggerUserCategoryAdd(),
-        triggerRemove = ReactiveTriggerUserCategoryRemove()
+        triggerRemove = ReactiveTriggerUserCategoryRemove(),
+        triggerSet = ReactiveTriggerUserCategorySet()
     )
 
     /**
@@ -44,7 +42,8 @@ object ReactiveUser : ReactiveLazyObject {
     )
     var userColors: ReactiveMutableList<UserColor> = mutableReactiveListOf(
         triggerAdd = ReactiveTriggerUserColorAdd(),
-        triggerRemove = ReactiveTriggerUserColorRemove()
+        triggerRemove = ReactiveTriggerUserColorRemove(),
+        triggerSet = ReactiveTriggerUserColorSet()
     )
 
     /**

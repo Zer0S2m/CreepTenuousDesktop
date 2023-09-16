@@ -10,9 +10,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseBreadCrumbs
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseBreadCrumbsItem
-import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 
 /**
  * Component Class - Breadcrumbs

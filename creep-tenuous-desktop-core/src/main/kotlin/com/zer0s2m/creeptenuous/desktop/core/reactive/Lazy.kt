@@ -1,5 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive
 
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import kotlin.reflect.KClass
 
 /**
@@ -17,6 +18,7 @@ annotation class Lazy<T>(
      *
      * Doesn't affect the system at all.
      */
+    @Suppress("UNUSED")
     val event: String = "",
 
     /**
@@ -27,6 +29,16 @@ annotation class Lazy<T>(
     /**
      * Node for injecting objects into other reactive or lazy objects
      */
-    val node: Node = Node()
+    val node: Node = Node(),
+
+    /**
+     * List of handlers that run after the object is loaded [handler]
+     */
+    val handlerAfter: KClass<out ReactiveHandlerAfter> = ReactiveHandlerAfter::class,
+
+    /**
+     * Injection to inject end object after handlers
+     */
+    val injection: ReactiveInjection = ReactiveInjection()
 
 )

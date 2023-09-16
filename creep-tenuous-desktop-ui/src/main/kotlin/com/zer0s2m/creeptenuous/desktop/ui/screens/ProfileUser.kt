@@ -15,16 +15,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.font.FontWeight
-import com.zer0s2m.creeptenuous.desktop.common.enums.*
-import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
-import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
+import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
+import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
+import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.context.BaseContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
+import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
+import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.*
 import kotlinx.coroutines.launch
@@ -243,7 +247,7 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
                     enabled = false
                 ).render()
                 Text(
-                    text = "User name",
+                    text = ReactiveUser.profileSettings!!.name,
                     modifier = Modifier
                         .padding(start = 8.dp)
                 )
@@ -251,10 +255,17 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
             IconButton(
                 onClick = {
                     coroutineScope.launch {
+                        reactiveNavigationScreen.action(
+                            state = mutableStateOf(navigation),
+                            route = Screen.DASHBOARD_SCREEN,
+                            objects = listOf(
+                                "managerFileSystemObjects"
+                            ),
+                            scope = coroutineScope
+                        )
+
                         isFromPastScreen.value = true
                         appliedScreenFromTransitionFromPast.value = baseScreen
-
-                        navigation.navigate(Screen.DASHBOARD_SCREEN.name)
                     }
                 },
                 modifier = Modifier

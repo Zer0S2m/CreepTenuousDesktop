@@ -8,17 +8,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import com.zer0s2m.creeptenuous.desktop.ui.components.fields.TextFieldAdvanced
-import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
-import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
-import com.zer0s2m.creeptenuous.desktop.core.validation.MaxNumberValidator
-import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
-import com.zer0s2m.creeptenuous.desktop.core.validation.PositiveNumberValidator
 import com.zer0s2m.creeptenuous.desktop.common.dto.SettingsSystemModel
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.navigationScreen
+import com.zer0s2m.creeptenuous.desktop.core.validation.MaxNumberValidator
+import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
+import com.zer0s2m.creeptenuous.desktop.core.validation.PositiveNumberValidator
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
+import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.misc.dp
 import kotlinx.coroutines.launch
 

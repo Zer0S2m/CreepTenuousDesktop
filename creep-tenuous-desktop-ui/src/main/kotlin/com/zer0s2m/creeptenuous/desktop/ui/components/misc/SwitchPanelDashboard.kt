@@ -13,9 +13,9 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseComponent
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseComponent
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 
 /**

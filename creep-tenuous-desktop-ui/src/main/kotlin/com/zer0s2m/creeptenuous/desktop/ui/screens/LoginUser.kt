@@ -13,15 +13,15 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.zer0s2m.creeptenuous.desktop.ui.components.fields.TextFieldAdvanced
-import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
-import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
-import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.common.dto.LoginUserModel
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
-import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.navigationScreen
+import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
+import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
+import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.misc.dp
 import kotlinx.coroutines.launch
 
@@ -90,11 +90,17 @@ class LoginUser {
                                 data["password"].toString()
                             )
                             println(dataClass)
-                            navigationScreen.action(
-                                state = mutableStateOf(navigationController),
-                                route = Screen.DASHBOARD_SCREEN,
-                                scope = scope
-                            )
+
+                            scope.launch {
+                                reactiveNavigationScreen.action(
+                                    state = mutableStateOf(navigationController),
+                                    route = Screen.DASHBOARD_SCREEN,
+                                    objects = listOf(
+                                        "managerFileSystemObjects"
+                                    ),
+                                    scope = scope
+                                )
+                            }
                         }
                     },
                     modifier = Modifier
