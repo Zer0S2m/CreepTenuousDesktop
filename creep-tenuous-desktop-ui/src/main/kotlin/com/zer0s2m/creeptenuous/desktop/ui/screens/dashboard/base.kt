@@ -66,7 +66,7 @@ internal fun PopupSetUserCategoryInFileObject(
             contentColor = contentColorFor(MaterialTheme.colors.surface),
             modifier = Modifier
                 .width(360.dp)
-                .height(180.dp)
+                .height(188.dp)
                 .shadow(24.dp, RoundedCornerShape(4.dp))
         ) {
             Column(
@@ -261,7 +261,7 @@ internal fun PopupSetUserColorInFileObject(
             contentColor = contentColorFor(MaterialTheme.colors.surface),
             modifier = Modifier
                 .width(360.dp)
-                .height(180.dp)
+                .height(188.dp)
                 .shadow(24.dp, RoundedCornerShape(4.dp))
         ) {
             Column(

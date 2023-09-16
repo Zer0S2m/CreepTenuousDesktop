@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardPanelBaseFolderUser
+import com.zer0s2m.creeptenuous.desktop.ui.components.CardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.SwitchPanelDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 

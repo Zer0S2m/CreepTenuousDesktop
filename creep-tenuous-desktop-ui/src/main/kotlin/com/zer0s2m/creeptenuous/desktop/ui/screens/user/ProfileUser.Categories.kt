@@ -25,7 +25,7 @@ import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFormState
-import com.zer0s2m.creeptenuous.desktop.ui.components.fields.TextFieldAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser

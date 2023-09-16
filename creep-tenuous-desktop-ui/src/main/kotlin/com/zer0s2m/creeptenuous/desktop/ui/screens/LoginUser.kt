@@ -19,7 +19,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
-import com.zer0s2m.creeptenuous.desktop.ui.components.fields.TextFieldAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.misc.dp

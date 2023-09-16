@@ -10,8 +10,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CartFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.fields.FieldSearch
+import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.components.misc.FieldSearch
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import kotlinx.coroutines.CoroutineScope

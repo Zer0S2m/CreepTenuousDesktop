@@ -28,10 +28,10 @@ import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigati
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
-import com.zer0s2m.creeptenuous.desktop.ui.components.cards.CardModalSheet
+import com.zer0s2m.creeptenuous.desktop.ui.components.CardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbs
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbsItem
-import com.zer0s2m.creeptenuous.desktop.ui.components.modals.ModalRightSheetLayout
+import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.*

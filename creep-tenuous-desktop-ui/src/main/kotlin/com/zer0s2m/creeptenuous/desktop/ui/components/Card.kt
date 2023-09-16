@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.ui.components.cards
+package com.zer0s2m.creeptenuous.desktop.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -6,10 +6,7 @@ import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -32,10 +29,162 @@ import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setAnimateColorAsStateInCard
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInCard
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.menu.DropdownMenuAdvanced
-import com.zer0s2m.creeptenuous.desktop.ui.components.menu.DropdownMenuItemAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardModalSheet
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
+
+
+/**
+ * The map component for the modal sheet.
+ * Extends a component [Card]
+ *
+ * @param modifier Modifier to be applied to the layout of the card.
+ * @param backgroundColor The background color.
+ * @param isAnimation Set background change animation for a component.
+ * @param onClick Callback to be called when the [Card] is clicked.
+ */
+class CardModalSheet(
+    override var modifier: Modifier = Modifier
+        .fillMaxSize(),
+    override val backgroundColor: Color = Colors.CARD_BASE.color,
+    override val isAnimation: Boolean = true,
+    override val onClick: (() -> Unit?)? = null
+) : BaseCardModalSheet {
+
+    /**
+     * Component rendering
+     *
+     * @param content Content of your screen
+     */
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    override fun render(content: @Composable () -> Unit) {
+        val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+        val isHover: MutableState<Boolean> = remember { mutableStateOf(false) }
+        val animatedCardColor = setAnimateColorAsStateInCard(isHover = isHover)
+
+        if (isAnimation) {
+            modifier = modifier
+                .hoverable(interactionSource = interactionSource)
+            setHoverInCard(
+                interactionSource = interactionSource,
+                isHover = isHover
+            )
+        }
+
+        Card(
+            onClick = { onClick?.let { it() } },
+            modifier = modifier,
+            elevation = 0.dp,
+            shape = RoundedCornerShape(8.dp),
+            backgroundColor = if (isAnimation) animatedCardColor.value else backgroundColor
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                content()
+            }
+        }
+    }
+
+}
+
+/**
+ * Component on the left side of the dashboard to show the user's base directories
+ *
+ * @param text The text to be displayed
+ * @param isAnimation Set background change animation for a component
+ * @param isIcon Set an icon for a component
+ * @param iconPath Path to icons [Resources]
+ * @param action Callback to be called when the [Card] is clicked
+ */
+class CardPanelBaseFolderUser(
+    override val text: String = "",
+    override val isAnimation: Boolean = true,
+    override val isIcon: Boolean = false,
+    override val iconPath: String? = null,
+    override val action: () -> Unit
+) : BaseCardPanelBaseFolderUser {
+
+    /**
+     * Text used by accessibility services to describe what this image represents
+     */
+    private val contentDescriptionIcon: String = "Icon displayed meaning directory"
+
+    /**
+     * Component rendering
+     */
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    override fun render() {
+        val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+        val isHover: MutableState<Boolean> = remember { mutableStateOf(false) }
+        val animatedButtonColor = setAnimateColorAsStateInCard(
+            isHover = isHover
+        )
+
+        if (isAnimation) {
+            setHoverInCard(
+                interactionSource = interactionSource,
+                isHover = isHover
+            )
+        }
+
+        Card(
+            backgroundColor = animatedButtonColor.value,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .hoverable(interactionSource = interactionSource)
+                .pointerHoverIcon(icon = PointerIcon.Hand),
+            elevation = 0.dp,
+            shape = RoundedCornerShape(0.dp),
+            contentColor = Color.Black,
+            onClick = action
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp, 0.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                if (!isIcon) {
+                    renderText()
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        iconPath?.let { painterResource(resourcePath = it) }?.let {
+                            Image(
+                                painter = it,
+                                contentDescription = contentDescriptionIcon,
+                                modifier = Modifier
+                                    .height(24.dp)
+                                    .width(24.dp)
+                            )
+                        }
+                        renderText()
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun renderText() {
+        Text(
+            text = text,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            modifier = Modifier.padding(12.dp, 0.dp)
+        )
+    }
+
+}
 
 /**
  * Base class for implementing work with file objects.
