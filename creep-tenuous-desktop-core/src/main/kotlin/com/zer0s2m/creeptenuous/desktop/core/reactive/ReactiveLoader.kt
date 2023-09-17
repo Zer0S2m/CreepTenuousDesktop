@@ -1,9 +1,13 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive
 
+import com.zer0s2m.creeptenuous.desktop.common.components.Environment
 import com.zer0s2m.creeptenuous.desktop.core.errors.ReactiveLoaderException
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
+import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
+import com.zer0s2m.creeptenuous.desktop.core.logging.logger
 import com.zer0s2m.creeptenuous.desktop.core.reactive.backend.Ktor
+import org.slf4j.Logger
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
 import kotlin.reflect.full.*
@@ -72,6 +76,8 @@ internal const val HANDLER_AFTER_NAME = "action"
  */
 object ReactiveLoader {
 
+    internal val logger: Logger = logger()
+
     /**
      * Load a single property of lazy behavior from the map of objects that are collected with [collectLoader]
      *
@@ -82,6 +88,9 @@ object ReactiveLoader {
         if (lazyObject != null && !lazyObject.isLoad) {
             setReactiveValue(reactiveLazyObject = lazyObject)
             lazyObject.isLoad = true
+
+            logger.infoDev("Loading a lazy property:\n\t[" +
+                    "${lazyObject.reactiveLazyObject.javaClass.canonicalName}] [$nameProperty]")
         }
     }
 
@@ -173,6 +182,8 @@ suspend fun collectLoader(
     }
 
     loadNode()
+
+    writeLogsToConsoleForCollectObjects()
 
     setReactiveValues(
         isReactive = true,
@@ -286,5 +297,29 @@ private suspend fun setReactiveValue(reactiveLazyObject: ReactiveLazy) {
                 }?.call(reactiveLazyObject.injectionClass.companionObjectInstance, objectFromHandler)
             }
         }
+    }
+}
+
+private fun writeLogsToConsoleForCollectObjects() {
+    if (Environment.IS_DEV) {
+        // Classes
+        var log = "Assembly of reactive and lazy objects:\n"
+        mapReactiveLazyObjects.forEach { (property, clazz) ->
+            val isType: String = if (clazz.isReactive) "Reactive" else "Lazy"
+            log += "\t[${clazz.reactiveLazyObject.javaClass.canonicalName}] [$property] - $isType\n"
+        }
+        ReactiveLoader.logger.infoDev(log.trim())
+
+        // Nodes
+        log = "Assembly of nodes for reactive and lazy objects:\n"
+        mapNodes.forEach { (property, clazz) ->
+            log += "\t[node: $property] classes:\n"
+            clazz.forEach {
+                val className: String = it.reactiveLazyObject.reactiveLazyObject.javaClass.canonicalName
+                val propertyName: String = it.reactiveLazyObject.field.name
+                log += "\t    [$className] [$propertyName]\n"
+            }
+        }
+        ReactiveLoader.logger.infoDev(log.trim())
     }
 }
