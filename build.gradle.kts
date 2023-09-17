@@ -19,10 +19,26 @@ repositories {
     google()
 }
 
+fun parseEnvFile(): Map<String, String> {
+    val env = mutableMapOf<String, String>()
+    file(".env").readLines().forEach {
+        val obj = it.split("=").toMutableList()
+        if (obj[0].contains("export")) {
+            obj[0] = obj[0].replace("export", "")
+        }
+        env[obj[0].trim()] = obj[1].trim()
+    }
+    return env
+}
+
 fun runTasks() {
     tasks.withType<JavaCompile> {
         sourceCompatibility to JavaVersion.VERSION_17
         targetCompatibility to JavaVersion.VERSION_17
+    }
+
+    tasks.withType<JavaExec> {
+        environment(parseEnvFile())
     }
 
     tasks.withType<KotlinCompile> {
