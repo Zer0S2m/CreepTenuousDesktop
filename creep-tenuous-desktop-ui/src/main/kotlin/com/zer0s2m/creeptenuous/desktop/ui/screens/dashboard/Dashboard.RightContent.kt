@@ -10,10 +10,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
+import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.FieldSearch
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
-import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
+import com.zer0s2m.creeptenuous.desktop.ui.components.misc.FieldSearch
 import kotlinx.coroutines.CoroutineScope
 
 /**
@@ -89,20 +90,28 @@ internal fun RenderLayoutDirectories(
                     color = directories.value[index].color,
                     categoryId = categoryId,
                     actionSetCategory = {
-                        Dashboard.setCurrentFileObjectSetProperty(directories.value[index].systemName)
+                        ContextScreen.set(
+                            Screen.DASHBOARD_SCREEN,
+                            "currentFileObjectSetProperty",
+                            directories.value[index].systemName
+                        )
                         if (categoryId != null) {
-                            Dashboard.setCategoryIdEditFileObject(categoryId)
+                            ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", categoryId)
                         } else {
-                            Dashboard.setCategoryIdEditFileObject(-1)
+                            ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", -1)
                         }
                         expandedStateSetCategoryPopup.value = true
                     },
                     actionSetColor = {
-                        Dashboard.setCurrentFileObjectSetProperty(directories.value[index].systemName)
+                        ContextScreen.set(
+                            Screen.DASHBOARD_SCREEN,
+                            "currentFileObjectSetProperty",
+                            directories.value[index].systemName
+                        )
                         if (color != null) {
-                            Dashboard.setColorEditFileObject(color)
+                            ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorEditFileObject", color)
                         } else {
-                            Dashboard.setColorEditFileObject()
+                            ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorEditFileObject", null)
                         }
                         expandedStateSetColorPopup.value = true
                     }
@@ -139,11 +148,15 @@ internal fun RenderLayoutFiles(
                     text = files.value[index].realName,
                     categoryId = categoryId,
                     actionSetCategory = {
-                        Dashboard.setCurrentFileObjectSetProperty(files.value[index].systemName)
+                        ContextScreen.set(
+                            Screen.DASHBOARD_SCREEN,
+                            "currentFileObjectSetProperty",
+                            files.value[index].systemName
+                        )
                         if (categoryId != null) {
-                            Dashboard.setCategoryIdEditFileObject(categoryId)
+                            ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", categoryId)
                         } else {
-                            Dashboard.setCategoryIdEditFileObject(-1)
+                            ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", -1)
                         }
                         expandedStateSetCategoryPopup.value = true
                     }
