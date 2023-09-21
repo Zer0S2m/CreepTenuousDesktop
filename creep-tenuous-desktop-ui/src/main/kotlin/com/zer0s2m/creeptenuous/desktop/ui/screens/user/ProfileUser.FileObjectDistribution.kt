@@ -16,13 +16,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
-import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
-import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserSettingsFileObjectDistribution
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setAnimateColorAsStateInSelectUser
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInSelectUser
+import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 
 /**
@@ -92,7 +94,14 @@ internal fun ProfileUser.ProfileFileObjectDistribution.switch() {
             .pointerHoverIcon(icon = PointerIcon.Hand),
         onCheckedChange = {
             checkedState.value = it
-            ReactiveUser.UserSettings.userSettingsFileObjectDistribution.isDeletingFilesWhenDeletingUser = it
+            ReactiveLoader.setReactiveValue(
+                "userSettingsFileObjectDistribution",
+                "setIsDeleteFileObjects",
+                UserSettingsFileObjectDistribution(
+                    it,
+                    ReactiveUser.UserSettings.userSettingsFileObjectDistribution.passingFilesToUser
+                )
+            )
         }
     )
 }
@@ -228,7 +237,14 @@ private fun DropdownMenuItemSelectUser(
 ) {
     DropdownMenuItem(
         onClick = {
-            ReactiveUser.UserSettings.userSettingsFileObjectDistribution.passingFilesToUser = newUser
+            ReactiveLoader.setReactiveValue(
+                "userSettingsFileObjectDistribution",
+                "setTransferUserFileObjects",
+                UserSettingsFileObjectDistribution(
+                    ReactiveUser.UserSettings.userSettingsFileObjectDistribution.isDeletingFilesWhenDeletingUser,
+                    newUser
+                )
+            )
             selectedUserItem.value = newUser
             expandedStates.value = false
         },

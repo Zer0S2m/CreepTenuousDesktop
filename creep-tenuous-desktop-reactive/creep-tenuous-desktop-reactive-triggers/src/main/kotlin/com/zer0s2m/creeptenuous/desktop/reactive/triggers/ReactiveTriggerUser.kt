@@ -4,13 +4,13 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserColor
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
 import com.zer0s2m.creeptenuous.desktop.core.logging.logger
-import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTrigger
+import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
 import org.slf4j.Logger
 
 /**
  * Reactive trigger to add new custom category
  */
-open class ReactiveTriggerUserCategoryAdd : ReactiveTrigger<UserCategory> {
+open class ReactiveTriggerUserCategoryAdd : BaseReactiveTrigger<UserCategory> {
 
     companion object {
         private val logger: Logger = logger()
@@ -30,7 +30,7 @@ open class ReactiveTriggerUserCategoryAdd : ReactiveTrigger<UserCategory> {
 /**
  * Reactive trigger to remove custom category
  */
-open class ReactiveTriggerUserCategoryRemove : ReactiveTrigger<UserCategory> {
+open class ReactiveTriggerUserCategoryRemove : BaseReactiveTrigger<UserCategory> {
 
     companion object {
         private val logger: Logger = logger()
@@ -50,7 +50,7 @@ open class ReactiveTriggerUserCategoryRemove : ReactiveTrigger<UserCategory> {
 /**
  * Reactive trigger to update custom category
  */
-open class ReactiveTriggerUserCategorySet : ReactiveTrigger<UserCategory> {
+open class ReactiveTriggerUserCategorySet : BaseReactiveTrigger<UserCategory> {
 
     companion object {
         private val logger: Logger = logger()
@@ -70,7 +70,7 @@ open class ReactiveTriggerUserCategorySet : ReactiveTrigger<UserCategory> {
 /**
  * Reactive trigger to add new custom color
  */
-open class ReactiveTriggerUserColorAdd : ReactiveTrigger<UserColor> {
+open class ReactiveTriggerUserColorAdd : BaseReactiveTrigger<UserColor> {
 
     companion object {
         private val logger: Logger = logger()
@@ -90,7 +90,7 @@ open class ReactiveTriggerUserColorAdd : ReactiveTrigger<UserColor> {
 /**
  * Reactive trigger to remove custom color
  */
-open class ReactiveTriggerUserColorRemove : ReactiveTrigger<UserColor> {
+open class ReactiveTriggerUserColorRemove : BaseReactiveTrigger<UserColor> {
 
     companion object {
         private val logger: Logger = logger()
@@ -110,7 +110,7 @@ open class ReactiveTriggerUserColorRemove : ReactiveTrigger<UserColor> {
 /**
  * Reactive trigger to update custom color
  */
-open class ReactiveTriggerUserColorSet : ReactiveTrigger<UserColor> {
+open class ReactiveTriggerUserColorSet : BaseReactiveTrigger<UserColor> {
 
     companion object {
         private val logger: Logger = logger()

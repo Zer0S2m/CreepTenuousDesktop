@@ -1,8 +1,8 @@
 package com.zer0s2m.creeptenuous.desktop.core.triggers
 
+import com.zer0s2m.creeptenuous.desktop.core.reactive.Lazy
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazyObject
-import com.zer0s2m.creeptenuous.desktop.core.reactive.Lazy
 
 /**
  * The main interface for implementing a reactive trigger.
@@ -12,9 +12,9 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.Lazy
  *
  * Performs the role of changing a value in properties
  *
- * @param T The type of the variable that will take [ReactiveTrigger.execution]
+ * @param T The type of the variable that will take [BaseReactiveTrigger.execution]
  */
-interface ReactiveTrigger<T> {
+interface BaseReactiveTrigger<T> {
 
     /**
      * Trigger execution
