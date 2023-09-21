@@ -58,6 +58,11 @@ interface BaseCardFileObject : BaseComponent, BaseAnimation {
     val actionMove: () -> Unit
 
     /**
+     * Action called when a file object is deleted
+     */
+    val actionDelete: () -> Unit
+
+    /**
      * Action called when a custom category is set on a file object
      */
     val actionSetCategory: () -> Unit

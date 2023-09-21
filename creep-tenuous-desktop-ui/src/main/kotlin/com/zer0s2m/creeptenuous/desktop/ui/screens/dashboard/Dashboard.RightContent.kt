@@ -10,8 +10,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
+import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.FieldSearch
@@ -89,17 +92,11 @@ internal fun RenderLayoutDirectories(
                     text = directories.value[index].realName,
                     color = directories.value[index].color,
                     categoryId = categoryId,
+                    actionDelete = {
+                        directories.value = actionDelete(directories.value[index])
+                    },
                     actionSetCategory = {
-                        ContextScreen.set(
-                            Screen.DASHBOARD_SCREEN,
-                            "currentFileObjectSetProperty",
-                            directories.value[index].systemName
-                        )
-                        if (categoryId != null) {
-                            ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", categoryId)
-                        } else {
-                            ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", -1)
-                        }
+                        actionSetCategory(categoryId, directories.value[index].systemName)
                         expandedStateSetCategoryPopup.value = true
                     },
                     actionSetColor = {
@@ -147,17 +144,11 @@ internal fun RenderLayoutFiles(
                     isFile = true,
                     text = files.value[index].realName,
                     categoryId = categoryId,
+                    actionDelete = {
+                        files.value = actionDelete(files.value[index])
+                    },
                     actionSetCategory = {
-                        ContextScreen.set(
-                            Screen.DASHBOARD_SCREEN,
-                            "currentFileObjectSetProperty",
-                            files.value[index].systemName
-                        )
-                        if (categoryId != null) {
-                            ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", categoryId)
-                        } else {
-                            ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", -1)
-                        }
+                        actionSetCategory(categoryId, files.value[index].systemName)
                         expandedStateSetCategoryPopup.value = true
                     }
                 ).render()
@@ -197,5 +188,55 @@ internal fun TopPanelDashboard(
                 scope = scope
             ).render()
         }
+    }
+}
+
+/**
+ * Action when deleting a file object.
+ *
+ * @param fileObject File object to be deleted.
+ * @return New filtered list of file objects.
+ */
+private fun actionDelete(fileObject: FileObject): MutableList<FileObject> {
+    val objects: MutableList<FileObject> = mutableListOf()
+    objects.addAll(ReactiveFileObject.managerFileSystemObjects.objects)
+
+    val managerFileObject = ManagerFileObject(
+        ReactiveFileObject.managerFileSystemObjects.systemParents,
+        ReactiveFileObject.managerFileSystemObjects.level,
+        objects
+    )
+    managerFileObject.objects.remove(fileObject)
+
+    ReactiveLoader.setReactiveValue(
+        "managerFileSystemObjects",
+        "deleteFileObject",
+        managerFileObject,
+        true
+    )
+
+    return if (fileObject.isFile) {
+        managerFileObject.objects.filter { it.isFile }.toMutableList()
+    } else {
+        managerFileObject.objects.filter { it.isDirectory }.toMutableList()
+    }
+}
+
+/**
+ * Action when binding a custom category to a file object.
+ *
+ * @param categoryId The current state of the user category of the file object.
+ * @param systemName System name of the file object.
+ */
+private fun actionSetCategory(categoryId: Int?, systemName: String) {
+    ContextScreen.set(
+        Screen.DASHBOARD_SCREEN,
+        "currentFileObjectSetProperty",
+        systemName
+    )
+    if (categoryId != null) {
+        ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", categoryId)
+    } else {
+        ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", -1)
     }
 }

@@ -1,12 +1,13 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive
 
-import com.zer0s2m.creeptenuous.desktop.common.components.Environment
+import com.zer0s2m.creeptenuous.desktop.core.env.Environment
 import com.zer0s2m.creeptenuous.desktop.core.errors.ReactiveLoaderException
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
 import com.zer0s2m.creeptenuous.desktop.core.logging.logger
 import com.zer0s2m.creeptenuous.desktop.core.reactive.backend.Ktor
+import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
 import org.slf4j.Logger
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
@@ -38,6 +39,8 @@ internal data class ReactiveLazy(
     val handler: KClass<out ReactiveHandler<Any>>,
 
     val handlerAfter: KClass<out ReactiveHandlerAfter>,
+
+    val triggers: MutableMap<String, KClass<out BaseReactiveTrigger<Any>>> = mutableMapOf(),
 
     val injectionClass: KClass<out ReactiveInjectionClass>? = null,
 
@@ -81,7 +84,8 @@ object ReactiveLoader {
     /**
      * Load a single property of lazy behavior from the map of objects that are collected with [collectLoader]
      *
-     * @param nameProperty The name of the lazy behavior property is specified using an annotation [Lazy]
+     * @param nameProperty The name of the lazy behavior property is specified using an annotation
+     * [Lazy] or [Reactive]
      */
     suspend fun load(nameProperty: String) {
         val lazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
@@ -91,6 +95,32 @@ object ReactiveLoader {
 
             logger.infoDev("Loading a lazy property:\n\t[" +
                     "${lazyObject.reactiveLazyObject.javaClass.canonicalName}] [$nameProperty]")
+        }
+    }
+
+    /**
+     * Set the data for a specific event to a [Reactive] or [Lazy] property and call the
+     * reactive trigger [BaseReactiveTrigger] when the data is set.
+     *
+     * @param nameProperty The name of the lazy behavior property is specified using an annotation
+     * [Lazy] or [Reactive]
+     * @param event Name of the event at which the reactive trigger should be executed.
+     * @param data Data.
+     * @param useOldData Whether to call the trigger using the old set data.
+     */
+    fun <T : Any> setReactiveValue(nameProperty: String, event: String, data: T, useOldData: Boolean = false) {
+        val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
+        if (reactiveLazyObject != null && reactiveLazyObject.triggers.containsKey(event)) {
+            val trigger: KClass<out BaseReactiveTrigger<Any>>? = reactiveLazyObject.triggers[event]
+
+            if (!useOldData) {
+                reactiveLazyObject.field.set(reactiveLazyObject.reactiveLazyObject, data)
+                trigger?.createInstance()?.execution(data)
+            } else {
+                trigger?.createInstance()?.execution(
+                    reactiveLazyObject.field.get(reactiveLazyObject.reactiveLazyObject), data)
+                reactiveLazyObject.field.set(reactiveLazyObject.reactiveLazyObject, data)
+            }
         }
     }
 
@@ -137,6 +167,14 @@ suspend fun collectLoader(
 
                 setReactiveInjection(annotationLazy.injection)
 
+                val triggers: Array<ReactiveTrigger<Any>> = annotationLazy.triggers
+                val collectedTriggers: MutableMap<String, KClass<out BaseReactiveTrigger<Any>>> = mutableMapOf()
+                if (triggers.isNotEmpty()) {
+                    triggers.forEach {
+                        collectedTriggers[it.event] = it.trigger
+                    }
+                }
+
                 @Suppress("NAME_SHADOWING")
                 val reactiveLazyObject = ReactiveLazy(
                     isLazy = true,
@@ -145,6 +183,7 @@ suspend fun collectLoader(
                     reactiveLazyObject = reactiveLazyObject,
                     handler = annotationLazy.handler,
                     handlerAfter = annotationLazy.handlerAfter,
+                    triggers = collectedTriggers,
                     injectionClass = injectionClass,
                     injectionMethod = injectionMethod
                 )
@@ -157,6 +196,14 @@ suspend fun collectLoader(
 
                 setReactiveInjection(annotationReactive.injection)
 
+                val triggers: Array<ReactiveTrigger<Any>> = annotationReactive.triggers
+                val collectedTriggers: MutableMap<String, KClass<out BaseReactiveTrigger<Any>>> = mutableMapOf()
+                if (triggers.isNotEmpty()) {
+                    triggers.forEach {
+                        collectedTriggers[it.event] = it.trigger
+                    }
+                }
+
                 @Suppress("NAME_SHADOWING")
                 val reactiveLazyObject = ReactiveLazy(
                     isLazy = false,
@@ -165,6 +212,7 @@ suspend fun collectLoader(
                     reactiveLazyObject = reactiveLazyObject,
                     handler = annotationReactive.handler,
                     handlerAfter = annotationReactive.handlerAfter,
+                    triggers = collectedTriggers,
                     injectionClass = injectionClass,
                     injectionMethod = injectionMethod
                 )

@@ -31,6 +31,11 @@ annotation class Reactive<T>(
     /**
      * Injection to inject end object after handlers
      */
-    val injection: ReactiveInjection = ReactiveInjection()
+    val injection: ReactiveInjection = ReactiveInjection(),
+
+    /**
+     * Reactive triggers when setting new data to a property.
+     */
+    val triggers: Array<ReactiveTrigger<T>> = []
 
 )

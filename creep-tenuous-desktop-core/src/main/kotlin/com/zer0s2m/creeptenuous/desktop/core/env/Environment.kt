@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.common.components
+package com.zer0s2m.creeptenuous.desktop.core.env
 
 /**
  * Primary storage for running the application with environment variables enabled.
