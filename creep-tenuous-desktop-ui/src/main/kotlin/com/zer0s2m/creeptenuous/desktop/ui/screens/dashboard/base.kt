@@ -21,7 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
+import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
+import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
@@ -87,14 +89,20 @@ internal fun PopupSetUserCategoryInFileObject(
                         .padding(bottom = 20.dp)
                 )
 
+                val categoryId: Int = ContextScreen.get(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject")
+                val categoryIdState: MutableState<Int> = mutableStateOf(categoryId)
+
                 SelectUserCategoryForFileObject(
                     expandedState = expandedStateDropDownMenu,
                     actionDelete = {
-                        Dashboard.setCategoryIdEditFileObject(categoryId = -1)
+                        ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", -1)
+                        categoryIdState.value = -1
                     },
                     actionDropdownItem = {
-                        Dashboard.setCategoryIdEditFileObject(categoryId = it)
-                    }
+                        ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", it)
+                        categoryIdState.value = it
+                    },
+                    categoryId = categoryIdState.value
                 )
 
                 Row(
@@ -116,11 +124,14 @@ internal fun PopupSetUserCategoryInFileObject(
                             )
 
                             newManagerFileObject.objects.forEachIndexed { index, fileObject ->
-                                if (fileObject.systemName == Dashboard.getCurrentFileObjectSetCategory()) {
-                                    if (Dashboard.getCategoryIdEditFileObject() == -1) {
+                                if (fileObject.systemName == ContextScreen.get(
+                                        Screen.DASHBOARD_SCREEN, "currentFileObjectSetProperty")) {
+                                    val categoryIdNew: Int = ContextScreen
+                                        .get(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject")
+                                    if (categoryIdNew == -1) {
                                         fileObject.categoryId = null
                                     } else {
-                                        fileObject.categoryId = Dashboard.getCategoryIdEditFileObject()
+                                        fileObject.categoryId = categoryIdNew
                                     }
                                     newManagerFileObject.objects[index] = fileObject
                                 }
@@ -145,13 +156,15 @@ internal fun PopupSetUserCategoryInFileObject(
  * @param expandedState Modal window states.
  * @param actionDropdownItem Call an action when an element is clicked [DropdownMenuItem].
  * @param actionDelete Call an action when deleting a category.
+ * @param categoryId Current selected user category.
  */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 internal fun SelectUserCategoryForFileObject(
     expandedState: MutableState<Boolean>,
     actionDropdownItem: (Int) -> Unit,
-    actionDelete: () -> Unit = {}
+    actionDelete: () -> Unit = {},
+    categoryId: Int
 ) {
     Row(
         modifier = Modifier
@@ -170,9 +183,9 @@ internal fun SelectUserCategoryForFileObject(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            if (Dashboard.getCategoryIdEditFileObject() != -1) {
+            if (categoryId != -1) {
                 val userCategory = ReactiveUser.customCategories.find {
-                    it.id == Dashboard.getCategoryIdEditFileObject()
+                    it.id == categoryId
                 }
                 if (userCategory != null) {
                     RenderLayoutUserCategory(userCategory)
@@ -279,19 +292,16 @@ internal fun PopupSetUserColorInFileObject(
                 val isSetColor: MutableState<Boolean> = remember { mutableStateOf(false) }
                 val currentColor: MutableState<Color?> = remember { mutableStateOf(null) }
 
-                if (Dashboard.getColorEditFileObject() != null
-                    && Dashboard.getColorEditFileObject()?.isNotEmpty() == true) {
+                val colorEditFileObject: String? = ContextScreen.get(Screen.DASHBOARD_SCREEN, "colorEditFileObject")
+                if (!colorEditFileObject.isNullOrEmpty()) {
                     ReactiveUser.userColors.forEach {
-                        if (it.color == Dashboard.getColorEditFileObject()) {
-                            val converterColor = Dashboard.getColorEditFileObject()
-                                ?.let { it1 -> colorConvertHexToRgb(it1) }
-                            if (converterColor != null) {
-                                currentColor.value = Color(
-                                    red = converterColor.red,
-                                    green = converterColor.green,
-                                    blue = converterColor.blue
-                                )
-                            }
+                        if (it.color == colorEditFileObject) {
+                            val converterColor = colorConvertHexToRgb(colorEditFileObject)
+                            currentColor.value = Color(
+                                red = converterColor.red,
+                                green = converterColor.green,
+                                blue = converterColor.blue
+                            )
                             isSetColor.value = true
                         }
                     }
@@ -313,7 +323,7 @@ internal fun PopupSetUserColorInFileObject(
                     actionDelete = {
                         currentColor.value = null
                         isSetColor.value = false
-                        Dashboard.setColorEditFileObject()
+                        ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorEditFileObject", null)
                     },
                     content = {
                         DropdownMenuSelectColor(
@@ -324,7 +334,7 @@ internal fun PopupSetUserColorInFileObject(
                                 expandedStateDropDownMenu.value = false
                                 currentColor.value = color
                                 isSetColor.value = true
-                                Dashboard.setColorEditFileObject(colorStr)
+                                ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorEditFileObject", colorStr)
                             }
                         )
                     }
@@ -349,8 +359,10 @@ internal fun PopupSetUserColorInFileObject(
                             )
 
                             newManagerFileObject.objects.forEachIndexed { index, fileObject ->
-                                if (fileObject.systemName == Dashboard.getCurrentFileObjectSetCategory()) {
-                                    fileObject.color = Dashboard.getColorEditFileObject()
+                                if (fileObject.systemName == ContextScreen.get(
+                                        Screen.DASHBOARD_SCREEN, "currentFileObjectSetProperty")) {
+                                    fileObject.color = ContextScreen
+                                        .get(Screen.DASHBOARD_SCREEN, "colorEditFileObject")
                                     newManagerFileObject.objects[index] = fileObject
                                 }
                             }
