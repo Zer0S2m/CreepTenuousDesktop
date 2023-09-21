@@ -1,10 +1,10 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive
 
-import com.zer0s2m.creeptenuous.desktop.core.triggers.ReactiveTrigger
+import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
 
 /**
  * A generic collection of items that supports adding and removing items in
- * a reactive manner with various triggers [ReactiveTrigger].
+ * a reactive manner with various triggers [BaseReactiveTrigger].
  *
  * @param E the type of elements contained in the collection.
  *          The mutable collection is invariant in its element type.
@@ -14,18 +14,18 @@ interface ReactiveMutableList<E> : MutableList<E> {
     /**
      * The trigger is fired when a new element is added to the collection.
      */
-    val triggerAdd: ReactiveTrigger<E>?
+    val triggerAdd: BaseReactiveTrigger<E>?
 
     /**
      * The trigger is fired when an item is removed from the collection.
      */
-    val triggerRemove: ReactiveTrigger<E>?
+    val triggerRemove: BaseReactiveTrigger<E>?
 
     /**
      * The trigger is called when the element at the specified position in
      * this list is replaced by the specified element.
      */
-    val triggerSet: ReactiveTrigger<E>?
+    val triggerSet: BaseReactiveTrigger<E>?
 
     /**
      * Adds the specified element to the collection in a reactive way and
@@ -91,9 +91,9 @@ interface ReactiveMutableList<E> : MutableList<E> {
  * in this list is replaced by the specified element.
  */
 class ReactiveArrayList<E>(
-    override val triggerAdd: ReactiveTrigger<E>? = null,
-    override val triggerRemove: ReactiveTrigger<E>? = null,
-    override val triggerSet: ReactiveTrigger<E>? = null
+    override val triggerAdd: BaseReactiveTrigger<E>? = null,
+    override val triggerRemove: BaseReactiveTrigger<E>? = null,
+    override val triggerSet: BaseReactiveTrigger<E>? = null
 ) :
     ReactiveMutableList<E>,
     RandomAccess,
@@ -108,9 +108,9 @@ class ReactiveArrayList<E>(
  * in this list is replaced by the specified element.
  */
 fun <T> mutableReactiveListOf(
-    triggerAdd: ReactiveTrigger<T>? = null,
-    triggerRemove: ReactiveTrigger<T>? = null,
-    triggerSet: ReactiveTrigger<T>? = null
+    triggerAdd: BaseReactiveTrigger<T>? = null,
+    triggerRemove: BaseReactiveTrigger<T>? = null,
+    triggerSet: BaseReactiveTrigger<T>? = null
 ): ReactiveMutableList<T> = ReactiveArrayList(
     triggerAdd = triggerAdd,
     triggerRemove = triggerRemove,
@@ -126,9 +126,9 @@ fun <T> mutableReactiveListOf(
  * in this list is replaced by the specified element.
  */
 fun <T> Collection<T>.toReactiveMutableList(
-    triggerAdd: ReactiveTrigger<T>? = null,
-    triggerRemove: ReactiveTrigger<T>? = null,
-    triggerSet: ReactiveTrigger<T>? = null
+    triggerAdd: BaseReactiveTrigger<T>? = null,
+    triggerRemove: BaseReactiveTrigger<T>? = null,
+    triggerSet: BaseReactiveTrigger<T>? = null
 ): ReactiveMutableList<T> {
     val newList: ReactiveMutableList<T> = ReactiveArrayList(
         triggerAdd = triggerAdd,

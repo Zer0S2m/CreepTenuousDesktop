@@ -60,7 +60,17 @@ object ReactiveUser : ReactiveLazyObject {
             node = Node(
                 type = NodeType.KTOR,
                 unit = "userProfile"
-            )
+            ),
+            triggers = [
+                ReactiveTrigger(
+                    event = "setTransferUserFileObjects",
+                    trigger = ReactiveTriggerUserSettingsSetTransferUser::class
+                ),
+                ReactiveTrigger(
+                    event = "setIsDeleteFileObjects",
+                    trigger = ReactiveTriggerUserSettingsSetIsDeleteFileObject::class
+                ),
+            ]
         )
         var userSettingsFileObjectDistribution: UserSettingsFileObjectDistribution =
             UserSettingsFileObjectDistribution(null, null)
