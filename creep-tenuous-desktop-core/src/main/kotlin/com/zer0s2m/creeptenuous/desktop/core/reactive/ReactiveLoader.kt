@@ -106,13 +106,21 @@ object ReactiveLoader {
      * [Lazy] or [Reactive]
      * @param event Name of the event at which the reactive trigger should be executed.
      * @param data Data.
+     * @param useOldData Whether to call the trigger using the old set data.
      */
-    fun <T : Any> setReactiveValue(nameProperty: String, event: String, data: T) {
+    fun <T : Any> setReactiveValue(nameProperty: String, event: String, data: T, useOldData: Boolean = false) {
         val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
         if (reactiveLazyObject != null && reactiveLazyObject.triggers.containsKey(event)) {
             val trigger: KClass<out BaseReactiveTrigger<Any>>? = reactiveLazyObject.triggers[event]
-            reactiveLazyObject.field.set(reactiveLazyObject.reactiveLazyObject, data)
-            trigger?.createInstance()?.execution(data)
+
+            if (!useOldData) {
+                reactiveLazyObject.field.set(reactiveLazyObject.reactiveLazyObject, data)
+                trigger?.createInstance()?.execution(data)
+            } else {
+                trigger?.createInstance()?.execution(
+                    reactiveLazyObject.field.get(reactiveLazyObject.reactiveLazyObject), data)
+                reactiveLazyObject.field.set(reactiveLazyObject.reactiveLazyObject, data)
+            }
         }
     }
 

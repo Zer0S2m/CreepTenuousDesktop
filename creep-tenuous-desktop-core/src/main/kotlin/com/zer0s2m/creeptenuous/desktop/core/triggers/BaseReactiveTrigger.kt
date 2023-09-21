@@ -17,10 +17,18 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazyObject
 interface BaseReactiveTrigger<T> {
 
     /**
-     * Trigger execution
+     * Trigger execution.
      *
-     * @param value The new value of a property or object
+     * @param value The new value of a property or object.
      */
-    fun execution(value: T)
+    fun execution(value: T) {}
+
+    /**
+     * Trigger execution.
+     *
+     * @param oldValue The old value of a property or object.
+     * @param newValue The new value of a property or object.
+     */
+    fun execution(oldValue: T, newValue: T) {}
 
 }
