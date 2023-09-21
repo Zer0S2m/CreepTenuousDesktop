@@ -201,6 +201,7 @@ class CardPanelBaseFolderUser(
  * @param actionRename Action called when a file object is renamed
  * @param actionCopy Action called when a file object is copied
  * @param actionMove Action called when a file object is moved
+ * @param actionDelete Action called when a file object is deleted
  * @param actionSetCategory Action called when a custom category is set on a file object
  * @param actionSetColor Action called when a custom color is set on a file object
  */
@@ -215,6 +216,7 @@ class CartFileObject(
     override val actionRename: () -> Unit = {},
     override val actionCopy: () -> Unit = {},
     override val actionMove: () -> Unit = {},
+    override val actionDelete: () -> Unit = {},
     override val actionSetCategory: () -> Unit = {},
     override val actionSetColor: () -> Unit = {},
 ) : BaseCardFileObject {
@@ -520,6 +522,16 @@ class CartFileObject(
                 action = {
                     expandedMenu.value = false
                     actionMove()
+                }
+            ),
+            DropdownMenuItemAdvanced(
+                text = "Delete",
+                colorText = Color.Black,
+                modifierMenu = modifierMenu,
+                contentPadding = contentPaddingMenu,
+                action = {
+                    expandedMenu.value = false
+                    actionDelete()
                 }
             ),
             DropdownMenuItemAdvanced(
