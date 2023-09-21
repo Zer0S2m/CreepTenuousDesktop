@@ -89,14 +89,20 @@ internal fun PopupSetUserCategoryInFileObject(
                         .padding(bottom = 20.dp)
                 )
 
+                val categoryId: Int = ContextScreen.get(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject")
+                val categoryIdState: MutableState<Int> = mutableStateOf(categoryId)
+
                 SelectUserCategoryForFileObject(
                     expandedState = expandedStateDropDownMenu,
                     actionDelete = {
                         ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", -1)
+                        categoryIdState.value = -1
                     },
                     actionDropdownItem = {
                         ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", it)
-                    }
+                        categoryIdState.value = it
+                    },
+                    categoryId = categoryIdState.value
                 )
 
                 Row(
@@ -120,12 +126,12 @@ internal fun PopupSetUserCategoryInFileObject(
                             newManagerFileObject.objects.forEachIndexed { index, fileObject ->
                                 if (fileObject.systemName == ContextScreen.get(
                                         Screen.DASHBOARD_SCREEN, "currentFileObjectSetProperty")) {
-                                    val categoryId: Int = ContextScreen
+                                    val categoryIdNew: Int = ContextScreen
                                         .get(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject")
-                                    if (categoryId == -1) {
+                                    if (categoryIdNew == -1) {
                                         fileObject.categoryId = null
                                     } else {
-                                        fileObject.categoryId = categoryId
+                                        fileObject.categoryId = categoryIdNew
                                     }
                                     newManagerFileObject.objects[index] = fileObject
                                 }
@@ -150,13 +156,15 @@ internal fun PopupSetUserCategoryInFileObject(
  * @param expandedState Modal window states.
  * @param actionDropdownItem Call an action when an element is clicked [DropdownMenuItem].
  * @param actionDelete Call an action when deleting a category.
+ * @param categoryId Current selected user category.
  */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 internal fun SelectUserCategoryForFileObject(
     expandedState: MutableState<Boolean>,
     actionDropdownItem: (Int) -> Unit,
-    actionDelete: () -> Unit = {}
+    actionDelete: () -> Unit = {},
+    categoryId: Int
 ) {
     Row(
         modifier = Modifier
@@ -175,7 +183,6 @@ internal fun SelectUserCategoryForFileObject(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            val categoryId: Int = ContextScreen.get(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject")
             if (categoryId != -1) {
                 val userCategory = ReactiveUser.customCategories.find {
                     it.id == categoryId
