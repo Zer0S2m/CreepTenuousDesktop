@@ -1,6 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.core.http
 
-import com.zer0s2m.creeptenuous.desktop.common.components.Environment
+import com.zer0s2m.creeptenuous.desktop.core.env.Environment
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*

@@ -1,6 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive
 
-import com.zer0s2m.creeptenuous.desktop.common.components.Environment
+import com.zer0s2m.creeptenuous.desktop.core.env.Environment
 import com.zer0s2m.creeptenuous.desktop.core.errors.ReactiveLoaderException
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass

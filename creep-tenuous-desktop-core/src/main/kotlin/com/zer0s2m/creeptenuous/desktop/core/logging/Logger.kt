@@ -1,6 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.core.logging
 
-import com.zer0s2m.creeptenuous.desktop.common.components.Environment
+import com.zer0s2m.creeptenuous.desktop.core.env.Environment
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
