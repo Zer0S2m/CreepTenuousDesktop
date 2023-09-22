@@ -5,9 +5,9 @@ import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandler
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.core.reactive.toReactiveMutableList
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorAdd
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorRemove
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorSet
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.user.ReactiveTriggerUserColorAdd
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.user.ReactiveTriggerUserColorRemove
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.user.ReactiveTriggerUserColorSet
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 

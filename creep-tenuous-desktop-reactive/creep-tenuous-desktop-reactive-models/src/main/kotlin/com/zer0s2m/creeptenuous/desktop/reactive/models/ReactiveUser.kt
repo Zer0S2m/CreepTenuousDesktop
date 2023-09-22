@@ -3,7 +3,7 @@ package com.zer0s2m.creeptenuous.desktop.reactive.models
 import com.zer0s2m.creeptenuous.desktop.common.dto.*
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.*
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.*
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.user.*
 
 /**
  * `Reactive` behavior user model

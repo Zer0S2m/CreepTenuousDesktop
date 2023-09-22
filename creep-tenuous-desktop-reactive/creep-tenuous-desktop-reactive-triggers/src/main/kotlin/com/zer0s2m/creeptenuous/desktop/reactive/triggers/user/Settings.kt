@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.reactive.triggers
+package com.zer0s2m.creeptenuous.desktop.reactive.triggers.user
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserSettingsFileObjectDistribution
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
@@ -9,7 +9,7 @@ import org.slf4j.Logger
 /**
  * The reactive trigger fires when a new user is installed to transfer file objects.
  */
-open class ReactiveTriggerUserSettingsSetTransferUser : BaseReactiveTrigger<UserSettingsFileObjectDistribution> {
+class ReactiveTriggerUserSettingsSetTransferUser : BaseReactiveTrigger<UserSettingsFileObjectDistribution> {
 
     companion object {
         private val logger: Logger = logger()
@@ -27,9 +27,9 @@ open class ReactiveTriggerUserSettingsSetTransferUser : BaseReactiveTrigger<User
 }
 
 /**
- * Reactive trigger fires when file objects are set to be deleted
+ * Reactive trigger fires when file objects are set to be deleted.
  */
-open class ReactiveTriggerUserSettingsSetIsDeleteFileObject : BaseReactiveTrigger<UserSettingsFileObjectDistribution> {
+class ReactiveTriggerUserSettingsSetIsDeleteFileObject : BaseReactiveTrigger<UserSettingsFileObjectDistribution> {
 
     companion object {
         private val logger: Logger = logger()

@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.reactive.triggers
+package com.zer0s2m.creeptenuous.desktop.reactive.triggers.io
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
@@ -10,7 +10,7 @@ import org.slf4j.Logger
 /**
  * Trigger fires when a file object is deleted.
  */
-open class ReactiveTriggerReactiveFileObjectDeleteFileObject : BaseReactiveTrigger<ManagerFileObject> {
+class ReactiveTriggerReactiveFileObjectDeleteFileObject : BaseReactiveTrigger<ManagerFileObject> {
 
     companion object {
         private val logger: Logger = logger()
@@ -34,31 +34,9 @@ open class ReactiveTriggerReactiveFileObjectDeleteFileObject : BaseReactiveTrigg
 }
 
 /**
- * The trigger is called when a file object is set to a custom color.
- */
-open class ReactiveTriggerReactiveFileObjectSetColorInFileObject : BaseReactiveIndependentTrigger {
-
-    companion object {
-        private val logger: Logger = logger()
-    }
-
-    /**
-     * Trigger execution.
-     *
-     * @param values Arbitrary number of arguments passed regardless of type
-     */
-    override fun execution(vararg values: Any?) {
-        val systemNameFileObject: String? = if (values[0] is String) values[0].toString() else null
-        val colorId: Int? = if (values[1] is Int) values[1].toString().toInt() else null
-        logger.infoDev("Set color in file object - directory\nDATA: [$systemNameFileObject, $colorId]")
-    }
-
-}
-
-/**
  * The trigger is called when a file object is set or unset to a custom category.
  */
-open class ReactiveTriggerReactiveFileObjectSetCategoryInFileObject : BaseReactiveIndependentTrigger {
+class ReactiveTriggerReactiveFileObjectSetCategoryInFileObject : BaseReactiveIndependentTrigger {
 
     companion object {
         private val logger: Logger = logger()
@@ -73,6 +51,28 @@ open class ReactiveTriggerReactiveFileObjectSetCategoryInFileObject : BaseReacti
         val systemNameFileObject: String? = if (values[0] is String) values[0].toString() else null
         val categoryId: Int? = if (values[1] is Int) values[1].toString().toInt() else null
         logger.infoDev("Set category in file object\nDATA: [$systemNameFileObject, $categoryId]")
+    }
+
+}
+
+/**
+ * The trigger is called when a file object is set to a custom color.
+ */
+class ReactiveTriggerReactiveFileObjectSetColorInFileObject : BaseReactiveIndependentTrigger {
+
+    companion object {
+        private val logger: Logger = logger()
+    }
+
+    /**
+     * Trigger execution.
+     *
+     * @param values Arbitrary number of arguments passed regardless of type
+     */
+    override fun execution(vararg values: Any?) {
+        val systemNameFileObject: String? = if (values[0] is String) values[0].toString() else null
+        val colorId: Int? = if (values[1] is Int) values[1].toString().toInt() else null
+        logger.infoDev("Set color in file object - directory\nDATA: [$systemNameFileObject, $colorId]")
     }
 
 }

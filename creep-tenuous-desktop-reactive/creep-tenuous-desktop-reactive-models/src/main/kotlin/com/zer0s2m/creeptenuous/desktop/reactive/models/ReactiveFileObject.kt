@@ -7,9 +7,9 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveIndependentTrigger
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazyObject
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveTrigger
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveFileObjectManagerFileSystemObjects
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectDeleteFileObject
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectSetCategoryInFileObject
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectSetColorInFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.ReactiveTriggerReactiveFileObjectDeleteFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.ReactiveTriggerReactiveFileObjectSetCategoryInFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.ReactiveTriggerReactiveFileObjectSetColorInFileObject
 
 /**
  * Reactive file object data model
