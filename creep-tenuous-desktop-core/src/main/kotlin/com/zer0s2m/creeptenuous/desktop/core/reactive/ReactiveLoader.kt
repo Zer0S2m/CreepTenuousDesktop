@@ -7,6 +7,7 @@ import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
 import com.zer0s2m.creeptenuous.desktop.core.logging.logger
 import com.zer0s2m.creeptenuous.desktop.core.reactive.backend.Ktor
+import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveIndependentTrigger
 import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
 import org.slf4j.Logger
 import java.lang.reflect.Field
@@ -41,6 +42,8 @@ internal data class ReactiveLazy(
     val handlerAfter: KClass<out ReactiveHandlerAfter>,
 
     val triggers: MutableMap<String, KClass<out BaseReactiveTrigger<Any>>> = mutableMapOf(),
+
+    val independentTriggers: MutableMap<String, KClass<out BaseReactiveIndependentTrigger>> = mutableMapOf(),
 
     val injectionClass: KClass<out ReactiveInjectionClass>? = null,
 
@@ -80,6 +83,135 @@ internal const val HANDLER_AFTER_NAME = "action"
 object ReactiveLoader {
 
     internal val logger: Logger = logger()
+
+    /**
+     * Collect a map of jet triggers.
+     *
+     * @param triggers Reaction triggers.
+     * @return Reaction trigger map.
+     */
+    private fun collectTriggers(triggers: Array<ReactiveTrigger<Any>>):
+            MutableMap<String, KClass<out BaseReactiveTrigger<Any>>> {
+        val collectedTriggers: MutableMap<String, KClass<out BaseReactiveTrigger<Any>>> = mutableMapOf()
+        if (triggers.isNotEmpty()) {
+            triggers.forEach { collectedTriggers[it.event] = it.trigger }
+        }
+        return collectedTriggers
+    }
+
+    /**
+     * Collect a map of independent jet triggers.
+     *
+     * @param triggers Independent reaction triggers.
+     * @return Independent reaction trigger map.
+     */
+    private fun collectIndependentTriggers(triggers: Array<ReactiveIndependentTrigger>):
+            MutableMap<String, KClass<out BaseReactiveIndependentTrigger>> {
+        val collectedTriggers: MutableMap<String, KClass<out BaseReactiveIndependentTrigger>> = mutableMapOf()
+        if (triggers.isNotEmpty()) {
+            triggers.forEach { collectedTriggers[it.event] = it.trigger }
+        }
+        return collectedTriggers
+    }
+
+    /**
+     * Collect all reactive classes for loading data and building an auxiliary map for loading data
+     *
+     * @param classes Reactive classes for collecting data
+     * @param injectionClasses Map of classes to which reactive and lazy properties will be
+     * implemented through the specified methods
+     */
+    suspend fun collectLoader(
+        classes: Collection<ReactiveLazyObject>,
+        injectionClasses: HashMap<KClass<out ReactiveInjectionClass>, Collection<String>> = hashMapOf()
+    ) {
+        var injectionClass: KClass<out ReactiveInjectionClass>? = null
+        var injectionMethod = ""
+
+        /**
+         * Sets the mentee for dependency injection
+         *
+         * @param injection Information about the injection
+         */
+        fun setReactiveInjection(injection: ReactiveInjection) {
+            if (injection.method.isNotEmpty()) {
+                val filteredInjectionClasses = injectionClasses.filterValues {
+                    it.contains(injection.method)
+                }
+
+                val (key, _) = filteredInjectionClasses.entries.iterator().next()
+
+                injectionClass = key
+                injectionMethod = injection.method
+            }
+        }
+
+        classes.forEach { reactiveLazyObject ->
+            reactiveLazyObject::class.memberProperties.forEach { kProperty ->
+                val annotationLazy = kProperty.findAnnotation<Lazy<Any>>()
+                val annotationReactive = kProperty.findAnnotation<Reactive<Any>>()
+                if (annotationLazy != null) {
+                    val propertyNode: Node = annotationLazy.node
+
+                    setReactiveInjection(annotationLazy.injection)
+
+                    @Suppress("NAME_SHADOWING")
+                    val reactiveLazyObject = ReactiveLazy(
+                        isLazy = true,
+                        isReactive = false,
+                        field = reactiveLazyObject::class.java.getDeclaredField(kProperty.name),
+                        reactiveLazyObject = reactiveLazyObject,
+                        handler = annotationLazy.handler,
+                        handlerAfter = annotationLazy.handlerAfter,
+                        triggers = collectTriggers(annotationLazy.triggers),
+                        independentTriggers = collectIndependentTriggers(annotationLazy.independentTriggers),
+                        injectionClass = injectionClass,
+                        injectionMethod = injectionMethod
+                    )
+                    mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
+                    if (propertyNode.type != NodeType.NONE) {
+                        collectNodes(propertyNode, reactiveLazyObject)
+                    }
+                } else if (annotationReactive != null) {
+                    val propertyNode: Node = annotationReactive.node
+
+                    setReactiveInjection(annotationReactive.injection)
+
+                    @Suppress("NAME_SHADOWING")
+                    val reactiveLazyObject = ReactiveLazy(
+                        isLazy = false,
+                        isReactive = true,
+                        field = reactiveLazyObject::class.java.getDeclaredField(kProperty.name),
+                        reactiveLazyObject = reactiveLazyObject,
+                        handler = annotationReactive.handler,
+                        handlerAfter = annotationReactive.handlerAfter,
+                        triggers = collectTriggers(annotationReactive.triggers),
+                        independentTriggers = collectIndependentTriggers(annotationReactive.independentTriggers),
+                        injectionClass = injectionClass,
+                        injectionMethod = injectionMethod
+                    )
+                    mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
+                    if (propertyNode.type != NodeType.NONE) {
+                        collectNodes(propertyNode, reactiveLazyObject)
+                    }
+                } else if (kProperty.hasAnnotation<Lazy<Any>>() && kProperty.hasAnnotation<Reactive<Any>>()) {
+                    throw ReactiveLoaderException("Parameter [${kProperty.name}] must have only one annotation")
+                }
+            }
+
+            injectionClass = null
+            injectionMethod = ""
+        }
+
+        loadNode()
+
+        writeLogsToConsoleForCollectObjects()
+
+        setReactiveValues(
+            isReactive = true,
+            isLazy = false
+        )
+    }
 
     /**
      * Load a single property of lazy behavior from the map of objects that are collected with [collectLoader]
@@ -124,119 +256,22 @@ object ReactiveLoader {
         }
     }
 
-}
-
-/**
- * Collect all reactive classes for loading data and building an auxiliary map for loading data
- *
- * @param classes Reactive classes for collecting data
- * @param injectionClasses Map of classes to which reactive and lazy properties will be
- * implemented through the specified methods
- */
-suspend fun collectLoader(
-    classes: Collection<ReactiveLazyObject>,
-    injectionClasses: HashMap<KClass<out ReactiveInjectionClass>, Collection<String>> = hashMapOf()
-) {
-    var injectionClass: KClass<out ReactiveInjectionClass>? = null
-    var injectionMethod = ""
-
     /**
-     * Sets the mentee for dependency injection
+     * Call an independent trigger [BaseReactiveIndependentTrigger].
      *
-     * @param injection Information about the injection
+     * @param nameProperty The name of the lazy behavior property is specified using an annotation
+     * [Lazy] or [Reactive]
+     * @param event Name of the event at which the reactive trigger should be executed.
+     * @param data Data.
      */
-    fun setReactiveInjection(injection: ReactiveInjection) {
-        if (injection.method.isNotEmpty()) {
-            val filteredInjectionClasses = injectionClasses.filterValues {
-                it.contains(injection.method)
-            }
-
-            val (key, _) = filteredInjectionClasses.entries.iterator().next()
-
-            injectionClass = key
-            injectionMethod = injection.method
+    fun executionIndependentTrigger(nameProperty: String, event: String, vararg data: Any?) {
+        val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
+        if (reactiveLazyObject != null && reactiveLazyObject.independentTriggers.containsKey(event)) {
+            val trigger: KClass<out BaseReactiveIndependentTrigger>? = reactiveLazyObject.independentTriggers[event]
+            trigger?.createInstance()?.execution(*data)
         }
     }
 
-    classes.forEach { reactiveLazyObject ->
-        reactiveLazyObject::class.memberProperties.forEach { kProperty ->
-            val annotationLazy = kProperty.findAnnotation<Lazy<Any>>()
-            val annotationReactive = kProperty.findAnnotation<Reactive<Any>>()
-            if (annotationLazy != null) {
-                val propertyNode: Node = annotationLazy.node
-
-                setReactiveInjection(annotationLazy.injection)
-
-                val triggers: Array<ReactiveTrigger<Any>> = annotationLazy.triggers
-                val collectedTriggers: MutableMap<String, KClass<out BaseReactiveTrigger<Any>>> = mutableMapOf()
-                if (triggers.isNotEmpty()) {
-                    triggers.forEach {
-                        collectedTriggers[it.event] = it.trigger
-                    }
-                }
-
-                @Suppress("NAME_SHADOWING")
-                val reactiveLazyObject = ReactiveLazy(
-                    isLazy = true,
-                    isReactive = false,
-                    field = reactiveLazyObject::class.java.getDeclaredField(kProperty.name),
-                    reactiveLazyObject = reactiveLazyObject,
-                    handler = annotationLazy.handler,
-                    handlerAfter = annotationLazy.handlerAfter,
-                    triggers = collectedTriggers,
-                    injectionClass = injectionClass,
-                    injectionMethod = injectionMethod
-                )
-                mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
-                if (propertyNode.type != NodeType.NONE) {
-                    collectNodes(propertyNode, reactiveLazyObject)
-                }
-            } else if (annotationReactive != null) {
-                val propertyNode: Node = annotationReactive.node
-
-                setReactiveInjection(annotationReactive.injection)
-
-                val triggers: Array<ReactiveTrigger<Any>> = annotationReactive.triggers
-                val collectedTriggers: MutableMap<String, KClass<out BaseReactiveTrigger<Any>>> = mutableMapOf()
-                if (triggers.isNotEmpty()) {
-                    triggers.forEach {
-                        collectedTriggers[it.event] = it.trigger
-                    }
-                }
-
-                @Suppress("NAME_SHADOWING")
-                val reactiveLazyObject = ReactiveLazy(
-                    isLazy = false,
-                    isReactive = true,
-                    field = reactiveLazyObject::class.java.getDeclaredField(kProperty.name),
-                    reactiveLazyObject = reactiveLazyObject,
-                    handler = annotationReactive.handler,
-                    handlerAfter = annotationReactive.handlerAfter,
-                    triggers = collectedTriggers,
-                    injectionClass = injectionClass,
-                    injectionMethod = injectionMethod
-                )
-                mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
-                if (propertyNode.type != NodeType.NONE) {
-                    collectNodes(propertyNode, reactiveLazyObject)
-                }
-            } else if (kProperty.hasAnnotation<Lazy<Any>>() && kProperty.hasAnnotation<Reactive<Any>>()) {
-                throw ReactiveLoaderException("Parameter [${kProperty.name}] must have only one annotation")
-            }
-        }
-
-        injectionClass = null
-        injectionMethod = ""
-    }
-
-    loadNode()
-
-    writeLogsToConsoleForCollectObjects()
-
-    setReactiveValues(
-        isReactive = true,
-        isLazy = false
-    )
 }
 
 /**

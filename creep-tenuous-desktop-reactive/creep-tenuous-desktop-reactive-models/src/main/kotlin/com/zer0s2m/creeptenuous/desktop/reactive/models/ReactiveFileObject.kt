@@ -3,10 +3,13 @@ package com.zer0s2m.creeptenuous.desktop.reactive.models
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveIndependentTrigger
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazyObject
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveTrigger
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveFileObjectManagerFileSystemObjects
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectDeleteFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectSetCategoryInFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectSetColorInFileObject
 
 /**
  * Reactive file object data model
@@ -25,6 +28,16 @@ object ReactiveFileObject : ReactiveLazyObject {
             ReactiveTrigger(
                 event = "deleteFileObject",
                 trigger = ReactiveTriggerReactiveFileObjectDeleteFileObject::class
+            )
+        ],
+        independentTriggers = [
+            ReactiveIndependentTrigger(
+                event = "setColorInFileObject",
+                trigger = ReactiveTriggerReactiveFileObjectSetColorInFileObject::class
+            ),
+            ReactiveIndependentTrigger(
+                event = "setCategoryInFileObject",
+                trigger = ReactiveTriggerReactiveFileObjectSetCategoryInFileObject::class
             )
         ]
     )

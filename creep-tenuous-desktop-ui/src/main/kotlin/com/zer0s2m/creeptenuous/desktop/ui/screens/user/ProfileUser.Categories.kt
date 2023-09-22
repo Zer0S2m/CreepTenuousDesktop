@@ -24,8 +24,8 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
-import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFormState
 import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFormState
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
@@ -377,7 +377,7 @@ private fun SelectColorForCategory(stateUserCategory: MutableState<UserCategory>
         expandedState = expandedState,
         modifier = Modifier
             .width(baseWidthColumnSelectColor),
-        action = { colorStr, color ->
+        action = { colorStr, color, _ ->
             expandedState.value = false
             currentColor.value = color
             isSetColor.value = true

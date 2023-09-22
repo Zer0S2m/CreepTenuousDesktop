@@ -36,6 +36,11 @@ annotation class Reactive<T>(
     /**
      * Reactive triggers when setting new data to a property.
      */
-    val triggers: Array<ReactiveTrigger<T>> = []
+    val triggers: Array<ReactiveTrigger<T>> = [],
+
+    /**
+     * Independent reactive triggers fire when new data is set to a property.
+     */
+    val independentTriggers: Array<ReactiveIndependentTrigger> = []
 
 )

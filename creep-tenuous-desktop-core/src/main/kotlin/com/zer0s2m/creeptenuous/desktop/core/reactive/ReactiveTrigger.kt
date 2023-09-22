@@ -8,6 +8,9 @@ import kotlin.reflect.KClass
  *
  * @param T The type of the variable that will take [BaseReactiveTrigger.execution].
  */
+@Target(AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.RUNTIME)
+@MustBeDocumented
 annotation class ReactiveTrigger<T>(
 
     /**

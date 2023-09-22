@@ -3,6 +3,7 @@ package com.zer0s2m.creeptenuous.desktop.reactive.triggers
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
 import com.zer0s2m.creeptenuous.desktop.core.logging.logger
+import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveIndependentTrigger
 import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
 import org.slf4j.Logger
 
@@ -28,6 +29,50 @@ open class ReactiveTriggerReactiveFileObjectDeleteFileObject : BaseReactiveTrigg
         } else {
             logger.infoDev("Delete a directory\nDATA: ${deletedFileObject[0]}")
         }
+    }
+
+}
+
+/**
+ * The trigger is called when a file object is set to a custom color.
+ */
+open class ReactiveTriggerReactiveFileObjectSetColorInFileObject : BaseReactiveIndependentTrigger {
+
+    companion object {
+        private val logger: Logger = logger()
+    }
+
+    /**
+     * Trigger execution.
+     *
+     * @param values Arbitrary number of arguments passed regardless of type
+     */
+    override fun execution(vararg values: Any?) {
+        val systemNameFileObject: String? = if (values[0] is String) values[0].toString() else null
+        val colorId: Int? = if (values[1] is Int) values[1].toString().toInt() else null
+        logger.infoDev("Set color in file object - directory\nDATA: [$systemNameFileObject, $colorId]")
+    }
+
+}
+
+/**
+ * The trigger is called when a file object is set or unset to a custom category.
+ */
+open class ReactiveTriggerReactiveFileObjectSetCategoryInFileObject : BaseReactiveIndependentTrigger {
+
+    companion object {
+        private val logger: Logger = logger()
+    }
+
+    /**
+     * Trigger execution.
+     *
+     * @param values Arbitrary number of arguments passed regardless of type
+     */
+    override fun execution(vararg values: Any?) {
+        val systemNameFileObject: String? = if (values[0] is String) values[0].toString() else null
+        val categoryId: Int? = if (values[1] is Int) values[1].toString().toInt() else null
+        logger.infoDev("Set category in file object\nDATA: [$systemNameFileObject, $categoryId]")
     }
 
 }

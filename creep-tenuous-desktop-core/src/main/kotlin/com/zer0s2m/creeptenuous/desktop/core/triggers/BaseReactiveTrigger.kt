@@ -10,9 +10,9 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazyObject
  * Use it on properties annotated with [Reactive] or [Lazy] and also if the class
  * implements [ReactiveLazyObject].
  *
- * Performs the role of changing a value in properties
+ * Performs the role of changing a value in properties.
  *
- * @param T The type of the variable that will take [BaseReactiveTrigger.execution]
+ * @param T The type of the variable that will take [BaseReactiveTrigger.execution].
  */
 interface BaseReactiveTrigger<T> {
 

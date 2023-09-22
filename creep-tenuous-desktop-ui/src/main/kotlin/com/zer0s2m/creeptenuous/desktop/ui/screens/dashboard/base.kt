@@ -24,6 +24,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
@@ -134,6 +135,13 @@ internal fun PopupSetUserCategoryInFileObject(
                                         fileObject.categoryId = categoryIdNew
                                     }
                                     newManagerFileObject.objects[index] = fileObject
+
+                                    ReactiveLoader.executionIndependentTrigger(
+                                        "managerFileSystemObjects",
+                                        "setCategoryInFileObject",
+                                        fileObject.systemName,
+                                        fileObject.categoryId
+                                    )
                                 }
                             }
 
@@ -330,11 +338,12 @@ internal fun PopupSetUserColorInFileObject(
                             expandedState = expandedStateDropDownMenu,
                             modifier = Modifier
                                 .width(baseWidthColumnSelectItem),
-                            action = { colorStr, color ->
+                            action = { colorStr, color, colorId ->
                                 expandedStateDropDownMenu.value = false
                                 currentColor.value = color
                                 isSetColor.value = true
                                 ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorEditFileObject", colorStr)
+                                ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorIdEditFileObject", colorId)
                             }
                         )
                     }
@@ -364,6 +373,13 @@ internal fun PopupSetUserColorInFileObject(
                                     fileObject.color = ContextScreen
                                         .get(Screen.DASHBOARD_SCREEN, "colorEditFileObject")
                                     newManagerFileObject.objects[index] = fileObject
+
+                                    ReactiveLoader.executionIndependentTrigger(
+                                        "managerFileSystemObjects",
+                                        "setColorInFileObject",
+                                        fileObject.systemName,
+                                        ContextScreen.get(Screen.DASHBOARD_SCREEN, "colorIdEditFileObject")
+                                    )
                                 }
                             }
 

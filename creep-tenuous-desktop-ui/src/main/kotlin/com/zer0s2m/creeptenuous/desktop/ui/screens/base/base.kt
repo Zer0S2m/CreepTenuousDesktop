@@ -148,7 +148,7 @@ internal fun InputSelectColor(
 internal fun DropdownMenuSelectColor(
     expandedState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
-    action: (String, Color) -> Unit
+    action: (String, Color, Int?) -> Unit
 ) {
     DropdownMenu(
         expanded = expandedState.value,
@@ -167,7 +167,7 @@ internal fun DropdownMenuSelectColor(
 
             DropdownMenuItem(
                 onClick = {
-                    action(it.color, color)
+                    action(it.color, color, it.id)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
