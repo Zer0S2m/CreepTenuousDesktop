@@ -81,6 +81,7 @@ internal fun BaseModalPopup(
  *
  * @param isSetColor Status: Is any color palette installed.
  * @param currentColor Current set color.
+ * @param isDelete Whether to show the delete object button.
  * @param action Configure component to receive clicks [Row].
  * @param actionDelete Configure component to receive clicks [Icon] (action delete).
  * @param content Internal field content.
@@ -90,6 +91,7 @@ internal fun BaseModalPopup(
 internal fun InputSelectColor(
     isSetColor: MutableState<Boolean>,
     currentColor: MutableState<Color?>,
+    isDelete: Boolean = true,
     action: () -> Unit,
     actionDelete: () -> Unit = {},
     content: @Composable () -> Unit = {}
@@ -127,7 +129,8 @@ internal fun InputSelectColor(
             }
 
             LayoutDeleteAndOpenInputSelect(
-                actionDelete = actionDelete
+                actionDelete = actionDelete,
+                isDelete = isDelete
             )
         }
 
@@ -201,27 +204,31 @@ private val contentDescriptionIconDelete: String get() = "Delete property"
  * Field action call layout - delete and open
  *
  * @param actionDelete Configure component to receive clicks [Icon] (action delete).
+ * @param isDelete Whether to show the delete object button.
  */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 internal fun LayoutDeleteAndOpenInputSelect(
-    actionDelete: () -> Unit,
+    actionDelete: () -> Unit = {},
+    isDelete: Boolean = true
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Icon(
-            painter = painterResource(resourcePath = Resources.ICON_DELETE.path),
-            contentDescription = contentDescriptionIconDelete,
-            tint = Color.Red,
-            modifier = Modifier
-                .size(32.dp)
-                .padding(end = 8.dp)
-                .onClick {
-                    actionDelete()
-                }
-        )
+        if (isDelete) {
+            Icon(
+                painter = painterResource(resourcePath = Resources.ICON_DELETE.path),
+                contentDescription = contentDescriptionIconDelete,
+                tint = Color.Red,
+                modifier = Modifier
+                    .size(32.dp)
+                    .padding(end = 8.dp)
+                    .onClick {
+                        actionDelete()
+                    }
+            )
+        }
 
         Icon(
             painter = painterResource(resourcePath = Resources.ICON_ARROW.path),

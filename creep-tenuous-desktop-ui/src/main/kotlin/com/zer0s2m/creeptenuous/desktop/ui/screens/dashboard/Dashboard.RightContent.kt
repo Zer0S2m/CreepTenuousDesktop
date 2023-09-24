@@ -3,14 +3,23 @@ package com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
+import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
@@ -19,6 +28,12 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.FieldSearch
 import kotlinx.coroutines.CoroutineScope
+
+/**
+ * Text used by accessibility services to describe what this image represents
+ */
+@get:ReadOnlyComposable
+private val contentDescriptionIconAdd: String get() = "Add file object"
 
 /**
  * Content on the right side of the main dashboard
@@ -35,11 +50,12 @@ internal fun RenderLayoutFilesObject(
     directories: MutableState<MutableList<FileObject>>,
     files: MutableState<MutableList<FileObject>>,
     expandedStateSetCategoryPopup: MutableState<Boolean>,
-    expandedStateSetColorPopup: MutableState<Boolean>
+    expandedStateSetColorPopup: MutableState<Boolean>,
+    expandedStateCreateFileObjectTypeDirectory: MutableState<Boolean>
 ) {
     Column(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 16.dp)
     ) {
         Column(
             modifier = Modifier
@@ -49,6 +65,7 @@ internal fun RenderLayoutFilesObject(
                 directories = directories,
                 expandedStateSetCategoryPopup = expandedStateSetCategoryPopup,
                 expandedStateSetColorPopup = expandedStateSetColorPopup,
+                expandedStateCreateFileObjectTypeDirectory = expandedStateCreateFileObjectTypeDirectory
             )
             RenderLayoutFiles(
                 files = files,
@@ -72,12 +89,31 @@ internal fun RenderLayoutDirectories(
     directories: MutableState<MutableList<FileObject>>,
     expandedStateSetCategoryPopup: MutableState<Boolean>,
     expandedStateSetColorPopup: MutableState<Boolean>,
+    expandedStateCreateFileObjectTypeDirectory: MutableState<Boolean>
 ) {
     Column(
         modifier = Modifier
             .padding(bottom = 28.dp)
     ) {
-        TitleCategoryFileObject("Folders", directories.value.size)
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TitleCategoryFileObject("Folders", directories.value.size)
+
+            IconButton(
+                onClick = {
+                    expandedStateCreateFileObjectTypeDirectory.value = true
+                }
+            ) {
+                Icon(
+                    painter = painterResource(resourcePath = Resources.ICON_ADD.path),
+                    contentDescription = contentDescriptionIconAdd,
+                    modifier = Modifier
+                        .pointerHoverIcon(PointerIcon.Hand),
+                    tint = Color.Gray
+                )
+            }
+        }
         LazyVerticalGrid(
             columns = GridCells.Adaptive(160.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -135,7 +171,9 @@ internal fun RenderLayoutFiles(
         LazyVerticalGrid(
             columns = GridCells.Adaptive(160.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .padding(top = 12.dp)
         ) {
             items(files.value.size) { index ->
                 val categoryId: Int? = files.value[index].categoryId
