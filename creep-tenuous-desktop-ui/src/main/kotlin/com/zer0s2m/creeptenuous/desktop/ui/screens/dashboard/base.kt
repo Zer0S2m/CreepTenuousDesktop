@@ -535,8 +535,16 @@ internal fun PopupCreateFileObjectTypeDirectory(
                                     categoryId = if (categoryId.value != -1) categoryId.value else null
                                 )
 
-                                println(newFileObjectDirectory)
-                                println(colorIdState.value)
+                                ReactiveLoader.executionIndependentTrigger(
+                                    "managerFileSystemObjects",
+                                    "createFileObjectOfTypeDirectory",
+                                    newFileObjectDirectory,
+                                    colorIdState.value
+                                )
+                                ReactiveFileObject.managerFileSystemObjects.objects.add(
+                                    newFileObjectDirectory
+                                )
+                                Dashboard.setManagerFileObject(ReactiveFileObject.managerFileSystemObjects)
                             }
                         }
                     ) {

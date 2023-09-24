@@ -7,6 +7,7 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveIndependentTrigger
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazyObject
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveTrigger
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveFileObjectManagerFileSystemObjects
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.ReactiveTriggerReactiveFileObjectCreateDirectory
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.ReactiveTriggerReactiveFileObjectDeleteFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.ReactiveTriggerReactiveFileObjectSetCategoryInFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.ReactiveTriggerReactiveFileObjectSetColorInFileObject
@@ -38,6 +39,10 @@ object ReactiveFileObject : ReactiveLazyObject {
             ReactiveIndependentTrigger(
                 event = "setCategoryInFileObject",
                 trigger = ReactiveTriggerReactiveFileObjectSetCategoryInFileObject::class
+            ),
+            ReactiveIndependentTrigger(
+                event = "createFileObjectOfTypeDirectory",
+                trigger = ReactiveTriggerReactiveFileObjectCreateDirectory::class
             )
         ]
     )
