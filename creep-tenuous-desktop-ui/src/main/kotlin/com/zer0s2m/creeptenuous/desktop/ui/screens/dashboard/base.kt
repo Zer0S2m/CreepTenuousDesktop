@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
@@ -38,6 +39,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.DropdownMenuSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.InputSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.LayoutDeleteAndOpenInputSelect
+import java.util.*
 
 /**
  * Base title for file object category
@@ -437,6 +439,8 @@ internal fun PopupCreateFileObjectTypeDirectory(
                 val currentColor: MutableState<Color?> = mutableStateOf(Color(0, 0, 0))
                 val categoryId: MutableState<Int> = mutableStateOf(-1)
                 val titleNewDirectory: MutableState<String> = mutableStateOf("")
+                val colorStrState: MutableState<String?> = mutableStateOf(null)
+                val colorIdState: MutableState<Int?> = mutableStateOf(null)
 
                 Text(
                     text = "Create directory",
@@ -488,6 +492,8 @@ internal fun PopupCreateFileObjectTypeDirectory(
                     actionDelete = {
                         isSetColor.value = false
                         currentColor.value = Color(0, 0, 0)
+                        colorStrState.value = null
+                        colorIdState.value = null
                     },
                     content = {
                         DropdownMenuSelectColor(
@@ -498,6 +504,8 @@ internal fun PopupCreateFileObjectTypeDirectory(
                                 expandedStateSelectColor.value = false
                                 isSetColor.value = true
                                 currentColor.value = color
+                                colorStrState.value = colorStr
+                                colorIdState.value = colorId
                             }
                         )
                     }
@@ -514,7 +522,22 @@ internal fun PopupCreateFileObjectTypeDirectory(
                             .fillMaxWidth()
                             .pointerHoverIcon(PointerIcon.Hand),
                         onClick = {
+                            if (stateFormCreateDirectory.validateForm()) {
+                                expandedState.value = false
 
+                                val dataForm = stateFormCreateDirectory.getData()
+                                val newFileObjectDirectory = FileObject(
+                                    realName = dataForm["title"].toString().trim(),
+                                    systemName = UUID.randomUUID().toString(),
+                                    isDirectory = true,
+                                    isFile = false,
+                                    color = colorStrState.value,
+                                    categoryId = if (categoryId.value != -1) categoryId.value else null
+                                )
+
+                                println(newFileObjectDirectory)
+                                println(colorIdState.value)
+                            }
                         }
                     ) {
                         Text("Create directory")
