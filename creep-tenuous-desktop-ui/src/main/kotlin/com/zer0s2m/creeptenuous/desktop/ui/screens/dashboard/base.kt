@@ -19,20 +19,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
+import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFormState
+import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
+import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
 import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.DropdownMenuSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.InputSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.LayoutDeleteAndOpenInputSelect
+import java.util.*
 
 /**
  * Base title for file object category
@@ -44,9 +51,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.base.LayoutDeleteAndOpenInput
 internal fun TitleCategoryFileObject(text: String, size: Int = 0): Unit = Text(
     text = "$text ($size)",
     fontWeight = FontWeight.SemiBold,
-    color = Color.Black,
-    modifier = Modifier
-        .padding(bottom = 12.dp)
+    color = Color.Black
 )
 
 /**
@@ -103,7 +108,7 @@ internal fun PopupSetUserCategoryInFileObject(
                         ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", it)
                         categoryIdState.value = it
                     },
-                    categoryId = categoryIdState.value
+                    categoryId = categoryIdState
                 )
 
                 Row(
@@ -172,7 +177,7 @@ internal fun SelectUserCategoryForFileObject(
     expandedState: MutableState<Boolean>,
     actionDropdownItem: (Int) -> Unit,
     actionDelete: () -> Unit = {},
-    categoryId: Int
+    categoryId: MutableState<Int>
 ) {
     Row(
         modifier = Modifier
@@ -191,9 +196,9 @@ internal fun SelectUserCategoryForFileObject(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            if (categoryId != -1) {
+            if (categoryId.value != -1) {
                 val userCategory = ReactiveUser.customCategories.find {
-                    it.id == categoryId
+                    it.id == categoryId.value
                 }
                 if (userCategory != null) {
                     RenderLayoutUserCategory(userCategory)
@@ -395,3 +400,164 @@ internal fun PopupSetUserColorInFileObject(
         }
     }
 }
+
+/**
+ * Modal window for creating a file object of type - directory
+ *
+ * @param expandedState Modal window states
+ */
+@Composable
+internal fun PopupCreateFileObjectTypeDirectory(
+    expandedState: MutableState<Boolean>,
+) {
+    BaseModalPopup(
+        stateModal = expandedState
+    ) {
+        Surface(
+            contentColor = contentColorFor(MaterialTheme.colors.surface),
+            modifier = Modifier
+                .width(360.dp)
+                .height(330.dp)
+                .shadow(24.dp, RoundedCornerShape(4.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .pointerInput({}) {
+                        detectTapGestures(onPress = {
+                            // Workaround to disable clicks on Surface background
+                            // https://github.com/JetBrains/compose-jb/issues/2581
+                        })
+                    },
+            ) {
+                val stateFormCreateDirectory: BaseFormState = FormState()
+
+                val expandedStateSelectColor: MutableState<Boolean> = mutableStateOf(false)
+                val expandedStateSelectCategory: MutableState<Boolean> = mutableStateOf(false)
+                val isSetColor: MutableState<Boolean> = mutableStateOf(false)
+                val currentColor: MutableState<Color?> = mutableStateOf(Color(0, 0, 0))
+                val categoryId: MutableState<Int> = mutableStateOf(-1)
+                val titleNewDirectory: MutableState<String> = mutableStateOf("")
+                val colorStrState: MutableState<String?> = mutableStateOf(null)
+                val colorIdState: MutableState<Int?> = mutableStateOf(null)
+
+                Text(
+                    text = "Create directory",
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .padding(bottom = 20.dp)
+                )
+
+                // TODO: Make form state for all kinds of components
+                Form(
+                    state = stateFormCreateDirectory,
+                    fields = listOf(
+                        TextFieldAdvanced(
+                            textField = titleNewDirectory.value,
+                            nameField = "title",
+                            labelField = "Enter directory title",
+                            validators = listOf(
+                                NotEmptyValidator()
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+                    )
+                )
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                )
+                SelectUserCategoryForFileObject(
+                    expandedState = expandedStateSelectCategory,
+                    actionDropdownItem = {
+                        categoryId.value = it
+                    },
+                    actionDelete = {
+                        categoryId.value = -1
+                    },
+                    categoryId = categoryId
+                )
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                )
+                InputSelectColor(
+                    isSetColor = isSetColor,
+                    currentColor = currentColor,
+                    action = {
+                        expandedStateSelectColor.value = true
+                    },
+                    actionDelete = {
+                        isSetColor.value = false
+                        currentColor.value = Color(0, 0, 0)
+                        colorStrState.value = null
+                        colorIdState.value = null
+                    },
+                    content = {
+                        DropdownMenuSelectColor(
+                            expandedState = expandedStateSelectColor,
+                            modifier = Modifier
+                                .width(baseWidthColumnSelectColor),
+                            action = { colorStr, color, colorId ->
+                                expandedStateSelectColor.value = false
+                                isSetColor.value = true
+                                currentColor.value = color
+                                colorStrState.value = colorStr
+                                colorIdState.value = colorId
+                            }
+                        )
+                    }
+                )
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                )
+                Row(
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .pointerHoverIcon(PointerIcon.Hand),
+                        onClick = {
+                            if (stateFormCreateDirectory.validateForm()) {
+                                expandedState.value = false
+
+                                val dataForm = stateFormCreateDirectory.getData()
+                                val newFileObjectDirectory = FileObject(
+                                    realName = dataForm["title"].toString().trim(),
+                                    systemName = UUID.randomUUID().toString(),
+                                    isDirectory = true,
+                                    isFile = false,
+                                    color = colorStrState.value,
+                                    categoryId = if (categoryId.value != -1) categoryId.value else null
+                                )
+
+                                ReactiveLoader.executionIndependentTrigger(
+                                    "managerFileSystemObjects",
+                                    "createFileObjectOfTypeDirectory",
+                                    newFileObjectDirectory,
+                                    colorIdState.value
+                                )
+                                ReactiveFileObject.managerFileSystemObjects.objects.add(
+                                    newFileObjectDirectory
+                                )
+                                Dashboard.setManagerFileObject(ReactiveFileObject.managerFileSystemObjects)
+                            }
+                        }
+                    ) {
+                        Text("Create directory")
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Width of color selection area from list
+ */
+@get:ReadOnlyComposable
+private val baseWidthColumnSelectColor: Dp get() = 328.dp

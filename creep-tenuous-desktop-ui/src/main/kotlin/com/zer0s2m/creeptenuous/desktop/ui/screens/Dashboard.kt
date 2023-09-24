@@ -67,6 +67,11 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     private val expandedStateModalSetColorPopup: MutableState<Boolean> = mutableStateOf(false)
 
+    /**
+     *  Current state of the modal [PopupCreateFileObjectTypeDirectory] when create directory
+     */
+    private val expandedStateModalCreateDirectory: MutableState<Boolean> = mutableStateOf(false)
+
     internal companion object {
 
         /**
@@ -160,6 +165,9 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                 files.value = mutableListOf()
             }
         )
+        PopupCreateFileObjectTypeDirectory(
+            expandedState = expandedStateModalCreateDirectory
+        )
 
         val scaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
@@ -202,7 +210,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                         directories = directories,
                         files = files,
                         expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
-                        expandedStateSetColorPopup = expandedStateModalSetColorPopup
+                        expandedStateSetColorPopup = expandedStateModalSetColorPopup,
+                        expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory
                     )
 
                     BreadCrumbs(
