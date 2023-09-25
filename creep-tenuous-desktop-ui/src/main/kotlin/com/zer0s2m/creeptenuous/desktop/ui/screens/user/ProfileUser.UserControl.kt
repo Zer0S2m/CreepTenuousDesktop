@@ -18,6 +18,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.dto.User
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
@@ -29,14 +30,37 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
  */
 @Composable
 fun ProfileUser.ProfileUserControl.render() {
+    val openDialog: MutableState<Boolean> = remember { mutableStateOf(false) }
+    val currentUser: MutableState<User?> = mutableStateOf(null)
+    val users: MutableState<MutableList<User>> = mutableStateOf(ReactiveCommon.systemUsers.toMutableStateList())
+
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        ReactiveCommon.systemUsers.forEach {
-            itemUser(nameUser = it.name, loginUser = it.login, roleUser = it.role[0].title)
+        users.value.forEach { user ->
+            itemUser(
+                nameUser = user.name,
+                loginUser = user.login,
+                roleUser = user.role[0].title,
+                actionDelete = { _ ->
+                    openDialog.value = true
+                    currentUser.value = user
+                }
+            )
         }
     }
+
+    AlertDialogDeleteUser(
+        openDialog = openDialog,
+        actionDelete = {
+            openDialog.value = false
+            currentUser.value?.let {
+                users.value.remove(currentUser.value)
+                ReactiveCommon.systemUsers.removeReactive(it)
+            }
+        }
+    )
 }
 
 /**
@@ -59,15 +83,15 @@ private val baseModifierIcon: Modifier get() = Modifier
  * @param nameUser Username.
  * @param loginUser Login user..
  * @param roleUser Role.
+ * @param actionDelete The action is called when the delete user button is clicked.
  */
 @Composable
 internal fun ProfileUser.ProfileUserControl.itemUser(
     nameUser: String,
     loginUser: String,
-    roleUser: String
+    roleUser: String,
+    actionDelete: (String) -> Unit = {}
 ) {
-    val openDialog: MutableState<Boolean> = remember { mutableStateOf(false) }
-
     BaseCardForItemCardUser(
         nameUser = nameUser,
         loginUser = loginUser,
@@ -107,8 +131,7 @@ internal fun ProfileUser.ProfileUserControl.itemUser(
             BaseTooltipAreaForItemUser(text = "Deleting a user") {
                 IconButton(
                     onClick = {
-                        println("Delete user")
-                        openDialog.value = true
+                        actionDelete(loginUser)
                     }
                 ) {
                     Icon(
@@ -121,10 +144,6 @@ internal fun ProfileUser.ProfileUserControl.itemUser(
             }
         }
     }
-
-    AlertDialogDeleteUser(
-        openDialog = openDialog
-    )
 }
 
 /**
@@ -166,10 +185,12 @@ private fun BaseTooltipAreaForItemUser(
  * Dialog box to confirm user deletion.
  *
  * @param openDialog Opening dialog state.
+ * @param actionDelete The action is called when the delete user button is clicked.
  */
 @Composable
 private fun AlertDialogDeleteUser(
-    openDialog: MutableState<Boolean>
+    openDialog: MutableState<Boolean>,
+    actionDelete: () -> Unit = {}
 ) {
     BaseModalPopup(
         stateModal = openDialog
@@ -203,9 +224,7 @@ private fun AlertDialogDeleteUser(
                         modifier = Modifier
                             .fillMaxWidth()
                             .pointerHoverIcon(PointerIcon.Hand),
-                        onClick = {
-                            openDialog.value = false
-                        },
+                        onClick = actionDelete,
                         colors = ButtonDefaults.textButtonColors(
                             backgroundColor = Color.Red,
                             contentColor = Color.White
