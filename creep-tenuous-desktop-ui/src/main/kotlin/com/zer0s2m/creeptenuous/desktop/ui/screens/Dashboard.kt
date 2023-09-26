@@ -174,7 +174,12 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             expandedState = expandedStateModalCreateDirectory
         )
         PopupRenameFileObject(
-            expandedState = expandedStateModalRenameFileObject
+            expandedState = expandedStateModalRenameFileObject,
+            actionRename = {
+                // TODO: A crutch for forcing layout reflow
+                directories.value = mutableListOf()
+                files.value = mutableListOf()
+            }
         )
 
         val scaffoldState = rememberScaffoldState()

@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FileObject(
 
-    val realName: String,
+    var realName: String,
 
     val systemName: String,
 

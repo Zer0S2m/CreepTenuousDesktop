@@ -99,3 +99,25 @@ class ReactiveTriggerReactiveFileObjectCreateDirectory : BaseReactiveIndependent
     }
 
 }
+
+/**
+ * The trigger fires when the name of the file object changes.
+ */
+class ReactiveTriggerReactiveFileObjectRenameFileObject : BaseReactiveIndependentTrigger {
+
+    companion object {
+        private val logger: Logger = logger()
+    }
+
+    /**
+     * Trigger execution.
+     *
+     * @param values Arbitrary number of arguments passed regardless of type
+     */
+    override fun execution(vararg values: Any?) {
+        val systemName: String? = if (values[0] is String) values[0].toString() else null
+        val newTitle: String? = if (values[1] is String) values[1].toString() else null
+        logger.infoDev("Rename file object\nDATA: [$systemName, $newTitle]")
+    }
+
+}

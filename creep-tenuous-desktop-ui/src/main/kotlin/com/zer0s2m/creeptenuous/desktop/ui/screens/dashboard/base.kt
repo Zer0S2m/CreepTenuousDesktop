@@ -566,10 +566,12 @@ private val baseWidthColumnSelectColor: Dp get() = 328.dp
  * Modal window for rename a file object.
  *
  * @param expandedState Modal window states.
+ * @param actionRename The action is triggered when the file object name changes.
  */
 @Composable
 internal fun PopupRenameFileObject(
     expandedState: MutableState<Boolean>,
+    actionRename: (ManagerFileObject) -> Unit
 ) {
     BaseModalPopup(
         stateModal = expandedState
@@ -642,6 +644,28 @@ internal fun PopupRenameFileObject(
                             .pointerHoverIcon(PointerIcon.Hand),
                         onClick = {
                             if (stateFormRenameFileObject.validateForm()) {
+                                currentFileObject?.let {
+                                    val dataForm = stateFormRenameFileObject.getData()
+                                    val newTitle: String = dataForm["title"].toString().trim()
+
+                                    ReactiveFileObject.managerFileSystemObjects.objects.forEach {
+                                        if (it.systemName == currentFileObjectSystemName) {
+                                            it.realName = newTitle
+                                        }
+                                    }
+
+                                    ReactiveLoader.executionIndependentTrigger(
+                                        "managerFileSystemObjects",
+                                        "renameFileObject",
+                                        currentFileObjectSystemName,
+                                        newTitle
+                                    )
+
+                                    actionRename(ReactiveFileObject.managerFileSystemObjects)
+
+                                    Dashboard.setManagerFileObject(ReactiveFileObject.managerFileSystemObjects)
+                                }
+
                                 expandedState.value = false
                             }
                         }
