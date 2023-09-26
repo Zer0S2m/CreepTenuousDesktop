@@ -1,41 +1,66 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.user
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
+import com.zer0s2m.creeptenuous.desktop.common.dto.User
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
+import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 
 /**
  * Rendering part of the user profile screen [Screen.PROFILE_USER_MANAGEMENT_SCREEN]
  */
 @Composable
 fun ProfileUser.ProfileUserControl.render() {
+    val openDialog: MutableState<Boolean> = remember { mutableStateOf(false) }
+    val currentUser: MutableState<User?> = mutableStateOf(null)
+    val users: MutableState<MutableList<User>> = mutableStateOf(ReactiveCommon.systemUsers.toMutableStateList())
+
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        ReactiveCommon.systemUsers.forEach {
-            itemUser(nameUser = it.name, loginUser = it.login, roleUser = it.role[0].title)
+        users.value.forEach { user ->
+            itemUser(
+                nameUser = user.name,
+                loginUser = user.login,
+                roleUser = user.role[0].title,
+                actionDelete = { _ ->
+                    openDialog.value = true
+                    currentUser.value = user
+                }
+            )
         }
     }
+
+    AlertDialogDeleteUser(
+        openDialog = openDialog,
+        actionDelete = {
+            openDialog.value = false
+            currentUser.value?.let {
+                users.value.remove(currentUser.value)
+                ReactiveCommon.systemUsers.removeReactive(it)
+            }
+        }
+    )
 }
 
 /**
@@ -58,12 +83,14 @@ private val baseModifierIcon: Modifier get() = Modifier
  * @param nameUser Username.
  * @param loginUser Login user..
  * @param roleUser Role.
+ * @param actionDelete The action is called when the delete user button is clicked.
  */
 @Composable
 internal fun ProfileUser.ProfileUserControl.itemUser(
     nameUser: String,
     loginUser: String,
-    roleUser: String
+    roleUser: String,
+    actionDelete: (String) -> Unit = {}
 ) {
     BaseCardForItemCardUser(
         nameUser = nameUser,
@@ -104,7 +131,7 @@ internal fun ProfileUser.ProfileUserControl.itemUser(
             BaseTooltipAreaForItemUser(text = "Deleting a user") {
                 IconButton(
                     onClick = {
-                        println("Delete user")
+                        actionDelete(loginUser)
                     }
                 ) {
                     Icon(
@@ -151,5 +178,76 @@ private fun BaseTooltipAreaForItemUser(
         delayMillis = 700
     ) {
         content()
+    }
+}
+
+/**
+ * Dialog box to confirm user deletion.
+ *
+ * @param openDialog Opening dialog state.
+ * @param actionDelete The action is called when the delete user button is clicked.
+ */
+@Composable
+private fun AlertDialogDeleteUser(
+    openDialog: MutableState<Boolean>,
+    actionDelete: () -> Unit = {}
+) {
+    BaseModalPopup(
+        stateModal = openDialog
+    ) {
+        Surface(
+            contentColor = contentColorFor(MaterialTheme.colors.surface),
+            modifier = Modifier
+                .width(360.dp)
+                .height(180.dp)
+                .shadow(24.dp, RoundedCornerShape(4.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .pointerInput({}) {
+                        detectTapGestures(onPress = {
+                            // Workaround to disable clicks on Surface background
+                            // https://github.com/JetBrains/compose-jb/issues/2581
+                        })
+                    },
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Are you sure you want to delete the user?"
+                )
+                Row(
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .pointerHoverIcon(PointerIcon.Hand),
+                        onClick = actionDelete,
+                        colors = ButtonDefaults.textButtonColors(
+                            backgroundColor = Color.Red,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Delete")
+                    }
+                }
+                Row(
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .pointerHoverIcon(PointerIcon.Hand),
+                        onClick = {
+                            openDialog.value = false
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            }
+        }
     }
 }
