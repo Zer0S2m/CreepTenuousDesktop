@@ -561,3 +561,119 @@ internal fun PopupCreateFileObjectTypeDirectory(
  */
 @get:ReadOnlyComposable
 private val baseWidthColumnSelectColor: Dp get() = 328.dp
+
+/**
+ * Modal window for rename a file object.
+ *
+ * @param expandedState Modal window states.
+ * @param actionRename The action is triggered when the file object name changes.
+ */
+@Composable
+internal fun PopupRenameFileObject(
+    expandedState: MutableState<Boolean>,
+    actionRename: (ManagerFileObject) -> Unit
+) {
+    BaseModalPopup(
+        stateModal = expandedState
+    ) {
+        Surface(
+            contentColor = contentColorFor(MaterialTheme.colors.surface),
+            modifier = Modifier
+                .width(360.dp)
+                .height(180.dp)
+                .shadow(24.dp, RoundedCornerShape(4.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .pointerInput({}) {
+                        detectTapGestures(onPress = {
+                            // Workaround to disable clicks on Surface background
+                            // https://github.com/JetBrains/compose-jb/issues/2581
+                        })
+                    },
+            ) {
+                val stateFormRenameFileObject: BaseFormState = FormState()
+                val currentFileObjectSystemName: String = ContextScreen.get(
+                    Screen.DASHBOARD_SCREEN, "currentFileObjectSetProperty")
+                val currentFileObject: FileObject? = ReactiveFileObject.managerFileSystemObjects.objects.find {
+                    it.systemName == currentFileObjectSystemName
+                }
+
+                val titleFileObject: MutableState<String> = mutableStateOf("")
+                var isFile = false
+                currentFileObject?.let {
+                    titleFileObject.value = currentFileObject.realName
+                    isFile = currentFileObject.isFile
+                }
+
+                Text(
+                    text = "Rename - ${if (isFile) "File" else "Directory"}",
+                    fontSize = 20.sp
+                )
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                )
+                Form(
+                    state = stateFormRenameFileObject,
+                    fields = listOf(
+                        TextFieldAdvanced(
+                            textField = titleFileObject.value,
+                            nameField = "title",
+                            labelField = "Enter title",
+                            validators = listOf(
+                                NotEmptyValidator()
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+                    )
+                )
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                )
+                Row(
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .pointerHoverIcon(PointerIcon.Hand),
+                        onClick = {
+                            if (stateFormRenameFileObject.validateForm()) {
+                                currentFileObject?.let {
+                                    val dataForm = stateFormRenameFileObject.getData()
+                                    val newTitle: String = dataForm["title"].toString().trim()
+
+                                    ReactiveFileObject.managerFileSystemObjects.objects.forEach {
+                                        if (it.systemName == currentFileObjectSystemName) {
+                                            it.realName = newTitle
+                                        }
+                                    }
+
+                                    ReactiveLoader.executionIndependentTrigger(
+                                        "managerFileSystemObjects",
+                                        "renameFileObject",
+                                        currentFileObjectSystemName,
+                                        newTitle
+                                    )
+
+                                    actionRename(ReactiveFileObject.managerFileSystemObjects)
+
+                                    Dashboard.setManagerFileObject(ReactiveFileObject.managerFileSystemObjects)
+                                }
+
+                                expandedState.value = false
+                            }
+                        }
+                    ) {
+                        Text("Rename")
+                    }
+                }
+            }
+        }
+    }
+}

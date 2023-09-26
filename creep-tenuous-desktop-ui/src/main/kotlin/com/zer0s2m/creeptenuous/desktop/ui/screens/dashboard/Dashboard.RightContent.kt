@@ -44,6 +44,7 @@ private val contentDescriptionIconAdd: String get() = "Add file object"
  * [PopupSetUserCategoryInFileObject] when setting a custom category
  * @param expandedStateSetColorPopup Current state of the modal
  * [PopupSetUserColorInFileObject] when setting a custom color
+ * @param expandedStateModalRenameFileObject Current state of the modal [PopupRenameFileObject] rename file object.
  */
 @Composable
 internal fun RenderLayoutFilesObject(
@@ -51,7 +52,8 @@ internal fun RenderLayoutFilesObject(
     files: MutableState<MutableList<FileObject>>,
     expandedStateSetCategoryPopup: MutableState<Boolean>,
     expandedStateSetColorPopup: MutableState<Boolean>,
-    expandedStateCreateFileObjectTypeDirectory: MutableState<Boolean>
+    expandedStateCreateFileObjectTypeDirectory: MutableState<Boolean>,
+    expandedStateModalRenameFileObject: MutableState<Boolean>
 ) {
     Column(
         modifier = Modifier
@@ -65,11 +67,13 @@ internal fun RenderLayoutFilesObject(
                 directories = directories,
                 expandedStateSetCategoryPopup = expandedStateSetCategoryPopup,
                 expandedStateSetColorPopup = expandedStateSetColorPopup,
-                expandedStateCreateFileObjectTypeDirectory = expandedStateCreateFileObjectTypeDirectory
+                expandedStateCreateFileObjectTypeDirectory = expandedStateCreateFileObjectTypeDirectory,
+                expandedStateModalRenameFileObject = expandedStateModalRenameFileObject
             )
             RenderLayoutFiles(
                 files = files,
-                expandedStateSetCategoryPopup = expandedStateSetCategoryPopup
+                expandedStateSetCategoryPopup = expandedStateSetCategoryPopup,
+                expandedStateModalRenameFileObject = expandedStateModalRenameFileObject
             )
         }
     }
@@ -83,13 +87,15 @@ internal fun RenderLayoutFilesObject(
  * [PopupSetUserCategoryInFileObject] when setting a custom category
  * @param expandedStateSetColorPopup Current state of the modal
  * [PopupSetUserColorInFileObject] when setting a custom color
+ * @param expandedStateModalRenameFileObject Current state of the modal [PopupRenameFileObject] rename file object.
  */
 @Composable
 internal fun RenderLayoutDirectories(
     directories: MutableState<MutableList<FileObject>>,
     expandedStateSetCategoryPopup: MutableState<Boolean>,
     expandedStateSetColorPopup: MutableState<Boolean>,
-    expandedStateCreateFileObjectTypeDirectory: MutableState<Boolean>
+    expandedStateCreateFileObjectTypeDirectory: MutableState<Boolean>,
+    expandedStateModalRenameFileObject: MutableState<Boolean>
 ) {
     Column(
         modifier = Modifier
@@ -147,6 +153,10 @@ internal fun RenderLayoutDirectories(
                             ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorEditFileObject", null)
                         }
                         expandedStateSetColorPopup.value = true
+                    },
+                    actionRename = {
+                        actionRename(directories.value[index].systemName)
+                        expandedStateModalRenameFileObject.value = true
                     }
                 ).render()
             }
@@ -160,11 +170,13 @@ internal fun RenderLayoutDirectories(
  * @param files file objects with type - file
  * @param expandedStateSetCategoryPopup Current state of the modal [PopupSetUserCategoryInFileObject]
  * when setting a custom category
+ * @param expandedStateModalRenameFileObject Current state of the modal [PopupRenameFileObject] rename file object.
  */
 @Composable
 internal fun RenderLayoutFiles(
     files: MutableState<MutableList<FileObject>>,
-    expandedStateSetCategoryPopup: MutableState<Boolean>
+    expandedStateSetCategoryPopup: MutableState<Boolean>,
+    expandedStateModalRenameFileObject: MutableState<Boolean>
 ) {
     Column {
         TitleCategoryFileObject("Files", files.value.size)
@@ -188,6 +200,10 @@ internal fun RenderLayoutFiles(
                     actionSetCategory = {
                         actionSetCategory(categoryId, files.value[index].systemName)
                         expandedStateSetCategoryPopup.value = true
+                    },
+                    actionRename = {
+                        actionRename(files.value[index].systemName)
+                        expandedStateModalRenameFileObject.value = true
                     }
                 ).render()
             }
@@ -277,4 +293,17 @@ private fun actionSetCategory(categoryId: Int?, systemName: String) {
     } else {
         ContextScreen.set(Screen.DASHBOARD_SCREEN, "categoryIdEditFileObject", -1)
     }
+}
+
+/**
+ * The action is called when a file object is renamed.
+ *
+ * @param systemName System name of the file object.
+ */
+private fun actionRename(systemName: String) {
+    ContextScreen.set(
+        Screen.DASHBOARD_SCREEN,
+        "currentFileObjectSetProperty",
+        systemName
+    )
 }

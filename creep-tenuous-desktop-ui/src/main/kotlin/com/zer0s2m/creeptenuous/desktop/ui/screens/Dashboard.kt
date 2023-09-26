@@ -72,6 +72,11 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     private val expandedStateModalCreateDirectory: MutableState<Boolean> = mutableStateOf(false)
 
+    /**
+     * Current state of the modal [PopupRenameFileObject] rename file object.
+     */
+    private val expandedStateModalRenameFileObject: MutableState<Boolean> = mutableStateOf(false)
+
     internal companion object {
 
         /**
@@ -168,6 +173,14 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         PopupCreateFileObjectTypeDirectory(
             expandedState = expandedStateModalCreateDirectory
         )
+        PopupRenameFileObject(
+            expandedState = expandedStateModalRenameFileObject,
+            actionRename = {
+                // TODO: A crutch for forcing layout reflow
+                directories.value = mutableListOf()
+                files.value = mutableListOf()
+            }
+        )
 
         val scaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
@@ -211,7 +224,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                         files = files,
                         expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
                         expandedStateSetColorPopup = expandedStateModalSetColorPopup,
-                        expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory
+                        expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory,
+                        expandedStateModalRenameFileObject = expandedStateModalRenameFileObject
                     )
 
                     BreadCrumbs(
