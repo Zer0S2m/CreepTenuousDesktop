@@ -16,11 +16,13 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.User
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
@@ -30,41 +32,68 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
  */
 @Composable
 fun ProfileUser.ProfileUserControl.render() {
-    val openDialog: MutableState<Boolean> = remember { mutableStateOf(false) }
+    val openDialogDeleteUser: MutableState<Boolean> = remember { mutableStateOf(false) }
+    val openDialogUnblockUser: MutableState<Boolean> = remember { mutableStateOf(false) }
     val currentUser: MutableState<User?> = mutableStateOf(null)
+    val currentIndexUser: MutableState<Int> = mutableStateOf(-1)
     val users: MutableState<MutableList<User>> = mutableStateOf(ReactiveCommon.systemUsers.toMutableStateList())
 
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        users.value.forEach { user ->
+        users.value.forEachIndexed { index, user ->
             itemUser(
                 nameUser = user.name,
                 loginUser = user.login,
                 roleUser = user.role[0].title,
                 user.isBlocked,
                 actionDelete = { _ ->
-                    openDialog.value = true
+                    openDialogDeleteUser.value = true
                     currentUser.value = user
+                    currentIndexUser.value = index
                 },
                 actionBlock = {
 
                 },
                 actionUnblock = {
-
+                    openDialogUnblockUser.value = true
+                    currentUser.value = user
+                    currentIndexUser.value = index
                 }
             )
         }
     }
 
-    AlertDialogDeleteUser(
-        openDialog = openDialog,
-        actionDelete = {
-            openDialog.value = false
+    AlertDialogDeleteOrUnblockUser(
+        openDialog = openDialogDeleteUser,
+        textButtonInAction = "Delete",
+        titleDialog = "Are you sure you want to delete the user?",
+        action = {
+            openDialogDeleteUser.value = false
             currentUser.value?.let {
                 users.value.remove(currentUser.value)
                 ReactiveCommon.systemUsers.removeReactive(it)
+            }
+        }
+    )
+    AlertDialogDeleteOrUnblockUser(
+        openDialog = openDialogUnblockUser,
+        textButtonInAction = "Unblock",
+        titleDialog = "Are you sure you want to unblock the user?",
+        action = {
+            openDialogUnblockUser.value = false
+            currentUser.value?.let {
+                if (currentIndexUser.value != -1) {
+                    currentUser.value!!.isBlocked = false
+                    ReactiveLoader.executionIndependentTrigger(
+                        "systemUsers",
+                        "unblockSystemUser",
+                        currentUser.value
+                    )
+                    ReactiveCommon.systemUsers[currentIndexUser.value] = currentUser.value!!
+                    users.value = ReactiveCommon.systemUsers
+                }
             }
         }
     )
@@ -214,15 +243,17 @@ private fun BaseTooltipAreaForItemUser(
 }
 
 /**
- * Dialog box to confirm user deletion.
+ * Dialog box to confirm user deletion or unblocking.
  *
  * @param openDialog Opening dialog state.
- * @param actionDelete The action is called when the delete user button is clicked.
+ * @param action The action is called when the delete or unblock user button is clicked.
  */
 @Composable
-private fun AlertDialogDeleteUser(
+private fun AlertDialogDeleteOrUnblockUser(
     openDialog: MutableState<Boolean>,
-    actionDelete: () -> Unit = {}
+    textButtonInAction: String,
+    titleDialog: String,
+    action: () -> Unit = {}
 ) {
     BaseModalPopup(
         stateModal = openDialog
@@ -247,7 +278,7 @@ private fun AlertDialogDeleteUser(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Are you sure you want to delete the user?"
+                    text = titleDialog
                 )
                 Row(
                     horizontalArrangement = Arrangement.Center
@@ -256,13 +287,16 @@ private fun AlertDialogDeleteUser(
                         modifier = Modifier
                             .fillMaxWidth()
                             .pointerHoverIcon(PointerIcon.Hand),
-                        onClick = actionDelete,
+                        onClick = action,
                         colors = ButtonDefaults.textButtonColors(
                             backgroundColor = Color.Red,
                             contentColor = Color.White
                         )
                     ) {
-                        Text("Delete")
+                        Text(
+                            text = textButtonInAction,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
                 Row(

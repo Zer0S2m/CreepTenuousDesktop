@@ -17,6 +17,6 @@ data class User(
 
     val role: List<UserRole>,
 
-    val isBlocked: Boolean
+    var isBlocked: Boolean
 
 )
