@@ -43,9 +43,16 @@ fun ProfileUser.ProfileUserControl.render() {
                 nameUser = user.name,
                 loginUser = user.login,
                 roleUser = user.role[0].title,
+                user.isBlocked,
                 actionDelete = { _ ->
                     openDialog.value = true
                     currentUser.value = user
+                },
+                actionBlock = {
+
+                },
+                actionUnblock = {
+
                 }
             )
         }
@@ -66,31 +73,43 @@ fun ProfileUser.ProfileUserControl.render() {
 /**
  * Text used by accessibility services to describe what this image represents
  */
-@Stable
+@get:ReadOnlyComposable
 private val contentDescriptionBlock: String get() = "User lock icon"
+
+/**
+ * Text used by accessibility services to describe what this image represents
+ */
+@get:ReadOnlyComposable
+private val contentDescriptionUnblock: String get() = "User unlock icon"
 
 /**
  * optional [Modifier] for this [Icon]
  */
 @Stable
 private val baseModifierIcon: Modifier get() = Modifier
-    .size(20.dp)
+    .size(24.dp)
     .pointerHoverIcon(icon = PointerIcon.Hand)
 
 /**
  * The main card to show the user in the system
  *
  * @param nameUser Username.
- * @param loginUser Login user..
+ * @param loginUser Login user.
  * @param roleUser Role.
+ * @param isBlocked Is blocked user.
  * @param actionDelete The action is called when the delete user button is clicked.
+ * @param actionBlock The action is called when the block user button is clicked.
+ * @param actionUnblock The action is called when the unblock user button is clicked.
  */
 @Composable
 internal fun ProfileUser.ProfileUserControl.itemUser(
     nameUser: String,
     loginUser: String,
     roleUser: String,
-    actionDelete: (String) -> Unit = {}
+    isBlocked: Boolean,
+    actionDelete: (String) -> Unit = {},
+    actionBlock: () -> Unit = {},
+    actionUnblock: () -> Unit = {},
 ) {
     BaseCardForItemCardUser(
         nameUser = nameUser,
@@ -113,18 +132,31 @@ internal fun ProfileUser.ProfileUserControl.itemUser(
                     text = "Role - $roleUser"
                 )
             }
-            BaseTooltipAreaForItemUser(text = "User blocking") {
-                IconButton(
-                    onClick = {
-                        println("Block user")
+            if (!isBlocked) {
+                BaseTooltipAreaForItemUser(text = "User blocking") {
+                    IconButton(
+                        onClick = actionBlock
+                    ) {
+                        Icon(
+                            painter = painterResource(resourcePath = Resources.ICON_BLOCK.path),
+                            contentDescription = contentDescriptionBlock,
+                            modifier = baseModifierIcon,
+                            tint = Color.Red
+                        )
                     }
-                ) {
-                    Icon(
-                        painter = painterResource(resourcePath = Resources.ICON_BLOCK.path),
-                        contentDescription = contentDescriptionBlock,
-                        modifier = baseModifierIcon,
-                        tint = Color.Red
-                    )
+                }
+            } else {
+                BaseTooltipAreaForItemUser(text = "User unblocking") {
+                    IconButton(
+                        onClick = actionUnblock
+                    ) {
+                        Icon(
+                            painter = painterResource(resourcePath = Resources.ICON_UNBLOCK.path),
+                            contentDescription = contentDescriptionUnblock,
+                            modifier = baseModifierIcon,
+                            tint = Color.Green
+                        )
+                    }
                 }
             }
 

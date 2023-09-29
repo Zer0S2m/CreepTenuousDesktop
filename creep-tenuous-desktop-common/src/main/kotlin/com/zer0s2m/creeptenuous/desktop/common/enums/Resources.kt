@@ -31,7 +31,9 @@ enum class Resources(val path: String) {
 
     ICON_DELETE("drawable/delete.png"),
 
-    ICON_BLOCK("drawable/block.png"),
+    ICON_BLOCK("drawable/block.svg"),
+
+    ICON_UNBLOCK("drawable/unblock.svg"),
 
     ICON_EDIT("drawable/base_edit.svg"),
 
