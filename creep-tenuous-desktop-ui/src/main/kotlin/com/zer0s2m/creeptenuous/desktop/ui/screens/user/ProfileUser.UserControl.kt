@@ -9,13 +9,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +27,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
+import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 
@@ -34,6 +38,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 fun ProfileUser.ProfileUserControl.render() {
     val openDialogDeleteUser: MutableState<Boolean> = remember { mutableStateOf(false) }
     val openDialogUnblockUser: MutableState<Boolean> = remember { mutableStateOf(false) }
+    val openDialogBlockUser: MutableState<Boolean> = remember { mutableStateOf(false) }
     val currentUser: MutableState<User?> = mutableStateOf(null)
     val currentIndexUser: MutableState<Int> = mutableStateOf(-1)
     val users: MutableState<MutableList<User>> = mutableStateOf(ReactiveCommon.systemUsers.toMutableStateList())
@@ -54,7 +59,9 @@ fun ProfileUser.ProfileUserControl.render() {
                     currentIndexUser.value = index
                 },
                 actionBlock = {
-
+                    openDialogBlockUser.value = true
+                    currentUser.value = user
+                    currentIndexUser.value = index
                 },
                 actionUnblock = {
                     openDialogUnblockUser.value = true
@@ -96,6 +103,9 @@ fun ProfileUser.ProfileUserControl.render() {
                 }
             }
         }
+    )
+    ModalBlockUser(
+        expandedState = openDialogBlockUser
     )
 }
 
@@ -317,3 +327,154 @@ private fun AlertDialogDeleteOrUnblockUser(
         }
     }
 }
+
+@Composable
+private fun ModalBlockUser(
+    expandedState: MutableState<Boolean>
+) {
+    val heightModal: MutableState<Int> = mutableStateOf(230)
+
+    BaseModalPopup(
+        stateModal = expandedState
+    ) {
+        Surface(
+            contentColor = contentColorFor(MaterialTheme.colors.surface),
+            modifier = Modifier
+                .width(400.dp)
+                .height(heightModal.value.dp)
+                .shadow(24.dp, RoundedCornerShape(4.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .width(368.dp)
+                    .pointerInput({}) {
+                        detectTapGestures(onPress = {
+                            // Workaround to disable clicks on Surface background
+                            // https://github.com/JetBrains/compose-jb/issues/2581
+                        })
+                    }
+            ) {
+                Text(
+                    text = "Blocking a user",
+                    fontSize = 20.sp
+                )
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                )
+                Column {
+                    val isActiveBlockCompletely: MutableState<Boolean> = remember { mutableStateOf(true) }
+                    val isActiveBlockTemporary: MutableState<Boolean> = remember { mutableStateOf(false) }
+
+                    Row(
+                        modifier = Modifier
+                            .height(40.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        TextButton(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .pointerHoverIcon(PointerIcon.Hand)
+                                .drawBehindIsActive(isActiveBlockCompletely.value)
+                                .fillMaxWidth(0.5f),
+                            onClick = {
+                                isActiveBlockCompletely.value = true
+                                isActiveBlockTemporary.value = false
+                                heightModal.value = 230
+                            }
+                        ) {
+                            Text(
+                                text = "Blocking completely",
+                                color = Color.White,
+                                fontWeight = FontWeight.Normal
+                            )
+                        }
+                        TextButton(
+                            modifier = Modifier
+                                .pointerHoverIcon(PointerIcon.Hand)
+                                .drawBehindIsActive(isActiveBlockTemporary.value)
+                                .fillMaxSize(),
+                            onClick = {
+                                isActiveBlockCompletely.value = false
+                                isActiveBlockTemporary.value = true
+                                heightModal.value = 400
+                            }
+                        ) {
+                            Text(
+                                text = "Temporary blocking",
+                                color = Color.White,
+                                fontWeight = FontWeight.Normal
+                            )
+                        }
+                    }
+                    Spacer(
+                        modifier = Modifier
+                            .padding(top = 20.dp)
+                    )
+                    if (isActiveBlockCompletely.value && !isActiveBlockTemporary.value) {
+
+                    } else if (!isActiveBlockCompletely.value && isActiveBlockTemporary.value) {
+                        Spacer(
+                            modifier = Modifier
+                                .padding(top = 20.dp)
+                        )
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .pointerHoverIcon(PointerIcon.Hand),
+                            onClick = {
+
+                            },
+                            colors = ButtonDefaults.textButtonColors(
+                                backgroundColor = Color.Red,
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(
+                                text = "Block",
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .pointerHoverIcon(PointerIcon.Hand),
+                            onClick = {
+                                expandedState.value = false
+                            }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Stable
+private fun Modifier.drawBehindIsActive(
+    isActive: Boolean,
+    color: Color = Colors.SECONDARY_VARIANT.color
+) =
+    if (isActive) this.then(this.drawBehind {
+        val strokeWidthPx = 3.dp.toPx()
+        val verticalOffset = size.height - 2.sp.toPx()
+        drawLine(
+            color = color,
+            strokeWidth = strokeWidthPx,
+            start = Offset(0f, verticalOffset),
+            end = Offset(size.width, verticalOffset)
+        )
+    }) else this
