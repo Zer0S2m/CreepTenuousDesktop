@@ -117,7 +117,48 @@ fun ProfileUser.ProfileUserControl.render() {
         expandedStateModalSelectDate = openDialogBlockUserSelectDate,
         selectDateStart = selectDateStartUserBlock,
         selectDateEnd = selectDateEndUserBlock,
-        currentDateUserBlock = currentDateUserBlock
+        currentDateUserBlock = currentDateUserBlock,
+        actionBlock = {
+            val isBlockUserCompletely: Boolean = ContextScreen.get(
+                Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                "isBlockUserCompletely"
+            )
+            val isBlockUserTemporary: Boolean = ContextScreen.get(
+                Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                "isBlockUserTemporary"
+            )
+
+            if (isBlockUserCompletely && !isBlockUserTemporary) {
+                ReactiveLoader.executionIndependentTrigger(
+                    "systemUsers",
+                    "blockSystemUserCompletely",
+                    currentUser.value
+                )
+            } else if (!isBlockUserCompletely && isBlockUserTemporary) {
+                val startDateBlockUser: Date = ContextScreen.get(
+                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                    "startDateBlockUser"
+                )
+                val endDateBlockUser: Date = ContextScreen.get(
+                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                    "endDateBlockUser"
+                )
+
+                ReactiveLoader.executionIndependentTrigger(
+                    "systemUsers",
+                    "blockSystemUserTemporary",
+                    startDateBlockUser,
+                    endDateBlockUser,
+                    currentUser.value
+                )
+            }
+
+            if (isBlockUserCompletely || isBlockUserTemporary) {
+                currentUser.value!!.isBlocked = true
+                ReactiveCommon.systemUsers[currentIndexUser.value] = currentUser.value!!
+                users.value = ReactiveCommon.systemUsers
+            }
+        }
     )
     ModalSelectDate(
         initDate = currentDateUserBlock,
@@ -393,7 +434,8 @@ private fun ModalBlockUser(
     expandedStateModalSelectDate: MutableState<Boolean>,
     selectDateStart: MutableState<Date?>,
     selectDateEnd: MutableState<Date?>,
-    currentDateUserBlock: MutableState<Date>
+    currentDateUserBlock: MutableState<Date>,
+    actionBlock: () -> Unit
 ) {
     val heightModal: MutableState<Int> = mutableStateOf(225)
     val isActiveBlockCompletely: MutableState<Boolean> = mutableStateOf(true)
@@ -556,19 +598,17 @@ private fun ModalBlockUser(
                                 .pointerHoverIcon(PointerIcon.Hand),
                             onClick = {
                                 expandedState.value = false
-
-                                if (isActiveBlockCompletely.value && !isActiveBlockTemporary.value) {
-
-                                } else if (!isActiveBlockCompletely.value && isActiveBlockTemporary.value) {
-                                    val startDateBlockUser: Date = ContextScreen.get(
-                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                        "endDateBlockUser"
-                                    )
-                                    val endDateBlockUser: Date = ContextScreen.get(
-                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                        "endDateBlockUser"
-                                    )
-                                }
+                                ContextScreen.set(
+                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                    "isBlockUserCompletely",
+                                    isActiveBlockCompletely.value
+                                )
+                                ContextScreen.set(
+                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                    "isBlockUserTemporary",
+                                    isActiveBlockTemporary.value
+                                )
+                                actionBlock()
                             },
                             colors = ButtonDefaults.textButtonColors(
                                 backgroundColor = Color.Red,
