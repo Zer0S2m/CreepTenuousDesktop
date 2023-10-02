@@ -119,15 +119,6 @@ fun ProfileUser.ProfileUserControl.render() {
         selectDateEnd = selectDateEndUserBlock,
         currentDateUserBlock = currentDateUserBlock,
         actionBlock = {
-            val isBlockUserCompletely: Boolean = ContextScreen.get(
-                Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                "isBlockUserCompletely"
-            )
-            val isBlockUserTemporary: Boolean = ContextScreen.get(
-                Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                "isBlockUserTemporary"
-            )
-
             if (isBlockUserCompletely && !isBlockUserTemporary) {
                 ReactiveLoader.executionIndependentTrigger(
                     "systemUsers",
@@ -135,15 +126,6 @@ fun ProfileUser.ProfileUserControl.render() {
                     currentUser.value
                 )
             } else if (!isBlockUserCompletely && isBlockUserTemporary) {
-                val startDateBlockUser: Date = ContextScreen.get(
-                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                    "startDateBlockUser"
-                )
-                val endDateBlockUser: Date = ContextScreen.get(
-                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                    "endDateBlockUser"
-                )
-
                 ReactiveLoader.executionIndependentTrigger(
                     "systemUsers",
                     "blockSystemUserTemporary",
@@ -158,6 +140,8 @@ fun ProfileUser.ProfileUserControl.render() {
                 ReactiveCommon.systemUsers[currentIndexUser.value] = currentUser.value!!
                 users.value = ReactiveCommon.systemUsers
             }
+
+            ContextScreen.clearScreen(Screen.PROFILE_USER_MANAGEMENT_SCREEN)
         }
     )
     ModalSelectDate(
@@ -165,33 +149,32 @@ fun ProfileUser.ProfileUserControl.render() {
         expandedState = openDialogBlockUserSelectDate,
         onDismissRequest = {
             openDialogBlockUserSelectDate.value = false
+
+            if (!isBlockUserCompletely && isBlockUserTemporary) {
+                if (isStartDateBlockUser) {
+                    selectDateStartUserBlock.value = null
+                    ContextScreen.clearValueByKey(
+                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                        "startDateBlockUser"
+                    )
+                } else if (isEndDateBlockUser) {
+                    selectDateEndUserBlock.value = null
+                    ContextScreen.clearValueByKey(
+                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                        "endDateBlockUser"
+                    )
+                }
+            }
         },
         onDateSelect = {
             openDialogBlockUserSelectDate.value = false
 
-            val isStartDateBlockUser: Boolean = ContextScreen.get(
-                Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                "isStartDateBlockUser"
-            )
-            val isEndDateBlockUser: Boolean = ContextScreen.get(
-                Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                "isEndDateBlockUser"
-            )
-
             if (isStartDateBlockUser && !isEndDateBlockUser) {
                 selectDateStartUserBlock.value = it
-                ContextScreen.set(
-                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                    "startDateBlockUser",
-                    it
-                )
+                startDateBlockUser = it
             } else if (!isStartDateBlockUser && isEndDateBlockUser) {
                 selectDateEndUserBlock.value = it
-                ContextScreen.set(
-                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                    "endDateBlockUser",
-                    it
-                )
+                endDateBlockUser = it
             }
 
             currentDateUserBlock.value = it
@@ -488,6 +471,8 @@ private fun ModalBlockUser(
                                 isActiveBlockCompletely.value = true
                                 isActiveBlockTemporary.value = false
                                 heightModal.value = 225
+                                isBlockUserCompletely = true
+                                isBlockUserTemporary = false
                             }
                         ) {
                             Text(
@@ -505,6 +490,8 @@ private fun ModalBlockUser(
                                 isActiveBlockCompletely.value = false
                                 isActiveBlockTemporary.value = true
                                 heightModal.value = 410
+                                isBlockUserCompletely = false
+                                isBlockUserTemporary = true
                             }
                         ) {
                             Text(
@@ -540,10 +527,7 @@ private fun ModalBlockUser(
 
                                 if (ContextScreen.containsValueByKey(
                                         Screen.PROFILE_USER_MANAGEMENT_SCREEN, "startDateBlockUser")) {
-                                    currentDateUserBlock.value = ContextScreen.get(
-                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                        "startDateBlockUser"
-                                    )
+                                    currentDateUserBlock.value = startDateBlockUser
                                 } else {
                                     currentDateUserBlock.value = Date()
                                 }
@@ -561,23 +545,12 @@ private fun ModalBlockUser(
                             actionOpen = {
                                 expandedStateModalSelectDate.value = true
 
-                                ContextScreen.set(
-                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                    "isStartDateBlockUser",
-                                    false
-                                )
-                                ContextScreen.set(
-                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                    "isEndDateBlockUser",
-                                    true
-                                )
+                                isStartDateBlockUser = false
+                                isEndDateBlockUser = true
 
                                 if (ContextScreen.containsValueByKey(
                                         Screen.PROFILE_USER_MANAGEMENT_SCREEN, "endDateBlockUser")) {
-                                    currentDateUserBlock.value = ContextScreen.get(
-                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                        "endDateBlockUser"
-                                    )
+                                    currentDateUserBlock.value = endDateBlockUser
                                 } else {
                                     currentDateUserBlock.value = Date()
                                 }
@@ -598,16 +571,8 @@ private fun ModalBlockUser(
                                 .pointerHoverIcon(PointerIcon.Hand),
                             onClick = {
                                 expandedState.value = false
-                                ContextScreen.set(
-                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                    "isBlockUserCompletely",
-                                    isActiveBlockCompletely.value
-                                )
-                                ContextScreen.set(
-                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                    "isBlockUserTemporary",
-                                    isActiveBlockTemporary.value
-                                )
+                                isBlockUserCompletely = isActiveBlockCompletely.value
+                                isBlockUserTemporary = isActiveBlockTemporary.value
                                 actionBlock()
                             },
                             colors = ButtonDefaults.textButtonColors(
@@ -640,6 +605,92 @@ private fun ModalBlockUser(
         }
     }
 }
+
+/**
+ * Will the user be permanently blocked.
+ */
+private var isBlockUserCompletely: Boolean
+    get() = ContextScreen.get(
+        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+        "isBlockUserCompletely"
+    )
+    set(value) {
+        ContextScreen.set(
+            Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+            "isBlockUserCompletely",
+            value
+        )
+    }
+
+/**
+ * Will the user be blocked for a period of time.
+ */
+private var isBlockUserTemporary: Boolean
+    get() = ContextScreen.get(
+        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+        "isBlockUserTemporary"
+    )
+    set(value) = ContextScreen.set(
+        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+        "isBlockUserTemporary",
+        value
+    )
+
+/**
+ * Is the start date for blocking the user selected.
+ */
+private var isStartDateBlockUser: Boolean
+    get() = ContextScreen.get(
+        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+        "isStartDateBlockUser"
+    )
+    set(value) = ContextScreen.set(
+        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+        "isStartDateBlockUser",
+        value
+    )
+
+/**
+ * Is the user's end date selected.
+ */
+private var isEndDateBlockUser: Boolean
+    get() = ContextScreen.get(
+        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+        "isEndDateBlockUser"
+    )
+    set(value) = ContextScreen.set(
+        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+        "isEndDateBlockUser",
+        value
+    )
+
+/**
+ * Start date of user blocking.
+ */
+private var startDateBlockUser: Date
+    get() = ContextScreen.get(
+        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+        "startDateBlockUser"
+    )
+    set(value) = ContextScreen.set(
+        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+        "startDateBlockUser",
+        value
+    )
+
+/**
+ * End date for user blocking.
+ */
+private var endDateBlockUser: Date
+    get() = ContextScreen.get(
+        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+        "endDateBlockUser"
+    )
+    set(value) = ContextScreen.set(
+        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+        "endDateBlockUser",
+        value
+    )
 
 @Stable
 private fun Modifier.drawBehindIsActive(

@@ -55,4 +55,14 @@ object ContextScreen {
         context[screen] = mutableMapOf()
     }
 
+    /**
+     * Removes the specified key and its corresponding value from the selected screen.
+     *
+     * @param screen The area of the screen from which data will be taken.
+     * @param key Property name.
+     */
+    fun clearValueByKey(screen: Screen, key: String) {
+        context[screen]?.remove(key)
+    }
+
 }
