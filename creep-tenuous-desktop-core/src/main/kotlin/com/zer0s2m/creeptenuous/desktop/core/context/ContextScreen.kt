@@ -36,4 +36,23 @@ object ContextScreen {
         return context[screen]?.get(key) as T
     }
 
+    /**
+     * Check the presence of a property in the screen using the key.
+     *
+     * @param screen The area of the screen from which data will be taken.
+     * @param key Property name.
+     */
+    fun containsValueByKey(screen: Screen, key: String): Boolean {
+        return context[screen]?.containsKey(key) ?: false
+    }
+
+    /**
+     * Clear screen state.
+     *
+     * @param screen The area of the screen from which data will be taken.
+     */
+    fun clearScreen(screen: Screen) {
+        context[screen] = mutableMapOf()
+    }
+
 }

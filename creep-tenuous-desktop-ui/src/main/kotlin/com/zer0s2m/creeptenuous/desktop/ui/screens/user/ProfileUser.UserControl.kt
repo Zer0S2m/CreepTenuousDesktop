@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.User
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
 import com.zer0s2m.creeptenuous.desktop.ui.components.DatePicker
@@ -45,13 +46,16 @@ fun ProfileUser.ProfileUserControl.render() {
     val currentUser: MutableState<User?> = mutableStateOf(null)
     val currentIndexUser: MutableState<Int> = mutableStateOf(-1)
     val users: MutableState<MutableList<User>> = mutableStateOf(ReactiveCommon.systemUsers.toMutableStateList())
+    val selectDateStartUserBlock: MutableState<Date?> = mutableStateOf(null)
+    val selectDateEndUserBlock: MutableState<Date?> = mutableStateOf(null)
+    val currentDateUserBlock: MutableState<Date> = mutableStateOf(Date())
 
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
         users.value.forEachIndexed { index, user ->
-            itemUser(
+            ItemUser(
                 nameUser = user.name,
                 loginUser = user.login,
                 roleUser = user.role[0].title,
@@ -107,16 +111,49 @@ fun ProfileUser.ProfileUserControl.render() {
             }
         }
     )
+
     ModalBlockUser(
-        expandedState = openDialogBlockUser
+        expandedState = openDialogBlockUser,
+        expandedStateModalSelectDate = openDialogBlockUserSelectDate,
+        selectDateStart = selectDateStartUserBlock,
+        selectDateEnd = selectDateEndUserBlock,
+        currentDateUserBlock = currentDateUserBlock
     )
     ModalSelectDate(
+        initDate = currentDateUserBlock,
         expandedState = openDialogBlockUserSelectDate,
         onDismissRequest = {
             openDialogBlockUserSelectDate.value = false
         },
         onDateSelect = {
             openDialogBlockUserSelectDate.value = false
+
+            val isStartDateBlockUser: Boolean = ContextScreen.get(
+                Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                "isStartDateBlockUser"
+            )
+            val isEndDateBlockUser: Boolean = ContextScreen.get(
+                Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                "isEndDateBlockUser"
+            )
+
+            if (isStartDateBlockUser && !isEndDateBlockUser) {
+                selectDateStartUserBlock.value = it
+                ContextScreen.set(
+                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                    "startDateBlockUser",
+                    it
+                )
+            } else if (!isStartDateBlockUser && isEndDateBlockUser) {
+                selectDateEndUserBlock.value = it
+                ContextScreen.set(
+                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                    "endDateBlockUser",
+                    it
+                )
+            }
+
+            currentDateUserBlock.value = it
         }
     )
 }
@@ -153,7 +190,8 @@ private val baseModifierIcon: Modifier get() = Modifier
  * @param actionUnblock The action is called when the unblock user button is clicked.
  */
 @Composable
-internal fun ProfileUser.ProfileUserControl.itemUser(
+@Suppress("UnusedReceiverParameter")
+internal fun ProfileUser.ProfileUserControl.ItemUser(
     nameUser: String,
     loginUser: String,
     roleUser: String,
@@ -340,9 +378,22 @@ private fun AlertDialogDeleteOrUnblockUser(
     }
 }
 
+/**
+ * Modal window for blocking a user.
+ *
+ * @param expandedState Modal window states.
+ * @param expandedStateModalSelectDate Modal window states [ModalSelectDate].
+ * @param selectDateStart Blocking start date [ModalSelectDate].
+ * @param selectDateEnd Blocking end date [ModalSelectDate].
+ * @param currentDateUserBlock Current selected date. [selectDateStart] or [selectDateEnd].
+ */
 @Composable
 private fun ModalBlockUser(
-    expandedState: MutableState<Boolean>
+    expandedState: MutableState<Boolean>,
+    expandedStateModalSelectDate: MutableState<Boolean>,
+    selectDateStart: MutableState<Date?>,
+    selectDateEnd: MutableState<Date?>,
+    currentDateUserBlock: MutableState<Date>
 ) {
     val heightModal: MutableState<Int> = mutableStateOf(225)
     val isActiveBlockCompletely: MutableState<Boolean> = mutableStateOf(true)
@@ -411,7 +462,7 @@ private fun ModalBlockUser(
                             onClick = {
                                 isActiveBlockCompletely.value = false
                                 isActiveBlockTemporary.value = true
-                                heightModal.value = 400
+                                heightModal.value = 410
                             }
                         ) {
                             Text(
@@ -427,17 +478,69 @@ private fun ModalBlockUser(
                                 .padding(top = 20.dp)
                         )
                         TextFieldSelectDate(
-                            textDate = "Select date...",
+                            textDate = if (selectDateStart.value != null) selectDateStart.value.toString()
+                            else "Select date...",
                             label = "Blocking start date (if the date is not specified, " +
-                                    "the current one is taken)"
+                                    "the current one is taken)",
+                            actionOpen = {
+                                expandedStateModalSelectDate.value = true
+
+                                ContextScreen.set(
+                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                    "isStartDateBlockUser",
+                                    true
+                                )
+                                ContextScreen.set(
+                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                    "isEndDateBlockUser",
+                                    false
+                                )
+
+                                if (ContextScreen.containsValueByKey(
+                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN, "startDateBlockUser")) {
+                                    currentDateUserBlock.value = ContextScreen.get(
+                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                        "startDateBlockUser"
+                                    )
+                                } else {
+                                    currentDateUserBlock.value = Date()
+                                }
+                            },
+                            isSelected = selectDateStart.value != null
                         )
                         Spacer(
                             modifier = Modifier
                                 .padding(top = 12.dp)
                         )
                         TextFieldSelectDate(
-                            textDate = "Select date...",
-                            label = "Blocking end date"
+                            textDate = if (selectDateEnd.value != null) selectDateEnd.value.toString()
+                                       else "Select date...",
+                            label = "Blocking end date",
+                            actionOpen = {
+                                expandedStateModalSelectDate.value = true
+
+                                ContextScreen.set(
+                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                    "isStartDateBlockUser",
+                                    false
+                                )
+                                ContextScreen.set(
+                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                    "isEndDateBlockUser",
+                                    true
+                                )
+
+                                if (ContextScreen.containsValueByKey(
+                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN, "endDateBlockUser")) {
+                                    currentDateUserBlock.value = ContextScreen.get(
+                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                        "endDateBlockUser"
+                                    )
+                                } else {
+                                    currentDateUserBlock.value = Date()
+                                }
+                            },
+                            isSelected = selectDateEnd.value != null
                         )
                     }
                     Spacer(
@@ -452,7 +555,20 @@ private fun ModalBlockUser(
                                 .fillMaxWidth()
                                 .pointerHoverIcon(PointerIcon.Hand),
                             onClick = {
+                                expandedState.value = false
 
+                                if (isActiveBlockCompletely.value && !isActiveBlockTemporary.value) {
+
+                                } else if (!isActiveBlockCompletely.value && isActiveBlockTemporary.value) {
+                                    val startDateBlockUser: Date = ContextScreen.get(
+                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                        "endDateBlockUser"
+                                    )
+                                    val endDateBlockUser: Date = ContextScreen.get(
+                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                        "endDateBlockUser"
+                                    )
+                                }
                             },
                             colors = ButtonDefaults.textButtonColors(
                                 backgroundColor = Color.Red,
@@ -504,12 +620,14 @@ private fun Modifier.drawBehindIsActive(
 /**
  * Modal window for selecting a date.
  *
+ * @param initDate Initial selected date state.
  * @param expandedState Modal window states.
  * @param onDismissRequest Cancel date selection.
  * @param onDateSelect Action that will be performed when the date is selected.
  */
 @Composable
 internal fun ModalSelectDate(
+    initDate: MutableState<Date>,
     expandedState: MutableState<Boolean>,
     onDismissRequest: () -> Unit,
     onDateSelect: (Date) -> Unit
@@ -536,7 +654,7 @@ internal fun ModalSelectDate(
                     }
             ) {
                 DatePicker(
-                    initDate = Date(),
+                    initDate = initDate.value,
                     onDismissRequest = onDismissRequest,
                     onDateSelect = onDateSelect,
                     minYear = GregorianCalendar().get(Calendar.YEAR)
@@ -546,20 +664,27 @@ internal fun ModalSelectDate(
     }
 }
 
+/**
+ * Text component for date picker.
+ *
+ * @param textDate Initial text when opening.
+ * @param label Small text field for hint.
+ * @param isSelected Is the date selected.
+ * @param actionOpen The action occurs when the date selection window opens.
+ */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun TextFieldSelectDate(
     textDate: String = "Select date...",
     label: String,
-    isSelected: Boolean = false
+    isSelected: Boolean = false,
+    actionOpen: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .pointerHoverIcon(PointerIcon.Hand)
             .fillMaxWidth()
-            .onClick {
-
-            }
+            .onClick(onClick = actionOpen)
             .border(0.5.dp, MaterialTheme.colors.secondary, RoundedCornerShape(4.dp))
     ) {
         Row(
@@ -595,5 +720,8 @@ private fun TextFieldSelectDate(
     )
 }
 
+/**
+ * Text used by accessibility services to describe what this image represents
+ */
 @get:ReadOnlyComposable
 private val contentDescriptionIconDate: String get() = "Select date"
