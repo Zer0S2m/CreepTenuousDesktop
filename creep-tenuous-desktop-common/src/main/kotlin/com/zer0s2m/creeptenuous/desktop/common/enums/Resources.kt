@@ -37,6 +37,8 @@ enum class Resources(val path: String) {
 
     ICON_EDIT("drawable/base_edit.svg"),
 
-    ICON_ADD("drawable/add.svg")
+    ICON_ADD("drawable/add.svg"),
+
+    ICON_DATE("drawable/date.png")
 
 }

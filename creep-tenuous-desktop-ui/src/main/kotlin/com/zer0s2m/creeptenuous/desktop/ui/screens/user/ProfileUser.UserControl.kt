@@ -27,9 +27,11 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
+import com.zer0s2m.creeptenuous.desktop.ui.components.DatePicker
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
+import java.util.*
 
 /**
  * Rendering part of the user profile screen [Screen.PROFILE_USER_MANAGEMENT_SCREEN]
@@ -39,6 +41,7 @@ fun ProfileUser.ProfileUserControl.render() {
     val openDialogDeleteUser: MutableState<Boolean> = remember { mutableStateOf(false) }
     val openDialogUnblockUser: MutableState<Boolean> = remember { mutableStateOf(false) }
     val openDialogBlockUser: MutableState<Boolean> = remember { mutableStateOf(false) }
+    val openDialogBlockUserSelectDate: MutableState<Boolean> = remember { mutableStateOf(false) }
     val currentUser: MutableState<User?> = mutableStateOf(null)
     val currentIndexUser: MutableState<Int> = mutableStateOf(-1)
     val users: MutableState<MutableList<User>> = mutableStateOf(ReactiveCommon.systemUsers.toMutableStateList())
@@ -106,6 +109,15 @@ fun ProfileUser.ProfileUserControl.render() {
     )
     ModalBlockUser(
         expandedState = openDialogBlockUser
+    )
+    ModalSelectDate(
+        expandedState = openDialogBlockUserSelectDate,
+        onDismissRequest = {
+            openDialogBlockUserSelectDate.value = false
+        },
+        onDateSelect = {
+            openDialogBlockUserSelectDate.value = false
+        }
     )
 }
 
@@ -332,7 +344,9 @@ private fun AlertDialogDeleteOrUnblockUser(
 private fun ModalBlockUser(
     expandedState: MutableState<Boolean>
 ) {
-    val heightModal: MutableState<Int> = mutableStateOf(230)
+    val heightModal: MutableState<Int> = mutableStateOf(225)
+    val isActiveBlockCompletely: MutableState<Boolean> = mutableStateOf(true)
+    val isActiveBlockTemporary: MutableState<Boolean> = mutableStateOf(false)
 
     BaseModalPopup(
         stateModal = expandedState
@@ -365,9 +379,6 @@ private fun ModalBlockUser(
                         .padding(top = 12.dp)
                 )
                 Column {
-                    val isActiveBlockCompletely: MutableState<Boolean> = remember { mutableStateOf(true) }
-                    val isActiveBlockTemporary: MutableState<Boolean> = remember { mutableStateOf(false) }
-
                     Row(
                         modifier = Modifier
                             .height(40.dp),
@@ -383,7 +394,7 @@ private fun ModalBlockUser(
                             onClick = {
                                 isActiveBlockCompletely.value = true
                                 isActiveBlockTemporary.value = false
-                                heightModal.value = 230
+                                heightModal.value = 225
                             }
                         ) {
                             Text(
@@ -410,18 +421,29 @@ private fun ModalBlockUser(
                             )
                         }
                     }
-                    Spacer(
-                        modifier = Modifier
-                            .padding(top = 20.dp)
-                    )
-                    if (isActiveBlockCompletely.value && !isActiveBlockTemporary.value) {
-
-                    } else if (!isActiveBlockCompletely.value && isActiveBlockTemporary.value) {
+                    if (!isActiveBlockCompletely.value && isActiveBlockTemporary.value) {
                         Spacer(
                             modifier = Modifier
                                 .padding(top = 20.dp)
                         )
+                        TextFieldSelectDate(
+                            textDate = "Select date...",
+                            label = "Blocking start date (if the date is not specified, " +
+                                    "the current one is taken)"
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .padding(top = 12.dp)
+                        )
+                        TextFieldSelectDate(
+                            textDate = "Select date...",
+                            label = "Blocking end date"
+                        )
                     }
+                    Spacer(
+                        modifier = Modifier
+                            .padding(top = 20.dp)
+                    )
                     Row(
                         horizontalArrangement = Arrangement.Center
                     ) {
@@ -478,3 +500,100 @@ private fun Modifier.drawBehindIsActive(
             end = Offset(size.width, verticalOffset)
         )
     }) else this
+
+/**
+ * Modal window for selecting a date.
+ *
+ * @param expandedState Modal window states.
+ * @param onDismissRequest Cancel date selection.
+ * @param onDateSelect Action that will be performed when the date is selected.
+ */
+@Composable
+internal fun ModalSelectDate(
+    expandedState: MutableState<Boolean>,
+    onDismissRequest: () -> Unit,
+    onDateSelect: (Date) -> Unit
+) {
+    BaseModalPopup(
+        stateModal = expandedState
+    ) {
+        Surface(
+            contentColor = contentColorFor(MaterialTheme.colors.surface),
+            modifier = Modifier
+                .width(350.dp)
+                .height(520.dp)
+                .shadow(24.dp, RoundedCornerShape(4.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .width(368.dp)
+                    .pointerInput({}) {
+                        detectTapGestures(onPress = {
+                            // Workaround to disable clicks on Surface background
+                            // https://github.com/JetBrains/compose-jb/issues/2581
+                        })
+                    }
+            ) {
+                DatePicker(
+                    initDate = Date(),
+                    onDismissRequest = onDismissRequest,
+                    onDateSelect = onDateSelect,
+                    minYear = GregorianCalendar().get(Calendar.YEAR)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun TextFieldSelectDate(
+    textDate: String = "Select date...",
+    label: String,
+    isSelected: Boolean = false
+) {
+    Row(
+        modifier = Modifier
+            .pointerHoverIcon(PointerIcon.Hand)
+            .fillMaxWidth()
+            .onClick {
+
+            }
+            .border(0.5.dp, MaterialTheme.colors.secondary, RoundedCornerShape(4.dp))
+    ) {
+        Row(
+            modifier = Modifier
+                .pointerHoverIcon(PointerIcon.Hand)
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = textDate,
+                color = if (isSelected) Color.Unspecified else Color(255, 255, 255, 160)
+            )
+
+            Icon(
+                painter = painterResource(resourcePath = Resources.ICON_DATE.path),
+                contentDescription = contentDescriptionIconDate,
+                tint = MaterialTheme.colors.secondaryVariant,
+                modifier = Modifier
+                    .size(24.dp)
+            )
+        }
+    }
+    Spacer(
+        modifier = Modifier
+            .padding(top = 4.dp)
+    )
+    Text(
+        text = label,
+        fontSize = 12.sp,
+        color = Color(255, 255, 255, 160),
+    )
+}
+
+@get:ReadOnlyComposable
+private val contentDescriptionIconDate: String get() = "Select date"
