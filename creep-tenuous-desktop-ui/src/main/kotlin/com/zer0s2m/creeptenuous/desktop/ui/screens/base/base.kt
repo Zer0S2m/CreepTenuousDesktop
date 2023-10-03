@@ -32,14 +32,16 @@ import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import java.awt.event.KeyEvent
 
 /**
- * The base layout for the modal window. Extends a component [Popup]
+ * The base layout for the modal window. Extends a component [Popup].
  *
- * @param stateModal Modal window states
- * @param content The inner content of the modal window
+ * @param stateModal Modal window states.
+ * @param content The inner content of the modal window.
+ * @param onDismissRequest Executes when the user clicks outside the popup.
  */
 @Composable
 internal fun BaseModalPopup(
     stateModal: MutableState<Boolean>,
+    onDismissRequest: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
     if (stateModal.value) {
@@ -51,7 +53,10 @@ internal fun BaseModalPopup(
                 popupContentSize: IntSize
             ): IntOffset = IntOffset.Zero
         },
-            onDismissRequest = { stateModal.value = false },
+            onDismissRequest = {
+                stateModal.value = false
+                onDismissRequest()
+            },
             properties = PopupProperties(focusable = true), onPreviewKeyEvent = { false }, onKeyEvent = {
                 if (it.type == KeyEventType.KeyDown && it.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
                     stateModal.value = false

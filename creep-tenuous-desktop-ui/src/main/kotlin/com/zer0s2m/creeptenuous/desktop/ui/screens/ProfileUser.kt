@@ -23,6 +23,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.context.BaseContextScreen
+import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
@@ -254,6 +255,7 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
             }
             IconButton(
                 onClick = {
+                    ContextScreen.clearScreen(Screen.PROFILE_USER_MANAGEMENT_SCREEN)
                     coroutineScope.launch {
                         reactiveNavigationScreen.action(
                             state = mutableStateOf(navigation),
