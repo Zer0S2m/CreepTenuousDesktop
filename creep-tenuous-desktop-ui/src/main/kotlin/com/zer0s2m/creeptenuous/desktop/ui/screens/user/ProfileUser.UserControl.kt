@@ -49,6 +49,7 @@ fun ProfileUser.ProfileUserControl.render() {
     val selectDateStartUserBlock: MutableState<Date?> = mutableStateOf(null)
     val selectDateEndUserBlock: MutableState<Date?> = mutableStateOf(null)
     val currentDateUserBlock: MutableState<Date> = mutableStateOf(Date())
+    val isErrorValidateDateEndBlockUser: MutableState<Boolean> = mutableStateOf(false)
 
     Column(
         modifier = Modifier
@@ -118,7 +119,18 @@ fun ProfileUser.ProfileUserControl.render() {
         selectDateStart = selectDateStartUserBlock,
         selectDateEnd = selectDateEndUserBlock,
         currentDateUserBlock = currentDateUserBlock,
+        isErrorValidateDateEndBlockUser = isErrorValidateDateEndBlockUser,
         actionBlock = {
+            fun final() {
+                if (isBlockUserCompletely || isBlockUserTemporary) {
+                    currentUser.value!!.isBlocked = true
+                    ReactiveCommon.systemUsers[currentIndexUser.value] = currentUser.value!!
+                    users.value = ReactiveCommon.systemUsers
+                }
+
+                ContextScreen.clearScreen(Screen.PROFILE_USER_MANAGEMENT_SCREEN)
+            }
+
             if (isBlockUserCompletely && !isBlockUserTemporary) {
                 ReactiveLoader.executionIndependentTrigger(
                     "systemUsers",
@@ -126,22 +138,31 @@ fun ProfileUser.ProfileUserControl.render() {
                     currentUser.value
                 )
             } else if (!isBlockUserCompletely && isBlockUserTemporary) {
-                ReactiveLoader.executionIndependentTrigger(
-                    "systemUsers",
-                    "blockSystemUserTemporary",
-                    startDateBlockUser,
-                    endDateBlockUser,
-                    currentUser.value
-                )
-            }
+                val existsStartDateBlockUser: Boolean = ContextScreen.containsValueByKey(
+                    Screen.PROFILE_USER_MANAGEMENT_SCREEN, "startDateBlockUser")
+                val existsEndDateBlockUser: Boolean = ContextScreen.containsValueByKey(
+                    Screen.PROFILE_USER_MANAGEMENT_SCREEN, "endDateBlockUser")
 
-            if (isBlockUserCompletely || isBlockUserTemporary) {
-                currentUser.value!!.isBlocked = true
-                ReactiveCommon.systemUsers[currentIndexUser.value] = currentUser.value!!
-                users.value = ReactiveCommon.systemUsers
+                if (!existsStartDateBlockUser && existsEndDateBlockUser) {
+                    ReactiveLoader.executionIndependentTrigger(
+                        "systemUsers",
+                        "blockSystemUserTemporary",
+                        null,
+                        endDateBlockUser,
+                        currentUser.value
+                    )
+                    final()
+                } else if (existsStartDateBlockUser && existsEndDateBlockUser) {
+                    ReactiveLoader.executionIndependentTrigger(
+                        "systemUsers",
+                        "blockSystemUserTemporary",
+                        startDateBlockUser,
+                        endDateBlockUser,
+                        currentUser.value
+                    )
+                    final()
+                }
             }
-
-            ContextScreen.clearScreen(Screen.PROFILE_USER_MANAGEMENT_SCREEN)
         }
     )
     ModalSelectDate(
@@ -175,6 +196,9 @@ fun ProfileUser.ProfileUserControl.render() {
             } else if (!isStartDateBlockUser && isEndDateBlockUser) {
                 selectDateEndUserBlock.value = it
                 endDateBlockUser = it
+                if (isErrorValidateDateEndBlockUser.value) {
+                    isErrorValidateDateEndBlockUser.value = false
+                }
             }
 
             currentDateUserBlock.value = it
@@ -418,6 +442,7 @@ private fun ModalBlockUser(
     selectDateStart: MutableState<Date?>,
     selectDateEnd: MutableState<Date?>,
     currentDateUserBlock: MutableState<Date>,
+    isErrorValidateDateEndBlockUser: MutableState<Boolean>,
     actionBlock: () -> Unit
 ) {
     val heightModal: MutableState<Int> = mutableStateOf(225)
@@ -542,6 +567,8 @@ private fun ModalBlockUser(
                             textDate = if (selectDateEnd.value != null) selectDateEnd.value.toString()
                                        else "Select date...",
                             label = "Blocking end date",
+                            isError = isErrorValidateDateEndBlockUser.value,
+                            labelError = "Please indicate the date",
                             actionOpen = {
                                 expandedStateModalSelectDate.value = true
 
@@ -570,10 +597,20 @@ private fun ModalBlockUser(
                                 .fillMaxWidth()
                                 .pointerHoverIcon(PointerIcon.Hand),
                             onClick = {
-                                expandedState.value = false
-                                isBlockUserCompletely = isActiveBlockCompletely.value
-                                isBlockUserTemporary = isActiveBlockTemporary.value
-                                actionBlock()
+                                val endDateBlockUser: Boolean = ContextScreen.containsValueByKey(
+                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                    "endDateBlockUser"
+                                )
+                                if (!isErrorValidateDateEndBlockUser.value && endDateBlockUser) {
+                                    expandedState.value = false
+                                    isBlockUserCompletely = isActiveBlockCompletely.value
+                                    isBlockUserTemporary = isActiveBlockTemporary.value
+                                    actionBlock()
+                                }
+
+                                if (!endDateBlockUser) {
+                                    isErrorValidateDateEndBlockUser.value = true
+                                }
                             },
                             colors = ButtonDefaults.textButtonColors(
                                 backgroundColor = Color.Red,
@@ -761,6 +798,7 @@ internal fun ModalSelectDate(
  * @param textDate Initial text when opening.
  * @param label Small text field for hint.
  * @param isSelected Is the date selected.
+ * @param isError Is the date selected.
  * @param actionOpen The action occurs when the date selection window opens.
  */
 @Composable
@@ -769,6 +807,8 @@ private fun TextFieldSelectDate(
     textDate: String = "Select date...",
     label: String,
     isSelected: Boolean = false,
+    isError: Boolean = false,
+    labelError: String = "",
     actionOpen: () -> Unit
 ) {
     Row(
@@ -776,7 +816,11 @@ private fun TextFieldSelectDate(
             .pointerHoverIcon(PointerIcon.Hand)
             .fillMaxWidth()
             .onClick(onClick = actionOpen)
-            .border(0.5.dp, MaterialTheme.colors.secondary, RoundedCornerShape(4.dp))
+            .border(
+                width = 0.5.dp,
+                color = if (!isError) MaterialTheme.colors.secondary else MaterialTheme.colors.error,
+                shape = RoundedCornerShape(4.dp)
+            )
     ) {
         Row(
             modifier = Modifier
@@ -788,7 +832,9 @@ private fun TextFieldSelectDate(
         ) {
             Text(
                 text = textDate,
-                color = if (isSelected) Color.Unspecified else Color(255, 255, 255, 160)
+                color = if (isSelected) Color.Unspecified
+                        else if (isError) MaterialTheme.colors.error.copy(0.60f)
+                        else Color(255, 255, 255, 160)
             )
 
             Icon(
@@ -805,9 +851,10 @@ private fun TextFieldSelectDate(
             .padding(top = 4.dp)
     )
     Text(
-        text = label,
+        text = if (!isError) label else labelError,
         fontSize = 12.sp,
-        color = Color(255, 255, 255, 160),
+        color = if (!isError) Color(255, 255, 255, 160)
+                else MaterialTheme.colors.error,
     )
 }
 
