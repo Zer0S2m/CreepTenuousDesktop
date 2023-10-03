@@ -1,9 +1,12 @@
 package com.zer0s2m.creeptenuous.desktop.reactive.models
 
-import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveCommonUsers
 import com.zer0s2m.creeptenuous.desktop.common.dto.User
-import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazyObject
+import com.zer0s2m.creeptenuous.desktop.core.reactive.*
+import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveCommonUsers
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.common.ReactiveTriggerReactiveSystemUserBlockCompletely
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.common.ReactiveTriggerReactiveSystemUserBlockTemporary
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.common.ReactiveTriggerReactiveSystemUserRemove
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.common.ReactiveTriggerReactiveSystemUserUnblock
 
 /**
  * General data of reactive behavior of the system
@@ -13,7 +16,25 @@ object ReactiveCommon : ReactiveLazyObject {
     /**
      * All users in the system
      */
-    @Reactive<List<User>>(handler = HandlerReactiveCommonUsers::class)
-    var systemUsers: List<User> = listOf()
+    @Reactive<ReactiveMutableList<User>>(
+        handler = HandlerReactiveCommonUsers::class,
+        independentTriggers = [
+            ReactiveIndependentTrigger(
+                event = "unblockSystemUser",
+                trigger = ReactiveTriggerReactiveSystemUserUnblock::class
+            ),
+            ReactiveIndependentTrigger(
+                event = "blockSystemUserCompletely",
+                trigger = ReactiveTriggerReactiveSystemUserBlockCompletely::class
+            ),
+            ReactiveIndependentTrigger(
+                event = "blockSystemUserTemporary",
+                trigger = ReactiveTriggerReactiveSystemUserBlockTemporary::class
+            )
+        ]
+    )
+    var systemUsers: ReactiveMutableList<User> = mutableReactiveListOf(
+        triggerRemove = ReactiveTriggerReactiveSystemUserRemove()
+    )
 
 }

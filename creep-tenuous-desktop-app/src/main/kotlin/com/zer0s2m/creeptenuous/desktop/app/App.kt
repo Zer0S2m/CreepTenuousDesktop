@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
-import com.zer0s2m.creeptenuous.desktop.core.reactive.collectLoader
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.navigation.runtime.rememberNavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
@@ -33,7 +33,7 @@ fun App() {
     val coroutineScope = rememberCoroutineScope()
 
     coroutineScope.launch {
-        collectLoader(
+        ReactiveLoader.collectLoader(
             classes = listOf(
                 ReactiveUser,
                 ReactiveUser.UserSettings,

@@ -1,9 +1,11 @@
 package com.zer0s2m.creeptenuous.desktop.core.http
 
+import com.zer0s2m.creeptenuous.desktop.core.env.Environment
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
@@ -13,6 +15,11 @@ import kotlinx.serialization.json.Json
 object HttpClient {
 
     val client: HttpClient = HttpClient(CIO) {
+        if (Environment.IS_DEV) install(Logging) {
+            logger = Logger.DEFAULT
+            level = LogLevel.INFO
+        } else { }
+
         install(ContentNegotiation) {
             json(
                 json = Json {

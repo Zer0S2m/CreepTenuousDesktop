@@ -3,8 +3,11 @@ package com.zer0s2m.creeptenuous.desktop.reactive.models
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveIndependentTrigger
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazyObject
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveTrigger
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveFileObjectManagerFileSystemObjects
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.*
 
 /**
  * Reactive file object data model
@@ -18,7 +21,31 @@ object ReactiveFileObject : ReactiveLazyObject {
         handler = HandlerReactiveFileObjectManagerFileSystemObjects::class,
         injection = ReactiveInjection(
             method = "setManagerFileObject"
-        )
+        ),
+        triggers = [
+            ReactiveTrigger(
+                event = "deleteFileObject",
+                trigger = ReactiveTriggerReactiveFileObjectDeleteFileObject::class
+            )
+        ],
+        independentTriggers = [
+            ReactiveIndependentTrigger(
+                event = "setColorInFileObject",
+                trigger = ReactiveTriggerReactiveFileObjectSetColorInFileObject::class
+            ),
+            ReactiveIndependentTrigger(
+                event = "setCategoryInFileObject",
+                trigger = ReactiveTriggerReactiveFileObjectSetCategoryInFileObject::class
+            ),
+            ReactiveIndependentTrigger(
+                event = "createFileObjectOfTypeDirectory",
+                trigger = ReactiveTriggerReactiveFileObjectCreateDirectory::class
+            ),
+            ReactiveIndependentTrigger(
+                event = "renameFileObject",
+                trigger = ReactiveTriggerReactiveFileObjectRenameFileObject::class
+            )
+        ]
     )
     var managerFileSystemObjects: ManagerFileObject = ManagerFileObject(
         systemParents = listOf(),

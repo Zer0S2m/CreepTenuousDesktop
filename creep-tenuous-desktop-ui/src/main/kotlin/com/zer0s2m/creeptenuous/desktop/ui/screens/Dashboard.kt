@@ -22,16 +22,16 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
-import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
+import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreenPage
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardModalSheet
+import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbs
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbsItem
-import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.*
@@ -67,8 +67,16 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     private val expandedStateModalSetColorPopup: MutableState<Boolean> = mutableStateOf(false)
 
-    // TODO: Reproduce the functionality in a more beautiful form.
-    //  For example, in the context state of each screen
+    /**
+     *  Current state of the modal [PopupCreateFileObjectTypeDirectory] when create directory
+     */
+    private val expandedStateModalCreateDirectory: MutableState<Boolean> = mutableStateOf(false)
+
+    /**
+     * Current state of the modal [PopupRenameFileObject] rename file object.
+     */
+    private val expandedStateModalRenameFileObject: MutableState<Boolean> = mutableStateOf(false)
+
     internal companion object {
 
         /**
@@ -101,36 +109,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             managerFileObject_Files.value = files
         }
 
-        private val categoryIdEditFileObject: MutableState<Int> = mutableStateOf(-1)
-
-        internal fun setCategoryIdEditFileObject(categoryId: Int = -1) {
-            categoryIdEditFileObject.value = categoryId
-        }
-
-        internal fun getCategoryIdEditFileObject(): Int {
-            return categoryIdEditFileObject.value
-        }
-
-        private val currentFileObjectSetProperty: MutableState<String> = mutableStateOf("")
-
-        internal fun setCurrentFileObjectSetProperty(fileObject: String) {
-            currentFileObjectSetProperty.value = fileObject
-        }
-
-        internal fun getCurrentFileObjectSetCategory(): String {
-            return currentFileObjectSetProperty.value
-        }
-
-        private val colorEditFileObject: MutableState<String?> = mutableStateOf(null)
-
-        internal fun setColorEditFileObject(color: String? = null) {
-            colorEditFileObject.value = color
-        }
-
-        internal fun getColorEditFileObject(): String? {
-            return colorEditFileObject.value
-        }
-
     }
 
     /**
@@ -142,7 +120,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     private fun onClickCardSheet(screen: Screen, scope: CoroutineScope, sectionProfile: Sections) {
         scope.launch {
-            ProfileUser.setAppliedScreenFromTransitionFromPast(context = ContextScreen(screen))
+            ProfileUser.setAppliedScreenFromTransitionFromPast(context = ContextScreenPage(screen))
             ProfileUser.setAppliedSectionFromTransitionFromPast(section = sectionProfile)
 
             reactiveNavigationScreen.action(
@@ -192,6 +170,17 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                 files.value = mutableListOf()
             }
         )
+        PopupCreateFileObjectTypeDirectory(
+            expandedState = expandedStateModalCreateDirectory
+        )
+        PopupRenameFileObject(
+            expandedState = expandedStateModalRenameFileObject,
+            actionRename = {
+                // TODO: A crutch for forcing layout reflow
+                directories.value = mutableListOf()
+                files.value = mutableListOf()
+            }
+        )
 
         val scaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
@@ -234,7 +223,9 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                         directories = directories,
                         files = files,
                         expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
-                        expandedStateSetColorPopup = expandedStateModalSetColorPopup
+                        expandedStateSetColorPopup = expandedStateModalSetColorPopup,
+                        expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory,
+                        expandedStateModalRenameFileObject = expandedStateModalRenameFileObject
                     )
 
                     BreadCrumbs(

@@ -1,5 +1,6 @@
 .gradle
 build/
+local.properties
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
@@ -45,3 +46,4 @@ bin/
 ### Dev ###
 db.json
 routes.json
+.env
