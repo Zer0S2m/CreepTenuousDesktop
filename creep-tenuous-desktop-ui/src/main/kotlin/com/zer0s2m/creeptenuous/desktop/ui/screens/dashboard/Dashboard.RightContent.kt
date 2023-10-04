@@ -216,11 +216,13 @@ internal fun RenderLayoutFiles(
  *
  * @param scaffoldState State for [Scaffold] composable component.
  * @param scope Defines a scope for new coroutines.
+ * @param avatar User avatar URL.
  */
 @Composable
 internal fun TopPanelDashboard(
     scaffoldState: ScaffoldState,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    avatar: String? = null
 ) {
     Row(
         modifier = Modifier.fillMaxSize()
@@ -239,7 +241,8 @@ internal fun TopPanelDashboard(
         ) {
             Avatar(
                 stateScaffold = scaffoldState,
-                scope = scope
+                scope = scope,
+                avatar = avatar
             ).render()
         }
     }
