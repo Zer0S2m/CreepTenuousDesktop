@@ -34,9 +34,8 @@ class Avatar(
     private val stateScaffold: ScaffoldState? = null,
     private val scope: CoroutineScope? = null,
     private var modifierIcon: Modifier = Modifier
-        .padding(0.dp)
-        .pointerHoverIcon(icon = PointerIcon.Hand),
-    private val modifierIconButton: Modifier = Modifier
+        .padding(0.dp),
+    private var modifierIconButton: Modifier = Modifier
         .pointerHoverIcon(PointerIcon.Hand)
         .padding(0.dp),
     private val enabled: Boolean = true,
@@ -55,6 +54,8 @@ class Avatar(
     override fun render() {
         if (!enabled) {
             modifierIcon = modifierIcon
+                .pointerHoverIcon(icon = PointerIcon.Default)
+            modifierIconButton = modifierIconButton
                 .pointerHoverIcon(icon = PointerIcon.Default)
         }
 
@@ -111,7 +112,7 @@ class Avatar(
                                 bitmap = bitmap,
                                 contentDescription = "Avatar for user",
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier
+                                modifier = modifierIcon
                                     .fillMaxSize()
                                     .clip(CircleShape)
                             )
