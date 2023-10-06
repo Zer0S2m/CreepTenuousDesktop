@@ -197,10 +197,10 @@ object ReactiveLoader {
                 } else if (kProperty.hasAnnotation<Lazy<Any>>() && kProperty.hasAnnotation<Reactive<Any>>()) {
                     throw ReactiveLoaderException("Parameter [${kProperty.name}] must have only one annotation")
                 }
-            }
 
-            injectionClass = null
-            injectionMethod = ""
+                injectionClass = null
+                injectionMethod = ""
+            }
         }
 
         loadNode()
@@ -372,13 +372,17 @@ private suspend fun setReactiveValue(reactiveLazyObject: ReactiveLazy) {
             methodHandlerAfter.callSuspend(reactiveLazyObject.handlerAfter.objectInstance)
         }
 
-        if (reactiveLazyObject.injectionClass != null && reactiveLazyObject.injectionMethod.isNotEmpty()) {
-            val compObject = reactiveLazyObject.injectionClass.companionObject
-            if (compObject != null) {
-                compObject.functions.find {
-                    it.name == reactiveLazyObject.injectionMethod
-                }?.call(reactiveLazyObject.injectionClass.companionObjectInstance, objectFromHandler)
-            }
+        runInjectionMethod(reactiveLazyObject, objectFromHandler)
+    }
+}
+
+internal fun runInjectionMethod(reactiveLazyObject: ReactiveLazy, objectFromHandler: Any?) {
+    if (reactiveLazyObject.injectionClass != null && reactiveLazyObject.injectionMethod.isNotEmpty()) {
+        val compObject = reactiveLazyObject.injectionClass.companionObject
+        if (compObject != null) {
+            compObject.functions.find {
+                it.name == reactiveLazyObject.injectionMethod
+            }?.call(reactiveLazyObject.injectionClass.companionObjectInstance, objectFromHandler)
         }
     }
 }

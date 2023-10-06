@@ -1,12 +1,13 @@
 package com.zer0s2m.creeptenuous.desktop.ui.components.misc
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -36,6 +37,7 @@ class Avatar(
         .padding(0.dp)
         .pointerHoverIcon(icon = PointerIcon.Hand),
     private val modifierIconButton: Modifier = Modifier
+        .pointerHoverIcon(PointerIcon.Hand)
         .padding(0.dp),
     private val enabled: Boolean = true,
     private val avatar: String? = null
@@ -108,10 +110,10 @@ class Avatar(
                             ComposeImage(
                                 bitmap = bitmap,
                                 contentDescription = "Avatar for user",
-                                contentScale = ContentScale.Inside,
-                                alpha = DefaultAlpha,
+                                contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .fillMaxSize()
+                                    .clip(CircleShape)
                             )
                         }
                     }

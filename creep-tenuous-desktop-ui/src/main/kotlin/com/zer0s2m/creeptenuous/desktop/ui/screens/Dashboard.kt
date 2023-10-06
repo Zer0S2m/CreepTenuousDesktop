@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserProfileSettings
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
@@ -27,6 +28,7 @@ import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
@@ -92,7 +94,9 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             mutableStateOf(mutableListOf())
 
         /**
-         * Set information about file objects by nesting level
+         * Set information about file objects by nesting level.
+         *
+         * @param managerFileObject information about file objects by nesting level.
          */
         internal fun setManagerFileObject(managerFileObject: ManagerFileObject) {
             this.managerFileObject.value = managerFileObject
@@ -107,6 +111,21 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
             managerFileObject_Directories.value = folders
             managerFileObject_Files.value = files
+        }
+
+        /**
+         * User profile information.
+         */
+        private val userProfile: MutableState<UserProfileSettings?> =
+            mutableStateOf(ReactiveUser.profileSettings)
+
+        /**
+         * Setting user profile information.
+         *
+         * @param userProfile User profile information.
+         */
+        internal fun setUserProfile(userProfile: UserProfileSettings) {
+            this.userProfile.value = userProfile
         }
 
     }
@@ -210,7 +229,10 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                 ) {
                     TopPanelDashboard(
                         scaffoldState = scaffoldState,
-                        scope = scope
+                        scope = scope,
+                        avatar = if (userProfile.value != null)
+                                 mutableStateOf(userProfile.value!!.avatar)
+                                 else mutableStateOf(null)
                     )
                 }
                 Column(

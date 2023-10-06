@@ -1,9 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive.backend
 
-import com.zer0s2m.creeptenuous.desktop.core.reactive.HANDLER_NAME
-import com.zer0s2m.creeptenuous.desktop.core.reactive.NodeType
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandlerKtor
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazy
+import com.zer0s2m.creeptenuous.desktop.core.reactive.*
 import io.ktor.client.statement.*
 import io.ktor.util.reflect.*
 import kotlin.reflect.KType
@@ -37,16 +34,20 @@ internal object Ktor {
                 if (method != null) {
                     val returnType: KType = method.returnType
 
+                    val objectFromHandler: Any? = response.call.bodyNullable(info = TypeInfo(
+                        type = returnType.jvmErasure,
+                        reifiedType = returnType.javaType,
+                        kotlinType = returnType
+                    ))
+
                     it.field.isAccessible = true
                     it.field.set(
                         it.reactiveLazyObject,
-                        response.call.bodyNullable(info = TypeInfo(
-                            type = returnType.jvmErasure,
-                            reifiedType = returnType.javaType,
-                            kotlinType = returnType
-                        ))
+                        objectFromHandler
                     )
                     it.isLoad = true
+
+                    runInjectionMethod(it, objectFromHandler)
                 }
             }
         }
