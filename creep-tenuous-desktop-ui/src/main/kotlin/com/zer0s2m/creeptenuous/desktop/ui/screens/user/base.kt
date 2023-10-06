@@ -28,6 +28,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
  * @param nameUser Username
  * @param loginUser Login user
  * @param fractionBaseInfoUser ave the content fill [Modifier.fillMaxHeight] basic user information
+ * @param avatar Avatar for user/
  * @param content Map internal content
  */
 @Composable
@@ -35,6 +36,7 @@ internal fun BaseCardForItemCardUser(
     nameUser: String,
     loginUser: String,
     fractionBaseInfoUser: Float = 0.8f,
+    avatar: String? = null,
     content: @Composable () -> Unit
 ) {
     Card(
@@ -56,7 +58,11 @@ internal fun BaseCardForItemCardUser(
                     .fillMaxWidth(fractionBaseInfoUser),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                BaseInfoForItemCardUser(name = nameUser, login = loginUser)
+                BaseInfoForItemCardUser(
+                    name = nameUser,
+                    login = loginUser,
+                    avatar = avatar
+                )
             }
             Row(
                 horizontalArrangement = Arrangement.Start,
@@ -73,16 +79,23 @@ internal fun BaseCardForItemCardUser(
 /**
  * Basic information about the user. Uses component [Avatar], [Text]
  *
- * @param name Username
- * @param login Login user
+ * @param name Username.
+ * @param login Login user.
+ * @param avatar Avatar for user.
  */
 @Composable
-private fun BaseInfoForItemCardUser(name: String, login: String) {
+private fun BaseInfoForItemCardUser(
+    name: String,
+    login: String,
+    avatar: String?
+) {
     Avatar(
         modifierIcon = Modifier
             .size(32.dp)
             .pointerHoverIcon(icon = PointerIcon.Default)
-            .padding(0.dp)
+            .padding(0.dp),
+        avatar = avatar,
+        enabled = false
     ).render()
     Text(
         text = "$name ($login)",
