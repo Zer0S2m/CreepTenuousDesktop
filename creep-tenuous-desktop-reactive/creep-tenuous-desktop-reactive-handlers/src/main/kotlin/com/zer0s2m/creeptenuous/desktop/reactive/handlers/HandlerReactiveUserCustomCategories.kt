@@ -26,7 +26,10 @@ object HandlerReactiveUserCustomCategories : ReactiveHandler<ReactiveMutableList
         return data.toReactiveMutableList(
             triggerAdd = ReactiveTriggerUserCategoryAdd(),
             triggerRemove = ReactiveTriggerUserCategoryRemove(),
-            triggerSet = ReactiveTriggerUserCategorySet()
+            triggerSet = ReactiveTriggerUserCategorySet(),
+            pipelinesRemove = listOf(
+                "deleteUserCategoryAndCleanFileObject"
+            )
         )
     }
 

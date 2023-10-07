@@ -2,8 +2,13 @@ package com.zer0s2m.creeptenuous.desktop.reactive.models
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.*
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
+import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipeline
+import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipelineType
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.*
+import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserCategoryCleanInFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserColorCleanInFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserColorCleanInUserCategory
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.user.*
 
 /**
@@ -15,12 +20,22 @@ object ReactiveUser : ReactiveLazyObject {
      * Custom categories for the user
      */
     @Reactive<ReactiveMutableList<UserCategory>>(
-        handler = HandlerReactiveUserCustomCategories::class
+        handler = HandlerReactiveUserCustomCategories::class,
+        pipelines = [
+            ReactivePipeline(
+                title = "deleteUserCategoryAndCleanFileObject",
+                type = ReactivePipelineType.AFTER,
+                pipeline = ReactivePipelineHandlerDeleteUserCategoryCleanInFileObject::class
+            )
+        ]
     )
     var customCategories: ReactiveMutableList<UserCategory> = mutableReactiveListOf(
         triggerAdd = ReactiveTriggerUserCategoryAdd(),
         triggerRemove = ReactiveTriggerUserCategoryRemove(),
-        triggerSet = ReactiveTriggerUserCategorySet()
+        triggerSet = ReactiveTriggerUserCategorySet(),
+        pipelinesRemove = listOf(
+            "deleteUserCategoryAndCleanFileObject"
+        )
     )
 
     /**
@@ -42,12 +57,28 @@ object ReactiveUser : ReactiveLazyObject {
      * Custom colors
      */
     @Reactive<ReactiveMutableList<UserColor>>(
-        handler = HandlerReactiveUserColor::class
+        handler = HandlerReactiveUserColor::class,
+        pipelines = [
+            ReactivePipeline(
+                title = "deleteUserColorAndCleanFileObject",
+                type = ReactivePipelineType.AFTER,
+                pipeline = ReactivePipelineHandlerDeleteUserColorCleanInFileObject::class
+            ),
+            ReactivePipeline(
+                title = "deleteUserColorAndCleanUserCategory",
+                type = ReactivePipelineType.AFTER,
+                pipeline = ReactivePipelineHandlerDeleteUserColorCleanInUserCategory::class
+            )
+        ]
     )
     var userColors: ReactiveMutableList<UserColor> = mutableReactiveListOf(
         triggerAdd = ReactiveTriggerUserColorAdd(),
         triggerRemove = ReactiveTriggerUserColorRemove(),
-        triggerSet = ReactiveTriggerUserColorSet()
+        triggerSet = ReactiveTriggerUserColorSet(),
+        pipelinesRemove = listOf(
+            "deleteUserColorAndCleanFileObject",
+            "deleteUserColorAndCleanUserCategory"
+        )
     )
 
     /**
