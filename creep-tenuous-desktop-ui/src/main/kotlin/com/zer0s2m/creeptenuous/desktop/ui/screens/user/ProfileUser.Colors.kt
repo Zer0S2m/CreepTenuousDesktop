@@ -106,7 +106,7 @@ fun ProfileUser.ProfileColors.render() {
  * @param actionDelete Action detailed documentation щт [IconButtonDelete] in the argument `onClick`
  */
 @Composable
-internal fun ColorItem(
+private fun ColorItem(
     color: Color,
     actionEdit: () -> Unit,
     actionDelete: () -> Unit
@@ -135,7 +135,7 @@ internal fun ColorItem(
  * @param listColors Collection of custom flowers. Required to create a new color
 */
 @Composable
-internal fun ModalCreateCustomColor(
+private fun ModalCreateCustomColor(
     isExists: MutableState<Boolean>,
     stateColor: Color,
     currentIndexColor: MutableState<Int>,

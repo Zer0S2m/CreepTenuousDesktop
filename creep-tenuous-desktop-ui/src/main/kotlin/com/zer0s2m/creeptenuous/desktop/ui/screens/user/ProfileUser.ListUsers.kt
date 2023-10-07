@@ -13,6 +13,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
  * Rendering part of the user profile screen [Screen.PROFILE_LIST_USERS_SCREEN]
  */
 @Composable
+@Suppress("UnusedReceiverParameter")
 fun ProfileUser.ProfileListUsers.render() {
     Column(
         modifier = Modifier

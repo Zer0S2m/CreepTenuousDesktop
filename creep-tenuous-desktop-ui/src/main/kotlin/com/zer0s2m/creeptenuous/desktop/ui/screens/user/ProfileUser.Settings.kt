@@ -10,6 +10,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
  * Rendering part of the user profile screen [Screen.PROFILE_SETTINGS_SCREEN]
  */
 @Composable
+@Suppress("UnusedReceiverParameter")
 fun ProfileUser.ProfileSettings.render() {
     Text("Settings", color = Color.Black)
 }

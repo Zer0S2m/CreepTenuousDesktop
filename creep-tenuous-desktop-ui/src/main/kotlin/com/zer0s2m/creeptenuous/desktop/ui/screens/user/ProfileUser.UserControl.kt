@@ -38,6 +38,7 @@ import java.util.*
  * Rendering part of the user profile screen [Screen.PROFILE_USER_MANAGEMENT_SCREEN]
  */
 @Composable
+@Suppress("UnusedReceiverParameter")
 fun ProfileUser.ProfileUserControl.render() {
     val openDialogDeleteUser: MutableState<Boolean> = remember { mutableStateOf(false) }
     val openDialogUnblockUser: MutableState<Boolean> = remember { mutableStateOf(false) }
@@ -240,8 +241,7 @@ private val baseModifierIcon: Modifier get() = Modifier
  * @param actionUnblock The action is called when the unblock user button is clicked.
  */
 @Composable
-@Suppress("UnusedReceiverParameter")
-internal fun ProfileUser.ProfileUserControl.ItemUser(
+internal fun ItemUser(
     nameUser: String,
     loginUser: String,
     roleUser: String,

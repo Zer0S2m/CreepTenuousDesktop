@@ -166,7 +166,7 @@ private val stateForm: MutableState<BaseFormState> = mutableStateOf(FormState())
  * @param actionDelete The lambda to be invoked when this icon is pressed - event delete
  */
 @Composable
-internal fun ItemCategory(
+private fun ItemCategory(
     userCategory: UserCategory,
     actionEdit: () -> Unit,
     actionDelete: () -> Unit
@@ -216,7 +216,7 @@ internal fun ItemCategory(
  * @param actionEdit [Button] click event edit
  */
 @Composable
-internal fun ModalCreateCategory(
+private fun ModalCreateCategory(
     isExists: Boolean,
     stateModal: MutableState<Boolean>,
     stateUserCategory: MutableState<UserCategory>,
