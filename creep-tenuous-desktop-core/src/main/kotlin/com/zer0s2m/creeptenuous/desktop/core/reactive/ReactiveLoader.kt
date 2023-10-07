@@ -75,11 +75,16 @@ private data class ReactiveLazyNode(
     val handler: ReactiveHandlerKtor? = null
 )
 
+/**
+ * Main repository of pipeline information.
+ */
 private data class InfoPipeline(
 
     val type: ReactivePipelineType,
 
     val handler: KClass<out ReactivePipelineHandler<Any>>,
+
+    val namePropertyReactiveLazy: String
 
 )
 
@@ -189,7 +194,7 @@ object ReactiveLoader {
                         collectNodes(propertyNode, reactiveLazyObject)
                     }
                     if (annotationLazy.pipelines.isNotEmpty()) {
-                        collectPipelines(annotationLazy.pipelines)
+                        collectPipelines(annotationLazy.pipelines, kProperty.name)
                     }
                 } else if (annotationReactive != null) {
                     val propertyNode: Node = annotationReactive.node
@@ -214,7 +219,7 @@ object ReactiveLoader {
                         collectNodes(propertyNode, reactiveLazyObject)
                     }
                     if (annotationReactive.pipelines.isNotEmpty()) {
-                        collectPipelines(annotationReactive.pipelines)
+                        collectPipelines(annotationReactive.pipelines, kProperty.name)
                     }
                 } else if (kProperty.hasAnnotation<Lazy<Any>>() && kProperty.hasAnnotation<Reactive<Any>>()) {
                     throw ReactiveLoaderException("Parameter [${kProperty.name}] must have only one annotation")
@@ -267,6 +272,10 @@ object ReactiveLoader {
         if (reactiveLazyObject != null && reactiveLazyObject.triggers.containsKey(event)) {
             val trigger: KClass<out BaseReactiveTrigger<Any>>? = reactiveLazyObject.triggers[event]
 
+            val pipelines: Iterable<String> = gePipelinesByNameProperty(nameProperty)
+
+            pipelineLaunch(pipelines, data, ReactivePipelineType.BEFORE)
+
             if (!useOldData) {
                 reactiveLazyObject.field.set(reactiveLazyObject.reactiveLazyObject, data)
                 trigger?.createInstance()?.execution(data)
@@ -275,6 +284,8 @@ object ReactiveLoader {
                     reactiveLazyObject.field.get(reactiveLazyObject.reactiveLazyObject), data)
                 reactiveLazyObject.field.set(reactiveLazyObject.reactiveLazyObject, data)
             }
+
+            pipelineLaunch(pipelines, data, ReactivePipelineType.AFTER)
         }
     }
 
@@ -290,7 +301,13 @@ object ReactiveLoader {
         val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
         if (reactiveLazyObject != null && reactiveLazyObject.independentTriggers.containsKey(event)) {
             val trigger: KClass<out BaseReactiveIndependentTrigger>? = reactiveLazyObject.independentTriggers[event]
+
+            val pipelines: Iterable<String> = gePipelinesByNameProperty(nameProperty)
+
+
+            pipelineLaunch(pipelines, data, ReactivePipelineType.BEFORE)
             trigger?.createInstance()?.execution(*data)
+            pipelineLaunch(pipelines, data, ReactivePipelineType.AFTER)
         }
     }
 
@@ -319,6 +336,22 @@ object ReactiveLoader {
     }
 
     /**
+     * Call the pipeline by its name.
+     *
+     * @param pipeline The name of the pipeline indicated in [ReactivePipeline.title].
+     * @param value The transmitted value specified in [ReactivePipelineHandler.launch].
+     * @param type Pipeline type.
+     */
+    fun pipelineLaunch(pipeline: Iterable<String>, value: Any, type: ReactivePipelineType) {
+        pipeline.forEach {
+            val infoPipeline = mapPipelines[it]
+            if (infoPipeline != null && infoPipeline.type == type) {
+                infoPipeline.handler.createInstance().launch(value)
+            }
+        }
+    }
+
+    /**
      * Check the type of pipeline specified in [ReactivePipeline.type].
      *
      * @param pipeline The name of the pipeline indicated in [ReactivePipeline.title].
@@ -329,6 +362,16 @@ object ReactiveLoader {
             return mapPipelines[pipeline]?.type == type
         }
         return false
+    }
+
+    private fun gePipelinesByNameProperty(property: String): Iterable<String> {
+        val pipelines: MutableList<String> = mutableListOf()
+        mapPipelines.forEach { (title, info) ->
+            if (info.namePropertyReactiveLazy == property) {
+                pipelines.add(title)
+            }
+        }
+        return pipelines
     }
 
 }
@@ -353,11 +396,12 @@ private fun collectNodes(node: Node, reactiveLazyObject: ReactiveLazy) {
 /**
  * Jet piping assembly.
  */
-private fun collectPipelines(pipelines: Array<ReactivePipeline<Any>>) {
+private fun collectPipelines(pipelines: Array<ReactivePipeline<Any>>, namePropertyReactiveLazy: String) {
     pipelines.forEach {
         mapPipelines[it.title] = InfoPipeline(
             type = it.type,
-            handler = it.pipeline
+            handler = it.pipeline,
+            namePropertyReactiveLazy = namePropertyReactiveLazy
         )
     }
 }

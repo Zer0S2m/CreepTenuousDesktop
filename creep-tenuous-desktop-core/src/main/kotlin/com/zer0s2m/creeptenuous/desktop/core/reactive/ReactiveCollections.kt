@@ -56,7 +56,9 @@ interface ReactiveMutableList<E> : MutableList<E> {
     fun addReactive(element: E): Boolean {
         val isAdded = add(element)
         if (isAdded) {
+            ReactiveLoader.pipelineLaunch(pipelinesAdd, element as Any, ReactivePipelineType.BEFORE)
             triggerAdd?.execution(element)
+            ReactiveLoader.pipelineLaunch(pipelinesAdd, element as Any, ReactivePipelineType.AFTER)
         }
         return isAdded
     }
@@ -70,21 +72,12 @@ interface ReactiveMutableList<E> : MutableList<E> {
     fun removeReactive(element: E): Boolean {
         val isRemoved = remove(element)
 
-        pipelinesRemove.forEach {
-            if (ReactiveLoader.checkTypePipeline(it, ReactivePipelineType.BEFORE)) {
-                ReactiveLoader.pipelineLaunch(it, element as Any)
-            }
-        }
-
         if (isRemoved) {
+            ReactiveLoader.pipelineLaunch(pipelinesRemove, element as Any, ReactivePipelineType.BEFORE)
             triggerRemove?.execution(element)
-
-            pipelinesRemove.forEach {
-                if (ReactiveLoader.checkTypePipeline(it, ReactivePipelineType.AFTER)) {
-                    ReactiveLoader.pipelineLaunch(it, element as Any)
-                }
-            }
+            ReactiveLoader.pipelineLaunch(pipelinesRemove, element as Any, ReactivePipelineType.AFTER)
         }
+
         return isRemoved
     }
 
@@ -97,19 +90,9 @@ interface ReactiveMutableList<E> : MutableList<E> {
     fun removeAtReactive(index: Int): E {
         val element = removeAt(index)
 
-        pipelinesRemove.forEach {
-            if (ReactiveLoader.checkTypePipeline(it, ReactivePipelineType.BEFORE)) {
-                ReactiveLoader.pipelineLaunch(it, element as Any)
-            }
-        }
-
+        ReactiveLoader.pipelineLaunch(pipelinesRemove, element as Any, ReactivePipelineType.BEFORE)
         triggerRemove?.execution(element)
-
-        pipelinesRemove.forEach {
-            if (ReactiveLoader.checkTypePipeline(it, ReactivePipelineType.AFTER)) {
-                ReactiveLoader.pipelineLaunch(it, element as Any)
-            }
-        }
+        ReactiveLoader.pipelineLaunch(pipelinesRemove, element as Any, ReactivePipelineType.AFTER)
 
         return element
     }
@@ -122,7 +105,9 @@ interface ReactiveMutableList<E> : MutableList<E> {
      */
     fun setReactive(index: Int, element: E): E {
         val newElement = set(index, element)
+        ReactiveLoader.pipelineLaunch(pipelinesSet, element as Any, ReactivePipelineType.BEFORE)
         triggerSet?.execution(element)
+        ReactiveLoader.pipelineLaunch(pipelinesSet, element as Any, ReactivePipelineType.AFTER)
         return newElement
     }
 
