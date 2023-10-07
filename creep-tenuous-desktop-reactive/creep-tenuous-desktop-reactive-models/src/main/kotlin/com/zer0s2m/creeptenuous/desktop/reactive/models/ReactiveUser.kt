@@ -6,6 +6,7 @@ import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipeline
 import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipelineType
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.*
+import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserCategoryCleanInFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserColorCleanInFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserColorCleanInUserCategory
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.user.*
@@ -19,12 +20,22 @@ object ReactiveUser : ReactiveLazyObject {
      * Custom categories for the user
      */
     @Reactive<ReactiveMutableList<UserCategory>>(
-        handler = HandlerReactiveUserCustomCategories::class
+        handler = HandlerReactiveUserCustomCategories::class,
+        pipelines = [
+            ReactivePipeline(
+                title = "deleteUserCategoryAndCleanFileObject",
+                type = ReactivePipelineType.AFTER,
+                pipeline = ReactivePipelineHandlerDeleteUserCategoryCleanInFileObject::class
+            )
+        ]
     )
     var customCategories: ReactiveMutableList<UserCategory> = mutableReactiveListOf(
         triggerAdd = ReactiveTriggerUserCategoryAdd(),
         triggerRemove = ReactiveTriggerUserCategoryRemove(),
-        triggerSet = ReactiveTriggerUserCategorySet()
+        triggerSet = ReactiveTriggerUserCategorySet(),
+        pipelinesRemove = listOf(
+            "deleteUserCategoryAndCleanFileObject"
+        )
     )
 
     /**
