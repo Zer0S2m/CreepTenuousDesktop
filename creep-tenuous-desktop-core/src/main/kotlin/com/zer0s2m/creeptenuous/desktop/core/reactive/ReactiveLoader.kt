@@ -523,5 +523,14 @@ private fun writeLogsToConsoleForCollectObjects() {
             }
         }
         ReactiveLoader.logger.infoDev(log.trim())
+
+        // Pipelines
+        log = "Jet piping assembly:\n"
+        mapPipelines.forEach { (title, info) ->
+            log += "\t[pipeline: $title] \n\t    [handler: ${info.handler}]\n\t    [property: " +
+                    info.namePropertyReactiveLazy + "]\n"
+        }
+
+        ReactiveLoader.logger.infoDev(log.trim())
     }
 }
