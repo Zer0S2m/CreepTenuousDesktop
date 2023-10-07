@@ -27,7 +27,7 @@ class SwitchPanelDashboard(
     private val modifier: Modifier = Modifier
         .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
         .fillMaxWidth()
-        .padding(12.dp, 0.dp)
+        .padding(8.dp, 0.dp)
 ) : BaseComponent {
 
     /**

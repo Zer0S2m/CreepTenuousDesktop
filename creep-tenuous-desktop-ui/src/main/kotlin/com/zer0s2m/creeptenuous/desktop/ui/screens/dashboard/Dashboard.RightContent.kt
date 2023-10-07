@@ -10,6 +10,7 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -216,14 +217,19 @@ internal fun RenderLayoutFiles(
  *
  * @param scaffoldState State for [Scaffold] composable component.
  * @param scope Defines a scope for new coroutines.
+ * @param avatar User avatar URL.
  */
 @Composable
 internal fun TopPanelDashboard(
     scaffoldState: ScaffoldState,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    avatar: MutableState<String?> = mutableStateOf(null)
 ) {
     Row(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
             modifier = Modifier
@@ -234,12 +240,14 @@ internal fun TopPanelDashboard(
         }
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(0.dp, 12.dp, 12.dp, 12.dp)
+                .height(40.dp)
+                .width(52.dp)
+                .padding(end = 12.dp)
         ) {
             Avatar(
                 stateScaffold = scaffoldState,
-                scope = scope
+                scope = scope,
+                avatar = avatar.value
             ).render()
         }
     }

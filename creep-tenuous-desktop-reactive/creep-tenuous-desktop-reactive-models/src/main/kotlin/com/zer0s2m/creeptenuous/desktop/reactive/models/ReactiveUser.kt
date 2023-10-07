@@ -1,6 +1,7 @@
 package com.zer0s2m.creeptenuous.desktop.reactive.models
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.*
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.*
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.user.*
@@ -30,6 +31,9 @@ object ReactiveUser : ReactiveLazyObject {
         node = Node(
             type = NodeType.KTOR,
             unit = "userProfile"
+        ),
+        injection = ReactiveInjection(
+            method = "setUserProfile"
         )
     )
     var profileSettings: UserProfileSettings? = null

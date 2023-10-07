@@ -14,7 +14,8 @@ include(
     "creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-handlers",
     "creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-triggers",
     "creep-tenuous-desktop-extended:creep-tenuous-desktop-navigation",
-    "creep-tenuous-desktop-extended:creep-tenuous-desktop-core-navigation"
+    "creep-tenuous-desktop-extended:creep-tenuous-desktop-core-navigation",
+    "creep-tenuous-desktop-extended:creep-tenuous-desktop-core-utils"
 )
 
 rootProject.name = "CreepTenuousDesktop"

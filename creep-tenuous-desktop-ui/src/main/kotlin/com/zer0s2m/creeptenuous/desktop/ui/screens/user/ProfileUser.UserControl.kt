@@ -60,7 +60,8 @@ fun ProfileUser.ProfileUserControl.render() {
                 nameUser = user.name,
                 loginUser = user.login,
                 roleUser = user.role[0].title,
-                user.isBlocked,
+                isBlocked = user.isBlocked,
+                avatar = user.avatar,
                 actionDelete = { _ ->
                     openDialogDeleteUser.value = true
                     currentUser.value = user
@@ -233,6 +234,7 @@ private val baseModifierIcon: Modifier get() = Modifier
  * @param loginUser Login user.
  * @param roleUser Role.
  * @param isBlocked Is blocked user.
+ * @param avatar Avatar for user.
  * @param actionDelete The action is called when the delete user button is clicked.
  * @param actionBlock The action is called when the block user button is clicked.
  * @param actionUnblock The action is called when the unblock user button is clicked.
@@ -244,6 +246,7 @@ internal fun ProfileUser.ProfileUserControl.ItemUser(
     loginUser: String,
     roleUser: String,
     isBlocked: Boolean,
+    avatar: String?,
     actionDelete: (String) -> Unit = {},
     actionBlock: () -> Unit = {},
     actionUnblock: () -> Unit = {},
@@ -251,7 +254,8 @@ internal fun ProfileUser.ProfileUserControl.ItemUser(
     BaseCardForItemCardUser(
         nameUser = nameUser,
         loginUser = loginUser,
-        fractionBaseInfoUser = 0.6f
+        fractionBaseInfoUser = 0.6f,
+        avatar = avatar
     ) {
         Row(
             modifier = Modifier

@@ -236,16 +236,20 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
             Row(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .fillMaxWidth(0.75f),
+                    .fillMaxWidth(0.8f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val avatar: String? = if (ReactiveUser.profileSettings != null)
+                    ReactiveUser.profileSettings!!.avatar else null
+
                 Avatar(
                     modifierIcon = Modifier
                         .padding(0.dp)
                         .pointerHoverIcon(icon = PointerIcon.Hand)
                         .width(32.dp)
                         .height(32.dp),
-                    enabled = false
+                    enabled = false,
+                    avatar = avatar
                 ).render()
                 Text(
                     text = ReactiveUser.profileSettings!!.name,

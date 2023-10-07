@@ -14,4 +14,6 @@ data class UserProfileSettings(
 
     val name: String,
 
+    val avatar: String?
+
 )
