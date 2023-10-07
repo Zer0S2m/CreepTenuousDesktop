@@ -1,6 +1,9 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive
 
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
+import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipeline
+import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveIndependentTrigger
+import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
 import kotlin.reflect.KClass
 
 /**
@@ -41,6 +44,12 @@ annotation class Reactive<T>(
     /**
      * Independent reactive triggers fire when new data is set to a property.
      */
-    val independentTriggers: Array<ReactiveIndependentTrigger> = []
+    val independentTriggers: Array<ReactiveIndependentTrigger> = [],
+
+    /**
+     * Reactive pipelines that are called before or after the completion of a reactive trigger.
+     * [BaseReactiveIndependentTrigger] or [BaseReactiveTrigger].
+     */
+    val pipelines: Array<ReactivePipeline<Any>> = []
 
 )

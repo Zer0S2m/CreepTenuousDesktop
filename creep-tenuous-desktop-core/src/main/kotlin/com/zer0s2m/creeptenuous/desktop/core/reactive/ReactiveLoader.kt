@@ -6,6 +6,9 @@ import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
 import com.zer0s2m.creeptenuous.desktop.core.logging.logger
+import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipeline
+import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipelineHandler
+import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipelineType
 import com.zer0s2m.creeptenuous.desktop.core.reactive.backend.Ktor
 import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveIndependentTrigger
 import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
@@ -23,6 +26,11 @@ private val mapReactiveLazyObjects: MutableMap<String, ReactiveLazy> = mutableMa
  * Core node storage for reactive and lazy properties
  */
 private val mapNodes: MutableMap<String, MutableCollection<ReactiveLazyNode>> = mutableMapOf()
+
+/**
+ * Reactive pipelines map/
+ */
+private val mapPipelines: MutableMap<String, InfoPipeline> = mutableMapOf()
 
 /**
  * A class that stores information about a reactive or lazy object
@@ -65,6 +73,14 @@ private data class ReactiveLazyNode(
     val reactiveLazyObject: ReactiveLazy,
 
     val handler: ReactiveHandlerKtor? = null
+)
+
+private data class InfoPipeline(
+
+    val type: ReactivePipelineType,
+
+    val handler: KClass<out ReactivePipelineHandler<Any>>,
+
 )
 
 /**
@@ -172,6 +188,9 @@ object ReactiveLoader {
                     if (propertyNode.type != NodeType.NONE) {
                         collectNodes(propertyNode, reactiveLazyObject)
                     }
+                    if (annotationLazy.pipelines.isNotEmpty()) {
+                        collectPipelines(annotationLazy.pipelines)
+                    }
                 } else if (annotationReactive != null) {
                     val propertyNode: Node = annotationReactive.node
 
@@ -193,6 +212,9 @@ object ReactiveLoader {
                     mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
                     if (propertyNode.type != NodeType.NONE) {
                         collectNodes(propertyNode, reactiveLazyObject)
+                    }
+                    if (annotationReactive.pipelines.isNotEmpty()) {
+                        collectPipelines(annotationReactive.pipelines)
                     }
                 } else if (kProperty.hasAnnotation<Lazy<Any>>() && kProperty.hasAnnotation<Reactive<Any>>()) {
                     throw ReactiveLoaderException("Parameter [${kProperty.name}] must have only one annotation")
@@ -272,6 +294,43 @@ object ReactiveLoader {
         }
     }
 
+    /**
+     * Call the pipeline by its name.
+     *
+     * @param pipeline The name of the pipeline indicated in [ReactivePipeline.title].
+     * @param value The transmitted value specified in [ReactivePipelineHandler.launch].
+     */
+    fun pipelineLaunch(pipeline: String, value: Any) {
+        val infoPipeline = mapPipelines[pipeline]
+        infoPipeline?.handler?.createInstance()?.launch(value)
+    }
+
+    /**
+     * Call the pipeline by its name.
+     *
+     * @param pipeline The name of the pipeline indicated in [ReactivePipeline.title].
+     * @param value The transmitted value specified in [ReactivePipelineHandler.launch].
+     */
+    fun pipelineLaunch(pipeline: Iterable<String>, value: Any) {
+        pipeline.forEach {
+            val infoPipeline = mapPipelines[it]
+            infoPipeline?.handler?.createInstance()?.launch(value)
+        }
+    }
+
+    /**
+     * Check the type of pipeline specified in [ReactivePipeline.type].
+     *
+     * @param pipeline The name of the pipeline indicated in [ReactivePipeline.title].
+     * @param type Pipeline type.
+     */
+    internal fun checkTypePipeline(pipeline: String, type: ReactivePipelineType): Boolean {
+        if (mapPipelines.containsKey(pipeline)) {
+            return mapPipelines[pipeline]?.type == type
+        }
+        return false
+    }
+
 }
 
 /**
@@ -288,6 +347,18 @@ private fun collectNodes(node: Node, reactiveLazyObject: ReactiveLazy) {
         mapNodes[node.unit] = mutableListOf(reactiveLazyNodeObject)
     } else {
         mapNodes[node.unit]?.add(reactiveLazyNodeObject)
+    }
+}
+
+/**
+ * Jet piping assembly.
+ */
+private fun collectPipelines(pipelines: Array<ReactivePipeline<Any>>) {
+    pipelines.forEach {
+        mapPipelines[it.title] = InfoPipeline(
+            type = it.type,
+            handler = it.pipeline
+        )
     }
 }
 

@@ -1,5 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive
 
+import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipelineType
 import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
 
 /**
@@ -28,6 +29,24 @@ interface ReactiveMutableList<E> : MutableList<E> {
     val triggerSet: BaseReactiveTrigger<E>?
 
     /**
+     * Name of reactive pipelines that will be executed before or after adding an element.
+     */
+    val pipelinesAdd: Collection<String>
+        get() = listOf()
+
+    /**
+     * Name of reactive pipelines that will be executed before or after element removal.
+     */
+    val pipelinesRemove: Collection<String>
+        get() = listOf()
+
+    /**
+     * The name of the reactive pipelines that will be executed before or after installation of the element.
+     */
+    val pipelinesSet: Collection<String>
+        get() = listOf()
+
+    /**
      * Adds the specified element to the collection in a reactive way and
      * invokes the specified [triggerAdd].
      *
@@ -50,8 +69,21 @@ interface ReactiveMutableList<E> : MutableList<E> {
      */
     fun removeReactive(element: E): Boolean {
         val isRemoved = remove(element)
+
+        pipelinesRemove.forEach {
+            if (ReactiveLoader.checkTypePipeline(it, ReactivePipelineType.BEFORE)) {
+                ReactiveLoader.pipelineLaunch(it, element as Any)
+            }
+        }
+
         if (isRemoved) {
             triggerRemove?.execution(element)
+
+            pipelinesRemove.forEach {
+                if (ReactiveLoader.checkTypePipeline(it, ReactivePipelineType.AFTER)) {
+                    ReactiveLoader.pipelineLaunch(it, element as Any)
+                }
+            }
         }
         return isRemoved
     }
@@ -64,7 +96,21 @@ interface ReactiveMutableList<E> : MutableList<E> {
      */
     fun removeAtReactive(index: Int): E {
         val element = removeAt(index)
+
+        pipelinesRemove.forEach {
+            if (ReactiveLoader.checkTypePipeline(it, ReactivePipelineType.BEFORE)) {
+                ReactiveLoader.pipelineLaunch(it, element as Any)
+            }
+        }
+
         triggerRemove?.execution(element)
+
+        pipelinesRemove.forEach {
+            if (ReactiveLoader.checkTypePipeline(it, ReactivePipelineType.AFTER)) {
+                ReactiveLoader.pipelineLaunch(it, element as Any)
+            }
+        }
+
         return element
     }
 
@@ -89,11 +135,18 @@ interface ReactiveMutableList<E> : MutableList<E> {
  * @param triggerRemove The trigger is fired when an item is removed from the collection.
  * @param triggerSet The trigger is called when the element at the specified position
  * in this list is replaced by the specified element.
+ * @param pipelinesAdd Name of reactive pipelines that will be executed before or after adding an element.
+ * @param pipelinesRemove Name of reactive pipelines that will be executed before or after element removal.
+ * @param pipelinesSet The name of the reactive pipelines that will be executed before or after installation
+ * of the element.
  */
 class ReactiveArrayList<E>(
     override val triggerAdd: BaseReactiveTrigger<E>? = null,
     override val triggerRemove: BaseReactiveTrigger<E>? = null,
-    override val triggerSet: BaseReactiveTrigger<E>? = null
+    override val triggerSet: BaseReactiveTrigger<E>? = null,
+    override val pipelinesAdd: Collection<String> = listOf(),
+    override val pipelinesRemove: Collection<String> = listOf(),
+    override val pipelinesSet: Collection<String> = listOf()
 ) :
     ReactiveMutableList<E>,
     RandomAccess,
@@ -106,15 +159,25 @@ class ReactiveArrayList<E>(
  * @param triggerRemove The trigger is fired when an item is removed from the collection.
  * @param triggerSet The trigger is called when the element at the specified position
  * in this list is replaced by the specified element.
+ * @param pipelinesAdd Name of reactive pipelines that will be executed before or after adding an element.
+ * @param pipelinesRemove Name of reactive pipelines that will be executed before or after element removal.
+ * @param pipelinesSet The name of the reactive pipelines that will be executed before or after installation
+ * of the element.
  */
 fun <T> mutableReactiveListOf(
     triggerAdd: BaseReactiveTrigger<T>? = null,
     triggerRemove: BaseReactiveTrigger<T>? = null,
-    triggerSet: BaseReactiveTrigger<T>? = null
+    triggerSet: BaseReactiveTrigger<T>? = null,
+    pipelinesAdd: Collection<String> = listOf(),
+    pipelinesRemove: Collection<String> = listOf(),
+    pipelinesSet: Collection<String> = listOf()
 ): ReactiveMutableList<T> = ReactiveArrayList(
     triggerAdd = triggerAdd,
     triggerRemove = triggerRemove,
-    triggerSet = triggerSet
+    triggerSet = triggerSet,
+    pipelinesAdd = pipelinesAdd,
+    pipelinesRemove = pipelinesRemove,
+    pipelinesSet = pipelinesSet
 )
 
 /**
@@ -124,16 +187,26 @@ fun <T> mutableReactiveListOf(
  * @param triggerRemove The trigger is fired when an item is removed from the collection.
  * @param triggerSet The trigger is called when the element at the specified position
  * in this list is replaced by the specified element.
+ * @param pipelinesAdd Name of reactive pipelines that will be executed before or after adding an element.
+ * @param pipelinesRemove Name of reactive pipelines that will be executed before or after element removal.
+ * @param pipelinesSet The name of the reactive pipelines that will be executed before or after installation
+ * of the element.
  */
 fun <T> Collection<T>.toReactiveMutableList(
     triggerAdd: BaseReactiveTrigger<T>? = null,
     triggerRemove: BaseReactiveTrigger<T>? = null,
-    triggerSet: BaseReactiveTrigger<T>? = null
+    triggerSet: BaseReactiveTrigger<T>? = null,
+    pipelinesAdd: Collection<String> = listOf(),
+    pipelinesRemove: Collection<String> = listOf(),
+    pipelinesSet: Collection<String> = listOf()
 ): ReactiveMutableList<T> {
     val newList: ReactiveMutableList<T> = ReactiveArrayList(
         triggerAdd = triggerAdd,
         triggerRemove = triggerRemove,
-        triggerSet = triggerSet
+        triggerSet = triggerSet,
+        pipelinesAdd = pipelinesAdd,
+        pipelinesRemove = pipelinesRemove,
+        pipelinesSet = pipelinesSet
     )
     newList.addAll(this)
     return newList
