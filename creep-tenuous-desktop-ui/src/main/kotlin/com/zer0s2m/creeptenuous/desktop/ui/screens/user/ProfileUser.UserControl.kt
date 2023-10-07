@@ -139,6 +139,7 @@ fun ProfileUser.ProfileUserControl.render() {
                     "blockSystemUserCompletely",
                     currentUser.value
                 )
+                final()
             } else if (!isBlockUserCompletely && isBlockUserTemporary) {
                 val existsStartDateBlockUser: Boolean = ContextScreen.containsValueByKey(
                     Screen.PROFILE_USER_MANAGEMENT_SCREEN, "startDateBlockUser")
@@ -192,10 +193,10 @@ fun ProfileUser.ProfileUserControl.render() {
         onDateSelect = {
             openDialogBlockUserSelectDate.value = false
 
-            if (isStartDateBlockUser && !isEndDateBlockUser) {
+            if ((isStartDateBlockUser && !isEndDateBlockUser) && isBlockUserTemporary) {
                 selectDateStartUserBlock.value = it
                 startDateBlockUser = it
-            } else if (!isStartDateBlockUser && isEndDateBlockUser) {
+            } else if ((!isStartDateBlockUser && isEndDateBlockUser) && isBlockUserTemporary) {
                 selectDateEndUserBlock.value = it
                 endDateBlockUser = it
                 if (isErrorValidateDateEndBlockUser.value) {
@@ -601,19 +602,27 @@ private fun ModalBlockUser(
                                 .fillMaxWidth()
                                 .pointerHoverIcon(PointerIcon.Hand),
                             onClick = {
-                                val endDateBlockUser: Boolean = ContextScreen.containsValueByKey(
-                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                    "endDateBlockUser"
-                                )
-                                if (!isErrorValidateDateEndBlockUser.value && endDateBlockUser) {
+                                fun final() {
                                     expandedState.value = false
                                     isBlockUserCompletely = isActiveBlockCompletely.value
                                     isBlockUserTemporary = isActiveBlockTemporary.value
                                     actionBlock()
                                 }
 
-                                if (!endDateBlockUser) {
-                                    isErrorValidateDateEndBlockUser.value = true
+                                if (isActiveBlockCompletely.value && !isActiveBlockTemporary.value) {
+                                    final()
+                                } else if (!isActiveBlockCompletely.value && isActiveBlockTemporary.value) {
+                                    val endDateBlockUser: Boolean = ContextScreen.containsValueByKey(
+                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                        "endDateBlockUser"
+                                    )
+                                    if (!isErrorValidateDateEndBlockUser.value && endDateBlockUser) {
+                                        final()
+                                    }
+
+                                    if (!endDateBlockUser) {
+                                        isErrorValidateDateEndBlockUser.value = true
+                                    }
                                 }
                             },
                             colors = ButtonDefaults.textButtonColors(
