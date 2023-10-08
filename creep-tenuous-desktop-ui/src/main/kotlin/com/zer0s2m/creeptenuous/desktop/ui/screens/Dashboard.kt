@@ -131,27 +131,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
     }
 
     /**
-     * Event when clicking on the button to go to the section of an individual user profile
-     *
-     * @param screen Internal profile screen to go to
-     * @param scope Defines a scope for new coroutines
-     * @param sectionProfile New section in profile
-     */
-    private fun onClickCardSheet(screen: Screen, scope: CoroutineScope, sectionProfile: Sections) {
-        scope.launch {
-            ProfileUser.setAppliedScreenFromTransitionFromPast(context = ContextScreenPage(screen))
-            ProfileUser.setAppliedSectionFromTransitionFromPast(section = sectionProfile)
-
-            reactiveNavigationScreen.action(
-                state = navigationState,
-                route = Screen.PROFILE_SCREEN,
-                objects = listOf(),
-                scope = scope
-            )
-        }
-    }
-
-    /**
      * Rendering content on the left side of the dashboard
      */
     @Composable
@@ -201,11 +180,21 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             }
         )
 
-        val scaffoldState = rememberScaffoldState()
+        val scaffoldStateProfileUser = rememberScaffoldState()
+        val scaffoldStateCommentFileObject = rememberScaffoldState()
         val scope = rememberCoroutineScope()
 
-        val modalRightSheetLayout = ModalRightSheetLayout(
-            state = scaffoldState,
+        val modalProfileUser = ModalRightSheetLayout(
+            state = scaffoldStateProfileUser,
+            modifier = Modifier
+                .fillMaxSize(),
+            modifierDrawerInternal = Modifier
+                .fillMaxSize()
+                .padding(12.dp)
+                .background(Color.White)
+        )
+        val modalCommentsFileObject = ModalRightSheetLayout(
+            state = scaffoldStateCommentFileObject,
             modifier = Modifier
                 .fillMaxSize(),
             modifierDrawerInternal = Modifier
@@ -214,161 +203,80 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                 .background(Color.White)
         )
 
-        modalRightSheetLayout.render(
+        modalCommentsFileObject.render(
             drawerContent = {
-                renderContentModalRightSheet()
+                ContentCommentsInFileObjectModal()
             }
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                Column (
-                    modifier = Modifier
-                        .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
-                ) {
-                    TopPanelDashboard(
-                        scaffoldState = scaffoldState,
-                        scope = scope,
-                        avatar = if (userProfile.value != null)
-                                 mutableStateOf(userProfile.value!!.avatar)
-                                 else mutableStateOf(null)
+            modalProfileUser.render(
+                drawerContent = {
+                    ContentProfileUserModal(
+                        navigationState = navigationState
                     )
                 }
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White),
-                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    RenderLayoutFilesObject(
-                        directories = directories,
-                        files = files,
-                        expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
-                        expandedStateSetColorPopup = expandedStateModalSetColorPopup,
-                        expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory,
-                        expandedStateModalRenameFileObject = expandedStateModalRenameFileObject
-                    )
-
-                    BreadCrumbs(
-                        items = listOf(
-                            BreadCrumbsItem(
-                                text = "Folder 1",
-                                action = {
-                                    println(true)
-                                }
-                            ),
-                            BreadCrumbsItem(
-                                text = "Folder 2",
-                                action = {
-                                    println(true)
-                                }
-                            ),
-                            BreadCrumbsItem(
-                                text = "Folder 3",
-                                action = {
-                                    println(true)
-                                }
-                            )
-                        ),
+                    Column (
                         modifier = Modifier
-                            .height(40.dp)
-                            .background(Colors.BREAD_CRUMBS_BASE.color)
-                            .fillMaxWidth()
-                            .padding(4.dp, 8.dp)
-                    ).render()
+                            .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
+                    ) {
+                        TopPanelDashboard(
+                            scaffoldState = scaffoldStateProfileUser,
+                            scope = scope,
+                            avatar = if (userProfile.value != null)
+                                mutableStateOf(userProfile.value!!.avatar)
+                            else mutableStateOf(null)
+                        )
+                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.White),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        RenderLayoutFilesObject(
+                            directories = directories,
+                            files = files,
+                            expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
+                            expandedStateSetColorPopup = expandedStateModalSetColorPopup,
+                            expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory,
+                            expandedStateModalRenameFileObject = expandedStateModalRenameFileObject,
+                            scaffoldStateCommentFileObject = scaffoldStateCommentFileObject
+                        )
+
+                        BreadCrumbs(
+                            items = listOf(
+                                BreadCrumbsItem(
+                                    text = "Folder 1",
+                                    action = {
+                                        println(true)
+                                    }
+                                ),
+                                BreadCrumbsItem(
+                                    text = "Folder 2",
+                                    action = {
+                                        println(true)
+                                    }
+                                ),
+                                BreadCrumbsItem(
+                                    text = "Folder 3",
+                                    action = {
+                                        println(true)
+                                    }
+                                )
+                            ),
+                            modifier = Modifier
+                                .height(40.dp)
+                                .background(Colors.BREAD_CRUMBS_BASE.color)
+                                .fillMaxWidth()
+                                .padding(4.dp, 8.dp)
+                        ).render()
+                    }
                 }
             }
-        }
-    }
-
-    /**
-     * Renders a popup modal window to navigate to the screen state - user settings [Screen.PROFILE_SCREEN]
-     */
-    @Composable
-    private fun renderContentModalRightSheet() {
-        val baseModifierCard: Modifier = Modifier
-            .height(60.dp)
-            .fillMaxWidth()
-            .padding(4.dp)
-            .pointerHoverIcon(icon = PointerIcon.Hand)
-
-        val coroutineScope: CoroutineScope = rememberCoroutineScope()
-
-        Column {
-            TitleInSectionForCardsModalSheet(Sections.MAIN_PROFILE.title)
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(5),
-                content = {
-                    items(Sections.MAIN_PROFILE.sections.size) { index ->
-                        CardModalSheet(
-                            modifier = baseModifierCard
-                        ) {
-                            onClickCardSheet(
-                                screen = Sections.MAIN_PROFILE.routes[index],
-                                scope = coroutineScope,
-                                sectionProfile = Sections.MAIN_PROFILE
-                            )
-                        }.render {
-                            TextInCardModalSheet(Sections.MAIN_PROFILE.sections[index])
-                        }
-                    }
-                }
-            )
-        }
-
-        Divider(
-            modifier = Modifier.padding(bottom = 12.dp),
-            thickness = 0.dp
-        )
-
-        Column {
-            TitleInSectionForCardsModalSheet(Sections.USER_CONTROL.title)
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(5),
-                content = {
-                    items(Sections.USER_CONTROL.sections.size) { index ->
-                        CardModalSheet(
-                            modifier = baseModifierCard
-                        ) {
-                            onClickCardSheet(
-                                screen = Sections.USER_CONTROL.routes[index],
-                                scope = coroutineScope,
-                                sectionProfile = Sections.USER_CONTROL
-                            )
-                        }.render {
-                            TextInCardModalSheet(Sections.USER_CONTROL.sections[index])
-                        }
-                    }
-                }
-            )
-        }
-
-        Divider(
-            modifier = Modifier.padding(bottom = 12.dp),
-            thickness = 0.dp
-        )
-
-        Column {
-            TitleInSectionForCardsModalSheet(Sections.USER_CUSTOMIZATION.title)
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(5),
-                content = {
-                    items(Sections.USER_CUSTOMIZATION.sections.size) { index ->
-                        CardModalSheet(
-                            modifier = baseModifierCard
-                        ) {
-                            onClickCardSheet(
-                                screen = Sections.USER_CUSTOMIZATION.routes[index],
-                                scope = coroutineScope,
-                                sectionProfile = Sections.USER_CUSTOMIZATION
-                            )
-                        }.render {
-                            TextInCardModalSheet(Sections.USER_CUSTOMIZATION.sections[index])
-                        }
-                    }
-                }
-            )
         }
     }
 
@@ -400,3 +308,138 @@ private fun TitleInSectionForCardsModalSheet(text: String = ""): Unit = Text(
     color = Colors.TEXT.color,
     fontWeight = FontWeight.Bold
 )
+
+/**
+ * Renders a popup modal window to navigate to the screen state - user settings [Screen.PROFILE_SCREEN].
+ *
+ * @param navigationState Navigation controller for handling screen changes.
+ */
+@Composable
+private fun ContentProfileUserModal(
+    navigationState: State<NavigationController>
+) {
+    val baseModifierCard: Modifier = Modifier
+        .height(60.dp)
+        .fillMaxWidth()
+        .padding(4.dp)
+        .pointerHoverIcon(icon = PointerIcon.Hand)
+
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+
+    Column {
+        TitleInSectionForCardsModalSheet(Sections.MAIN_PROFILE.title)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(5),
+            content = {
+                items(Sections.MAIN_PROFILE.sections.size) { index ->
+                    CardModalSheet(
+                        modifier = baseModifierCard
+                    ) {
+                        onClickCardSheet(
+                            screen = Sections.MAIN_PROFILE.routes[index],
+                            scope = coroutineScope,
+                            sectionProfile = Sections.MAIN_PROFILE,
+                            navigationState = navigationState
+                        )
+                    }.render {
+                        TextInCardModalSheet(Sections.MAIN_PROFILE.sections[index])
+                    }
+                }
+            }
+        )
+    }
+
+    Divider(
+        modifier = Modifier.padding(bottom = 12.dp),
+        thickness = 0.dp
+    )
+
+    Column {
+        TitleInSectionForCardsModalSheet(Sections.USER_CONTROL.title)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(5),
+            content = {
+                items(Sections.USER_CONTROL.sections.size) { index ->
+                    CardModalSheet(
+                        modifier = baseModifierCard
+                    ) {
+                        onClickCardSheet(
+                            screen = Sections.USER_CONTROL.routes[index],
+                            scope = coroutineScope,
+                            sectionProfile = Sections.USER_CONTROL,
+                            navigationState = navigationState
+                        )
+                    }.render {
+                        TextInCardModalSheet(Sections.USER_CONTROL.sections[index])
+                    }
+                }
+            }
+        )
+    }
+
+    Divider(
+        modifier = Modifier.padding(bottom = 12.dp),
+        thickness = 0.dp
+    )
+
+    Column {
+        TitleInSectionForCardsModalSheet(Sections.USER_CUSTOMIZATION.title)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(5),
+            content = {
+                items(Sections.USER_CUSTOMIZATION.sections.size) { index ->
+                    CardModalSheet(
+                        modifier = baseModifierCard
+                    ) {
+                        onClickCardSheet(
+                            screen = Sections.USER_CUSTOMIZATION.routes[index],
+                            scope = coroutineScope,
+                            sectionProfile = Sections.USER_CUSTOMIZATION,
+                            navigationState = navigationState
+                        )
+                    }.render {
+                        TextInCardModalSheet(Sections.USER_CUSTOMIZATION.sections[index])
+                    }
+                }
+            }
+        )
+    }
+}
+
+/**
+ * Event when clicking on the button to go to the section of an individual user profile
+ *
+ * @param screen Internal profile screen to go to
+ * @param scope Defines a scope for new coroutines
+ * @param sectionProfile New section in profile
+ * @param navigationState Navigation controller for handling screen changes
+ */
+private fun onClickCardSheet(
+    screen: Screen,
+    scope: CoroutineScope,
+    sectionProfile: Sections,
+    navigationState: State<NavigationController>
+) {
+    scope.launch {
+        ProfileUser.setAppliedScreenFromTransitionFromPast(context = ContextScreenPage(screen))
+        ProfileUser.setAppliedSectionFromTransitionFromPast(section = sectionProfile)
+
+        reactiveNavigationScreen.action(
+            state = navigationState,
+            route = Screen.PROFILE_SCREEN,
+            objects = listOf(),
+            scope = scope
+        )
+    }
+}
+
+@Composable
+private fun ContentCommentsInFileObjectModal() {
+    Text(
+        text = "File object comments",
+        modifier = Modifier
+            .padding(4.dp, 0.dp),
+        color = Colors.TEXT.color,
+        fontWeight = FontWeight.Bold
+    )
+}

@@ -7,10 +7,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +26,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.FieldSearch
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * Text used by accessibility services to describe what this image represents
@@ -46,6 +44,7 @@ private val contentDescriptionIconAdd: String get() = "Add file object"
  * @param expandedStateSetColorPopup Current state of the modal
  * [PopupSetUserColorInFileObject] when setting a custom color
  * @param expandedStateModalRenameFileObject Current state of the modal [PopupRenameFileObject] rename file object.
+ * @param scaffoldStateCommentFileObject State of this scaffold widget.
  */
 @Composable
 internal fun RenderLayoutFilesObject(
@@ -54,8 +53,11 @@ internal fun RenderLayoutFilesObject(
     expandedStateSetCategoryPopup: MutableState<Boolean>,
     expandedStateSetColorPopup: MutableState<Boolean>,
     expandedStateCreateFileObjectTypeDirectory: MutableState<Boolean>,
-    expandedStateModalRenameFileObject: MutableState<Boolean>
+    expandedStateModalRenameFileObject: MutableState<Boolean>,
+    scaffoldStateCommentFileObject: ScaffoldState
 ) {
+    val scope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier
             .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 16.dp)
@@ -65,16 +67,20 @@ internal fun RenderLayoutFilesObject(
                 .padding(bottom = 28.dp)
         ) {
             RenderLayoutDirectories(
+                scope = scope,
                 directories = directories,
                 expandedStateSetCategoryPopup = expandedStateSetCategoryPopup,
                 expandedStateSetColorPopup = expandedStateSetColorPopup,
                 expandedStateCreateFileObjectTypeDirectory = expandedStateCreateFileObjectTypeDirectory,
-                expandedStateModalRenameFileObject = expandedStateModalRenameFileObject
+                expandedStateModalRenameFileObject = expandedStateModalRenameFileObject,
+                scaffoldStateCommentFileObject = scaffoldStateCommentFileObject
             )
             RenderLayoutFiles(
+                scope = scope,
                 files = files,
                 expandedStateSetCategoryPopup = expandedStateSetCategoryPopup,
-                expandedStateModalRenameFileObject = expandedStateModalRenameFileObject
+                expandedStateModalRenameFileObject = expandedStateModalRenameFileObject,
+                scaffoldStateCommentFileObject = scaffoldStateCommentFileObject
             )
         }
     }
@@ -83,20 +89,24 @@ internal fun RenderLayoutFilesObject(
 /**
  * Content renderer responsible for file objects with type - category
  *
+ * @param scope Defines a scope for new coroutines.
  * @param directories file objects with type - directory
  * @param expandedStateSetCategoryPopup Current state of the modal
  * [PopupSetUserCategoryInFileObject] when setting a custom category
  * @param expandedStateSetColorPopup Current state of the modal
  * [PopupSetUserColorInFileObject] when setting a custom color
  * @param expandedStateModalRenameFileObject Current state of the modal [PopupRenameFileObject] rename file object.
+ * @param scaffoldStateCommentFileObject State of this scaffold widget.
  */
 @Composable
 internal fun RenderLayoutDirectories(
+    scope: CoroutineScope,
     directories: MutableState<MutableList<FileObject>>,
     expandedStateSetCategoryPopup: MutableState<Boolean>,
     expandedStateSetColorPopup: MutableState<Boolean>,
     expandedStateCreateFileObjectTypeDirectory: MutableState<Boolean>,
-    expandedStateModalRenameFileObject: MutableState<Boolean>
+    expandedStateModalRenameFileObject: MutableState<Boolean>,
+    scaffoldStateCommentFileObject: ScaffoldState
 ) {
     Column(
         modifier = Modifier
@@ -158,6 +168,13 @@ internal fun RenderLayoutDirectories(
                     actionRename = {
                         actionRename(directories.value[index].systemName)
                         expandedStateModalRenameFileObject.value = true
+                    },
+                    actionComments = {
+                        if (scaffoldStateCommentFileObject.drawerState.isClosed) {
+                            scope.launch {
+                                scaffoldStateCommentFileObject.drawerState.open()
+                            }
+                        }
                     }
                 ).render()
             }
@@ -168,16 +185,20 @@ internal fun RenderLayoutDirectories(
 /**
  * Content renderer responsible for file objects with type - file
  *
+ * @param scope Defines a scope for new coroutines.
  * @param files file objects with type - file
  * @param expandedStateSetCategoryPopup Current state of the modal [PopupSetUserCategoryInFileObject]
  * when setting a custom category
  * @param expandedStateModalRenameFileObject Current state of the modal [PopupRenameFileObject] rename file object.
+ * @param scaffoldStateCommentFileObject State of this scaffold widget.
  */
 @Composable
 internal fun RenderLayoutFiles(
+    scope: CoroutineScope,
     files: MutableState<MutableList<FileObject>>,
     expandedStateSetCategoryPopup: MutableState<Boolean>,
-    expandedStateModalRenameFileObject: MutableState<Boolean>
+    expandedStateModalRenameFileObject: MutableState<Boolean>,
+    scaffoldStateCommentFileObject: ScaffoldState
 ) {
     Column {
         TitleCategoryFileObject("Files", files.value.size)
@@ -205,6 +226,13 @@ internal fun RenderLayoutFiles(
                     actionRename = {
                         actionRename(files.value[index].systemName)
                         expandedStateModalRenameFileObject.value = true
+                    },
+                    actionComments = {
+                        if (scaffoldStateCommentFileObject.drawerState.isClosed) {
+                            scope.launch {
+                                scaffoldStateCommentFileObject.drawerState.open()
+                            }
+                        }
                     }
                 ).render()
             }
