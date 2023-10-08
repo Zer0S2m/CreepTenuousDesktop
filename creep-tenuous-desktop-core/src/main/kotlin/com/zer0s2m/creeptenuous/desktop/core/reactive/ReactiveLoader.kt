@@ -258,6 +258,22 @@ object ReactiveLoader {
     }
 
     /**
+     * Reactive property purification.
+     *
+     * @param nameProperty The name of the lazy behavior property is specified using an annotation
+     * [Lazy] or [Reactive]
+     */
+    fun resetIsLoad(nameProperty: String) {
+        val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
+        if (reactiveLazyObject != null) {
+            reactiveLazyObject.isLoad = false
+
+            logger.infoDev("Reactive property purification:\n\t[" +
+                    "${reactiveLazyObject.reactiveLazyObject.javaClass.canonicalName}] [$nameProperty]")
+        }
+    }
+
+    /**
      * Set the data for a specific event to a [Reactive] or [Lazy] property and call the
      * reactive trigger [BaseReactiveTrigger] when the data is set.
      *

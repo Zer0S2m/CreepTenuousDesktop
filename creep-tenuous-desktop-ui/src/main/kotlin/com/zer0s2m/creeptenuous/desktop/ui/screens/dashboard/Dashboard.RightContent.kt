@@ -170,11 +170,11 @@ internal fun RenderLayoutDirectories(
                         expandedStateModalRenameFileObject.value = true
                     },
                     actionComments = {
-                        if (scaffoldStateCommentFileObject.drawerState.isClosed) {
-                            scope.launch {
-                                scaffoldStateCommentFileObject.drawerState.open()
-                            }
-                        }
+                        actionComments(
+                            scope = scope,
+                            scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
+                            systemName = directories.value[index].systemName
+                        )
                     }
                 ).render()
             }
@@ -228,11 +228,11 @@ internal fun RenderLayoutFiles(
                         expandedStateModalRenameFileObject.value = true
                     },
                     actionComments = {
-                        if (scaffoldStateCommentFileObject.drawerState.isClosed) {
-                            scope.launch {
-                                scaffoldStateCommentFileObject.drawerState.open()
-                            }
-                        }
+                        actionComments(
+                            scope = scope,
+                            scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
+                            systemName = files.value[index].systemName
+                        )
                     }
                 ).render()
             }
@@ -342,4 +342,31 @@ private fun actionRename(systemName: String) {
         "currentFileObjectSetProperty",
         systemName
     )
+}
+
+/**
+ * Load comments for a file object and render.
+ *
+ * @param scope Defines a scope for new coroutines.
+ * @param scaffoldStateCommentFileObject State for [Scaffold] composable component.
+ * @param systemName System name of the file object.
+ */
+private fun actionComments(
+    scope: CoroutineScope,
+    scaffoldStateCommentFileObject: ScaffoldState,
+    systemName: String
+) {
+    if (scaffoldStateCommentFileObject.drawerState.isClosed) {
+        ReactiveLoader.resetIsLoad("commentsFileSystemObject")
+        scope.launch {
+            ContextScreen.set(
+                Screen.DASHBOARD_SCREEN,
+                "currentFileObject",
+                systemName
+            )
+
+            ReactiveLoader.load("commentsFileSystemObject")
+            scaffoldStateCommentFileObject.drawerState.open()
+        }
+    }
 }

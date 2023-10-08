@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserProfileSettings
@@ -26,6 +27,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreenPage
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
@@ -128,6 +130,21 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             this.userProfile.value = userProfile
         }
 
+        /**
+         * Comments for a file object.
+         */
+        private val commentsInFileObject: MutableState<ReactiveMutableList<CommentFileObject>> =
+            mutableStateOf(ReactiveFileObject.commentsFileSystemObject)
+
+        /**
+         * Set comments for a file object.
+         *
+         * @param comments Comments for a file object.
+         */
+        internal fun setCommentsInFileObject(comments: ReactiveMutableList<CommentFileObject>) {
+            this.commentsInFileObject.value = comments
+        }
+
     }
 
     /**
@@ -205,7 +222,9 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
         modalCommentsFileObject.render(
             drawerContent = {
-                ContentCommentsInFileObjectModal()
+                ContentCommentsInFileObjectModal(
+                    comments = commentsInFileObject
+                )
             }
         ) {
             modalProfileUser.render(
@@ -434,7 +453,10 @@ private fun onClickCardSheet(
 }
 
 @Composable
-private fun ContentCommentsInFileObjectModal() {
+@Suppress("SameParameterValue")
+private fun ContentCommentsInFileObjectModal(
+    comments: MutableState<ReactiveMutableList<CommentFileObject>>
+) {
     Text(
         text = "File object comments",
         modifier = Modifier
