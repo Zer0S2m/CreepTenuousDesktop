@@ -325,18 +325,31 @@ class CartFileObject(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .padding(12.dp, 8.dp)
+                    .fillMaxSize()
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
+                        .fillMaxSize()
                 ) {
-                    content()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        content()
+                        if (categoryId != null) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                            ) {
+                                CategoryLayout()
+                            }
+                        }
+                    }
+                    IconMenu()
                 }
-
-                renderCategoryLayout()
             }
         }
     }
@@ -347,7 +360,7 @@ class CartFileObject(
     @Composable
     private fun renderDirectory() {
         renderBase {
-            renderDirectoryContent()
+            DirectoryContent()
         }
     }
 
@@ -355,7 +368,7 @@ class CartFileObject(
      * Renders the main content of a [isDirectory]
      */
     @Composable
-    private fun renderDirectoryContent() {
+    private fun DirectoryContent() {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -373,7 +386,6 @@ class CartFileObject(
                 fontSize = 14.sp
             )
         }
-        renderIconMenu()
     }
 
     /**
@@ -382,7 +394,7 @@ class CartFileObject(
     @Composable
     private fun renderFile() {
         renderBase {
-            renderFileContent()
+            FileContent()
         }
     }
 
@@ -390,7 +402,7 @@ class CartFileObject(
      * Renders the main content of a [isFile]
      */
     @Composable
-    private fun renderFileContent() {
+    private fun FileContent() {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -408,14 +420,13 @@ class CartFileObject(
                 fontSize = 14.sp
             )
         }
-        renderIconMenu()
     }
 
     /**
      * Rendering the component responsible for binding a custom category to a file object
      */
     @Composable
-    private fun renderCategoryLayout() {
+    private fun CategoryLayout() {
         if (categoryId != null) {
             val userCategory = ReactiveUser.customCategories.find {
                 it.id == categoryId
@@ -447,10 +458,11 @@ class CartFileObject(
      * Rendering a component - opening a menu for the underlying file system object
      */
     @Composable
-    private fun renderIconMenu() {
+    private fun IconMenu() {
         Box(
             modifier = Modifier
-                .fillMaxHeight()
+                .fillMaxHeight(),
+            contentAlignment = Alignment.Center
         ) {
             IconButton(
                 onClick = {
@@ -468,7 +480,7 @@ class CartFileObject(
                 )
             }
 
-            renderDropDownMenu(expandedMenu)
+            DropdownMenu(expandedMenu)
         }
     }
 
@@ -478,7 +490,7 @@ class CartFileObject(
      * @param expanded Variable value holder for opening and closing the menu for the user
      */
     @Composable
-    private fun renderDropDownMenu(expanded: MutableState<Boolean>) {
+    private fun DropdownMenu(expanded: MutableState<Boolean>) {
         val modifierMenu: Modifier = Modifier
             .pointerHoverIcon(icon = PointerIcon.Hand)
         val contentPaddingMenu = PaddingValues(12.dp, 4.dp)
