@@ -30,6 +30,8 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
+import com.zer0s2m.creeptenuous.desktop.ui.screens.user.IconButtonDelete
+import com.zer0s2m.creeptenuous.desktop.ui.screens.user.IconButtonEdit
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -598,21 +600,49 @@ class CartFileObject(
  *
  * @param text Comment text.
  * @param createdAt Date the comment was created.
+ * @param modifierButtonEdit The modifier to be applied to the layout for button edit.
+ * @param modifierButtonDelete The modifier to be applied to the layout. for button delete
+ * @param actionEdit The lambda to be invoked when this icon is pressed [IconButton]. Event - edit.
+ * @param actionDelete The lambda to be invoked when this icon is pressed [IconButton]. Event - delete.
  */
 @Composable
 internal fun CartCommentForFileObject(
     text: String,
-    createdAt: String
+    createdAt: String,
+    modifierButtonEdit: Modifier = Modifier
+        .size(26.dp)
+        .padding(4.dp),
+    modifierButtonDelete: Modifier = Modifier
+        .size(26.dp)
+        .padding(4.dp),
+    actionEdit: () -> Unit = {},
+    actionDelete: () -> Unit = {}
 ) {
     val localCreatedAt = DateTimeFormatter
         .ofPattern("MMMM dd, yyyy HH:mm:ss")
         .format(LocalDateTime.parse(createdAt, dateFormatForComment))
 
     Column {
-        Text(
-            text = localCreatedAt,
-            color = MaterialTheme.colors.secondaryVariant.copy(0.8f),
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = localCreatedAt,
+                color = MaterialTheme.colors.secondaryVariant.copy(0.8f),
+            )
+            Spacer(
+                modifier = Modifier
+                    .width(12.dp)
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButtonEdit(
+                    modifierLayout = modifierButtonEdit,
+                    onClick = actionEdit
+                )
+                IconButtonDelete(
+                    modifierLayout = modifierButtonDelete,
+                    onClick = actionDelete
+                )
+            }
+        }
         Spacer(
             modifier = Modifier
                 .height(4.dp)
