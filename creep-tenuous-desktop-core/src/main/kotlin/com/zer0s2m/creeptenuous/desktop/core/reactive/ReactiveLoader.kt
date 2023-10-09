@@ -320,7 +320,6 @@ object ReactiveLoader {
 
             val pipelines: Iterable<String> = gePipelinesByNameProperty(nameProperty)
 
-
             pipelineLaunch(pipelines, data, ReactivePipelineType.BEFORE)
             trigger?.createInstance()?.execution(*data)
             pipelineLaunch(pipelines, data, ReactivePipelineType.AFTER)

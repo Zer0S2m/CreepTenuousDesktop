@@ -1,5 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.reactive.triggers.io
 
+import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
@@ -118,6 +119,26 @@ class ReactiveTriggerReactiveFileObjectRenameFileObject : BaseReactiveIndependen
         val systemName: String? = if (values[0] is String) values[0].toString() else null
         val newTitle: String? = if (values[1] is String) values[1].toString() else null
         logger.infoDev("Rename file object\nDATA: [$systemName, $newTitle]")
+    }
+
+}
+
+/**
+ * A reactive trigger fires when a comment for a file object is deleted.
+ */
+class ReactiveTriggerReactiveFileObjectRemoveCommentFileObject : BaseReactiveTrigger<CommentFileObject> {
+
+    companion object {
+        private val logger: Logger = logger()
+    }
+
+    /**
+     * Trigger execution.
+     *
+     * @param value The new value of a property or object.
+     */
+    override fun execution(value: CommentFileObject) {
+        logger.infoDev("Delete a comment for file object\nDATA: $value")
     }
 
 }

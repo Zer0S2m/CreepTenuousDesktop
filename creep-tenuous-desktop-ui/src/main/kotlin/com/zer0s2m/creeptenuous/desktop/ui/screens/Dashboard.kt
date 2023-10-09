@@ -15,6 +15,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -493,6 +494,8 @@ private fun ContentCommentsInFileObjectModal(
 private fun LayoutCommentsInFileObject(
     comments: MutableState<ReactiveMutableList<CommentFileObject>>
 ) {
+    val internalComments: SnapshotStateList<CommentFileObject> = comments.value.toMutableStateList()
+
     Column {
         Box {
             val stateScroll: LazyListState = rememberLazyListState()
@@ -504,15 +507,22 @@ private fun LayoutCommentsInFileObject(
                     .padding(end = 12.dp),
                 state = stateScroll
             ) {
-                items(comments.value.size) { index ->
-                    val comment: CommentFileObject = comments.value[index]
+                items(internalComments.size) { index ->
+                    val comment: CommentFileObject = internalComments[index]
 
                     CartCommentForFileObject(
                         text = comment.comment,
-                        createdAt = comment.createdAt
+                        createdAt = comment.createdAt,
+                        actionEdit = {
+
+                        },
+                        actionDelete = {
+                            ReactiveFileObject.commentsFileSystemObject.removeAtReactive(index)
+                            internalComments.removeAt(index)
+                        }
                     )
 
-                    if (comments.value.size - 1 != index) {
+                    if (internalComments.size - 1 != index) {
                         Spacer(
                             modifier = Modifier
                                 .height(16.dp)
