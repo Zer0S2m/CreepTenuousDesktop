@@ -33,6 +33,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
+import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreenPage
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
@@ -91,6 +92,12 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     private val expandedStateModalRenameFileObject: MutableState<Boolean> = mutableStateOf(false)
 
+    /**
+     * Current state of the modal [PopupInteractionCommentFileObject] rename file object.
+     */
+    private val expandedStateModalInteractionCommentFileObject: MutableState<Boolean> =
+        mutableStateOf(false)
+
     internal companion object {
 
         /**
@@ -143,8 +150,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         /**
          * Comments for a file object.
          */
-        private val commentsInFileObject: MutableState<ReactiveMutableList<CommentFileObject>> =
-            mutableStateOf(ReactiveFileObject.commentsFileSystemObject)
+        private val commentsInFileObject: SnapshotStateList<CommentFileObject> =
+            ReactiveFileObject.commentsFileSystemObject.toMutableStateList()
 
         /**
          * Set comments for a file object.
@@ -152,7 +159,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
          * @param comments Comments for a file object.
          */
         internal fun setCommentsInFileObject(comments: ReactiveMutableList<CommentFileObject>) {
-            this.commentsInFileObject.value = comments
+            commentsInFileObject.clear()
+            commentsInFileObject.addAll(comments)
         }
 
     }
@@ -206,6 +214,17 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                 files.value = mutableListOf()
             }
         )
+        PopupInteractionCommentFileObject(
+            expandedState = expandedStateModalInteractionCommentFileObject,
+            actionSave = { comment: CommentFileObject ->
+                val indexComment: Int = ContextScreen.get(
+                    Screen.DASHBOARD_SCREEN,
+                    "currentIndexFileObjectForInteractive"
+                )
+                ReactiveFileObject.commentsFileSystemObject.setReactive(indexComment, comment)
+                setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
+            }
+        )
 
         val scaffoldStateProfileUser = rememberScaffoldState()
         val scaffoldStateCommentFileObject = rememberScaffoldState()
@@ -233,7 +252,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         modalCommentsFileObject.render(
             drawerContent = {
                 ContentCommentsInFileObjectModal(
-                    comments = commentsInFileObject
+                    comments = commentsInFileObject,
+                    expandedStateModelInteractiveComment = expandedStateModalInteractionCommentFileObject
                 )
             }
         ) {
@@ -466,11 +486,14 @@ private fun onClickCardSheet(
  * Render the contents of a modal window to show the comments of a file object.
  *
  * @param comments Comments for file objects.
+ * @param expandedStateModelInteractiveComment Current state of the modal
+ * [PopupInteractionCommentFileObject] rename file object.
  */
 @Composable
 @Suppress("SameParameterValue")
 private fun ContentCommentsInFileObjectModal(
-    comments: MutableState<ReactiveMutableList<CommentFileObject>>
+    comments: SnapshotStateList<CommentFileObject>,
+    expandedStateModelInteractiveComment: MutableState<Boolean>
 ) {
     Text(
         text = "File object comments",
@@ -482,61 +505,73 @@ private fun ContentCommentsInFileObjectModal(
         modifier = Modifier
             .height(20.dp)
     )
-    LayoutCommentsInFileObject(comments = comments)
+    LayoutCommentsInFileObject(
+        comments = comments,
+        expandedStateModelInteractiveComment = expandedStateModelInteractiveComment
+    )
 }
 
 /**
  * Render the contents of file object comments.
  *
  * @param comments Comments for file objects.
+ * @param expandedStateModelInteractiveComment Current state of the modal
+ * [PopupInteractionCommentFileObject] rename file object.
  */
 @Composable
 private fun LayoutCommentsInFileObject(
-    comments: MutableState<ReactiveMutableList<CommentFileObject>>
+    comments: SnapshotStateList<CommentFileObject>,
+    expandedStateModelInteractiveComment: MutableState<Boolean>
 ) {
-    val internalComments: SnapshotStateList<CommentFileObject> = comments.value.toMutableStateList()
+    Box {
+        val stateScroll: LazyListState = rememberLazyListState()
+        val adapterScroll: ScrollbarAdapter = rememberScrollbarAdapter(scrollState = stateScroll)
 
-    Column {
-        Box {
-            val stateScroll: LazyListState = rememberLazyListState()
-            val adapterScroll: ScrollbarAdapter = rememberScrollbarAdapter(scrollState = stateScroll)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 12.dp),
+            state = stateScroll
+        ) {
+            items(comments.size) { index ->
+                val comment: CommentFileObject = comments[index]
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 12.dp),
-                state = stateScroll
-            ) {
-                items(internalComments.size) { index ->
-                    val comment: CommentFileObject = internalComments[index]
-
-                    CartCommentForFileObject(
-                        text = comment.comment,
-                        createdAt = comment.createdAt,
-                        actionEdit = {
-
-                        },
-                        actionDelete = {
-                            ReactiveFileObject.commentsFileSystemObject.removeAtReactive(index)
-                            internalComments.removeAt(index)
-                        }
-                    )
-
-                    if (internalComments.size - 1 != index) {
-                        Spacer(
-                            modifier = Modifier
-                                .height(16.dp)
+                CartCommentForFileObject(
+                    text = comment.comment,
+                    createdAt = comment.createdAt,
+                    actionEdit = {
+                        ContextScreen.set(
+                            Screen.DASHBOARD_SCREEN,
+                            "currentFileObjectForInteractive",
+                            comment
                         )
+                        ContextScreen.set(
+                            Screen.DASHBOARD_SCREEN,
+                            "currentIndexFileObjectForInteractive",
+                            index
+                        )
+                        expandedStateModelInteractiveComment.value = true
+                    },
+                    actionDelete = {
+                        ReactiveFileObject.commentsFileSystemObject.removeAtReactive(index)
+                        comments.removeAt(index)
                     }
+                )
+
+                if (comments.size - 1 != index) {
+                    Spacer(
+                        modifier = Modifier
+                            .height(16.dp)
+                    )
                 }
             }
-            VerticalScrollbar(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .background(Color.Gray.copy(0.8f), RoundedCornerShape(4.dp))
-                    .fillMaxHeight(),
-                adapter = adapterScroll
-            )
         }
+        VerticalScrollbar(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .background(Color.Gray.copy(0.8f), RoundedCornerShape(4.dp))
+                .fillMaxHeight(),
+            adapter = adapterScroll
+        )
     }
 }

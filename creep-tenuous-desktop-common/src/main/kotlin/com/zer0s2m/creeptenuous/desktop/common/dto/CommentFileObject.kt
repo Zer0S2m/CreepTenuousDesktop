@@ -8,9 +8,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CommentFileObject(
 
-    val id: Int,
+    val id: Int?,
 
-    val comment: String,
+    var comment: String,
 
     val fileSystemObject: String,
 

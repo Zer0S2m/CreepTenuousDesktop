@@ -142,3 +142,23 @@ class ReactiveTriggerReactiveFileObjectRemoveCommentFileObject : BaseReactiveTri
     }
 
 }
+
+/**
+ * A reactive trigger fires when a comment for a file object is deleted.
+ */
+class ReactiveTriggerReactiveFileObjectEditCommentFileObject : BaseReactiveTrigger<CommentFileObject> {
+
+    companion object {
+        private val logger: Logger = logger()
+    }
+
+    /**
+     * Trigger execution.
+     *
+     * @param value The new value of a property or object.
+     */
+    override fun execution(value: CommentFileObject) {
+        logger.infoDev("Edit a comment for file object\nDATA: $value")
+    }
+
+}
