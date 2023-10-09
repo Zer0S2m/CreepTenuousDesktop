@@ -8,12 +8,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CommentFileObject(
 
-    val id: Int?,
+    val id: Int,
 
     val comment: String,
 
     val fileSystemObject: String,
 
-    val createdAt: String?
+    val createdAt: String
 
 )

@@ -1,13 +1,21 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens
 
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.v2.ScrollbarAdapter
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -32,6 +40,7 @@ import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardModalSheet
+import com.zer0s2m.creeptenuous.desktop.ui.components.CartCommentForFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbs
@@ -452,6 +461,11 @@ private fun onClickCardSheet(
     }
 }
 
+/**
+ * Render the contents of a modal window to show the comments of a file object.
+ *
+ * @param comments Comments for file objects.
+ */
 @Composable
 @Suppress("SameParameterValue")
 private fun ContentCommentsInFileObjectModal(
@@ -459,9 +473,60 @@ private fun ContentCommentsInFileObjectModal(
 ) {
     Text(
         text = "File object comments",
-        modifier = Modifier
-            .padding(4.dp, 0.dp),
         color = Colors.TEXT.color,
+        fontSize = 18.sp,
         fontWeight = FontWeight.Bold
     )
+    Spacer(
+        modifier = Modifier
+            .height(20.dp)
+    )
+    LayoutCommentsInFileObject(comments = comments)
+}
+
+/**
+ * Render the contents of file object comments.
+ *
+ * @param comments Comments for file objects.
+ */
+@Composable
+private fun LayoutCommentsInFileObject(
+    comments: MutableState<ReactiveMutableList<CommentFileObject>>
+) {
+    Column {
+        Box {
+            val stateScroll: LazyListState = rememberLazyListState()
+            val adapterScroll: ScrollbarAdapter = rememberScrollbarAdapter(scrollState = stateScroll)
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 12.dp),
+                state = stateScroll
+            ) {
+                items(comments.value.size) { index ->
+                    val comment: CommentFileObject = comments.value[index]
+
+                    CartCommentForFileObject(
+                        text = comment.comment,
+                        createdAt = comment.createdAt
+                    )
+
+                    if (comments.value.size - 1 != index) {
+                        Spacer(
+                            modifier = Modifier
+                                .height(16.dp)
+                        )
+                    }
+                }
+            }
+            VerticalScrollbar(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .background(Color.Gray.copy(0.8f), RoundedCornerShape(4.dp))
+                    .fillMaxHeight(),
+                adapter = adapterScroll
+            )
+        }
+    }
 }

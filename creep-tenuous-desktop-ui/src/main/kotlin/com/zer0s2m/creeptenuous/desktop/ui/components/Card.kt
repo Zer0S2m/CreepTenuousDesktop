@@ -7,10 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +30,8 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 /**
@@ -593,3 +592,38 @@ class CartFileObject(
     }
 
 }
+
+/**
+ * Component for rendering a comment for a file object.
+ *
+ * @param text Comment text.
+ * @param createdAt Date the comment was created.
+ */
+@Composable
+internal fun CartCommentForFileObject(
+    text: String,
+    createdAt: String
+) {
+    val localCreatedAt = DateTimeFormatter
+        .ofPattern("MMMM dd, yyyy HH:mm:ss")
+        .format(LocalDateTime.parse(createdAt, dateFormatForComment))
+
+    Column {
+        Text(
+            text = localCreatedAt,
+            color = MaterialTheme.colors.secondaryVariant.copy(0.8f),
+        )
+        Spacer(
+            modifier = Modifier
+                .height(4.dp)
+        )
+        Text(text = text)
+    }
+}
+
+/**
+ * Date format for file object comment.
+ */
+@get:ReadOnlyComposable
+private val dateFormatForComment: DateTimeFormatter get() =
+    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
