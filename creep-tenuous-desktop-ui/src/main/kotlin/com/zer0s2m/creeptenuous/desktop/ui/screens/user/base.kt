@@ -10,7 +10,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
+import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
 
 /**
  * Basic card for user interaction in the system. Extends a component [Card]

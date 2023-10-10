@@ -1,22 +1,14 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens
 
-import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.v2.ScrollbarAdapter
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -41,20 +33,16 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.ui.components.BreadCrumbs
+import com.zer0s2m.creeptenuous.desktop.ui.components.BreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardModalSheet
-import com.zer0s2m.creeptenuous.desktop.ui.components.CartCommentForFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbs
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * The main dashboard for interacting with system file objects
@@ -276,7 +264,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
         modalCommentsFileObject.render(
             drawerContent = {
-                ContentCommentsInFileObjectModal(
+                PopupContentCommentsInFileObjectModal(
                     comments = commentsInFileObject,
                     expandedStateModelInteractiveComment = expandedStateModalInteractionCommentFileObject
                 )
@@ -362,7 +350,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
  * @param text The text to be displayed.
  */
 @Composable
-private fun TextInCardModalSheet(text: String = "") = Text(
+private fun TextInCardModalSheet(text: String) = Text(
     text = text,
     textAlign = TextAlign.Center,
     fontWeight = FontWeight.Medium,
@@ -375,10 +363,9 @@ private fun TextInCardModalSheet(text: String = "") = Text(
  * @param text The text to be displayed.
  */
 @Composable
-private fun TitleInSectionForCardsModalSheet(text: String = ""): Unit = Text(
+private fun TitleInSectionForCardsModalSheet(text: String): Unit = Text(
     text = text,
-    modifier = Modifier
-        .padding(4.dp, 0.dp),
+    modifier = Modifier.padding(4.dp, 0.dp),
     color = Colors.TEXT.color,
     fontWeight = FontWeight.Bold
 )
@@ -503,126 +490,6 @@ private fun onClickCardSheet(
             route = Screen.PROFILE_SCREEN,
             objects = listOf(),
             scope = scope
-        )
-    }
-}
-
-/**
- * Render the contents of a modal window to show the comments of a file object.
- *
- * @param comments Comments for file objects.
- * @param expandedStateModelInteractiveComment Current state of the modal
- * [PopupInteractionCommentFileObject] rename file object.
- */
-@Composable
-@Suppress("SameParameterValue")
-private fun ContentCommentsInFileObjectModal(
-    comments: SnapshotStateList<CommentFileObject>,
-    expandedStateModelInteractiveComment: MutableState<Boolean>
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "File object comments",
-            color = Colors.TEXT.color,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        IconButtonAdd(
-            onClick = {
-                expandedStateModelInteractiveComment.value = true
-                val currentFileObject: String = ContextScreen.get(
-                    Screen.DASHBOARD_SCREEN,
-                    "currentFileObject"
-                )
-
-                ContextScreen.set(
-                    Screen.DASHBOARD_SCREEN,
-                    mapOf(
-                        "isEditFileObjectForInteractive" to false,
-                        "isCreateFileObjectForInteractive" to true,
-                        "currentFileObjectForInteractive" to CommentFileObject(
-                            id = null,
-                            fileSystemObject = currentFileObject,
-                            comment = "",
-                            createdAt = LocalDateTime.now()
-                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                        )
-                    )
-                )
-            },
-            contentDescription = "Add a comment for file object"
-        )
-    }
-    Spacer(modifier = Modifier.height(20.dp))
-    LayoutCommentsInFileObject(
-        comments = comments,
-        expandedStateModelInteractiveComment = expandedStateModelInteractiveComment
-    )
-}
-
-/**
- * Render the contents of file object comments.
- *
- * @param comments Comments for file objects.
- * @param expandedStateModelInteractiveComment Current state of the modal
- * [PopupInteractionCommentFileObject] rename file object.
- */
-@Composable
-private fun LayoutCommentsInFileObject(
-    comments: SnapshotStateList<CommentFileObject>,
-    expandedStateModelInteractiveComment: MutableState<Boolean>
-) {
-    Box {
-        val stateScroll: LazyListState = rememberLazyListState()
-        val adapterScroll: ScrollbarAdapter = rememberScrollbarAdapter(scrollState = stateScroll)
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 12.dp),
-            state = stateScroll
-        ) {
-            items(comments.size) { index ->
-                val comment: CommentFileObject = comments[index]
-
-                CartCommentForFileObject(
-                    text = comment.comment,
-                    createdAt = comment.createdAt,
-                    actionEdit = {
-                        ContextScreen.set(
-                            Screen.DASHBOARD_SCREEN,
-                            mapOf(
-                                "currentFileObjectForInteractive" to comment,
-                                "currentIndexFileObjectForInteractive" to index,
-                                "isEditFileObjectForInteractive" to true,
-                                "isCreateFileObjectForInteractive" to false
-                            )
-                        )
-                        expandedStateModelInteractiveComment.value = true
-                    },
-                    actionDelete = {
-                        ReactiveFileObject.commentsFileSystemObject.removeAtReactive(index)
-                        comments.removeAt(index)
-                    }
-                )
-
-                if (comments.size - 1 != index) {
-                    Spacer(
-                        modifier = Modifier
-                            .height(16.dp)
-                    )
-                }
-            }
-        }
-        VerticalScrollbar(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .background(Color.Gray.copy(0.8f), RoundedCornerShape(4.dp))
-                .fillMaxHeight(),
-            adapter = adapterScroll
         )
     }
 }

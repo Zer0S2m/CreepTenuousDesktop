@@ -28,7 +28,6 @@ import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInCard
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardPanelBaseFolderUser
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

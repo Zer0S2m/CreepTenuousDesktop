@@ -31,8 +31,8 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFormState
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
-import com.zer0s2m.creeptenuous.desktop.ui.screens.base.DropdownMenuSelectColor
-import com.zer0s2m.creeptenuous.desktop.ui.screens.base.InputSelectColor
+import com.zer0s2m.creeptenuous.desktop.ui.screens.common.DropdownMenuSelectColor
+import com.zer0s2m.creeptenuous.desktop.ui.screens.common.InputSelectColor
 
 /**
  * Set the color palette when editing or creating a custom category.

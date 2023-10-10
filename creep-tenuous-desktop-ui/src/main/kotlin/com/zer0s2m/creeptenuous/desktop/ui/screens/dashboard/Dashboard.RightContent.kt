@@ -20,8 +20,8 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.FieldSearch
+import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
+import com.zer0s2m.creeptenuous.desktop.ui.components.FieldSearch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
