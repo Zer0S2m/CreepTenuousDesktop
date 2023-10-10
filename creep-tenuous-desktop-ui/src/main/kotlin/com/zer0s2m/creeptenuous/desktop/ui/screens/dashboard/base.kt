@@ -291,31 +291,31 @@ internal fun PopupSetUserColorInFileObject(
             fontSize = 20.sp
         )
         Spacer(modifier = Modifier.height(20.dp))
-        InputSelectColor(
-            isSetColor = isSetColor,
-            currentColor = currentColor,
-            action = {
-                expandedStateDropDownMenu.value = true
-            },
-            actionDelete = {
-                currentColor.value = null
-                isSetColor.value = false
-                ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorEditFileObject", null)
-            },
-            content = {
-                DropdownMenuSelectColor(
-                    expandedState = expandedStateDropDownMenu,
-                    modifier = Modifier.width(baseWidthColumnSelectItem),
-                    action = { colorStr, color, colorId ->
-                        expandedStateDropDownMenu.value = false
-                        currentColor.value = color
-                        isSetColor.value = true
-                        ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorEditFileObject", colorStr)
-                        ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorIdEditFileObject", colorId)
-                    }
-                )
-            }
-        )
+        Column {
+            InputSelectColor(
+                isSetColor = isSetColor,
+                currentColor = currentColor,
+                action = {
+                    expandedStateDropDownMenu.value = true
+                },
+                actionDelete = {
+                    currentColor.value = null
+                    isSetColor.value = false
+                    ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorEditFileObject", null)
+                }
+            )
+            DropdownMenuSelectColor(
+                expandedState = expandedStateDropDownMenu,
+                modifier = Modifier.width(baseWidthColumnSelectItem),
+                action = { colorStr, color, colorId ->
+                    expandedStateDropDownMenu.value = false
+                    currentColor.value = color
+                    isSetColor.value = true
+                    ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorEditFileObject", colorStr)
+                    ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorIdEditFileObject", colorId)
+                }
+            )
+        }
 
         Row(
             horizontalArrangement = Arrangement.Center,
@@ -423,33 +423,32 @@ internal fun PopupCreateFileObjectTypeDirectory(
             categoryId = categoryId
         )
         Spacer(modifier = Modifier.padding(top = 16.dp))
-        InputSelectColor(
-            isSetColor = isSetColor,
-            currentColor = currentColor,
-            action = {
-                expandedStateSelectColor.value = true
-            },
-            actionDelete = {
-                isSetColor.value = false
-                currentColor.value = Color(0, 0, 0)
-                colorStrState.value = null
-                colorIdState.value = null
-            },
-            content = {
-                DropdownMenuSelectColor(
-                    expandedState = expandedStateSelectColor,
-                    modifier = Modifier
-                        .width(baseWidthColumnSelectColor),
-                    action = { colorStr, color, colorId ->
-                        expandedStateSelectColor.value = false
-                        isSetColor.value = true
-                        currentColor.value = color
-                        colorStrState.value = colorStr
-                        colorIdState.value = colorId
-                    }
-                )
-            }
-        )
+        Column {
+            InputSelectColor(
+                isSetColor = isSetColor,
+                currentColor = currentColor,
+                action = {
+                    expandedStateSelectColor.value = true
+                },
+                actionDelete = {
+                    isSetColor.value = false
+                    currentColor.value = Color(0, 0, 0)
+                    colorStrState.value = null
+                    colorIdState.value = null
+                }
+            )
+            DropdownMenuSelectColor(
+                expandedState = expandedStateSelectColor,
+                modifier = Modifier.width(baseWidthColumnSelectColor),
+                action = { colorStr, color, colorId ->
+                    expandedStateSelectColor.value = false
+                    isSetColor.value = true
+                    currentColor.value = color
+                    colorStrState.value = colorStr
+                    colorIdState.value = colorId
+                }
+            )
+        }
         Spacer(modifier = Modifier.padding(top = 12.dp))
         Row(horizontalArrangement = Arrangement.Center) {
             Button(
