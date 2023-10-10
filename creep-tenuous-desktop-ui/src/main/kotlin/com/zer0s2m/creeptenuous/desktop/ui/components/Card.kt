@@ -7,10 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +30,10 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
+import com.zer0s2m.creeptenuous.desktop.ui.screens.user.IconButtonDelete
+import com.zer0s2m.creeptenuous.desktop.ui.screens.user.IconButtonEdit
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 /**
@@ -202,6 +203,7 @@ class CardPanelBaseFolderUser(
  * @param actionCopy Action called when a file object is copied
  * @param actionMove Action called when a file object is moved
  * @param actionDelete Action called when a file object is deleted
+ * @param actionComments Action called when comments are opened.
  * @param actionSetCategory Action called when a custom category is set on a file object
  * @param actionSetColor Action called when a custom color is set on a file object
  */
@@ -217,6 +219,7 @@ class CartFileObject(
     override val actionCopy: () -> Unit = {},
     override val actionMove: () -> Unit = {},
     override val actionDelete: () -> Unit = {},
+    override val actionComments: () -> Unit = {},
     override val actionSetCategory: () -> Unit = {},
     override val actionSetColor: () -> Unit = {},
 ) : BaseCardFileObject {
@@ -547,6 +550,16 @@ class CartFileObject(
                 }
             ),
             DropdownMenuItemAdvanced(
+                text = "Comments",
+                colorText = Color.Black,
+                modifierMenu = modifierMenu,
+                contentPadding = contentPaddingMenu,
+                action = {
+                    expandedMenu.value = false
+                    actionComments()
+                }
+            ),
+            DropdownMenuItemAdvanced(
                 text = "Set category",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
@@ -581,3 +594,66 @@ class CartFileObject(
     }
 
 }
+
+/**
+ * Component for rendering a comment for a file object.
+ *
+ * @param text Comment text.
+ * @param createdAt Date the comment was created.
+ * @param modifierButtonEdit The modifier to be applied to the layout for button edit.
+ * @param modifierButtonDelete The modifier to be applied to the layout. for button delete
+ * @param actionEdit The lambda to be invoked when this icon is pressed [IconButton]. Event - edit.
+ * @param actionDelete The lambda to be invoked when this icon is pressed [IconButton]. Event - delete.
+ */
+@Composable
+internal fun CartCommentForFileObject(
+    text: String,
+    createdAt: String,
+    modifierButtonEdit: Modifier = Modifier
+        .size(26.dp)
+        .padding(4.dp),
+    modifierButtonDelete: Modifier = Modifier
+        .size(26.dp)
+        .padding(4.dp),
+    actionEdit: () -> Unit = {},
+    actionDelete: () -> Unit = {}
+) {
+    val localCreatedAt = DateTimeFormatter
+        .ofPattern("MMMM dd, yyyy HH:mm:ss")
+        .format(LocalDateTime.parse(createdAt, dateFormatForComment))
+
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = localCreatedAt,
+                color = MaterialTheme.colors.secondaryVariant.copy(0.8f),
+            )
+            Spacer(
+                modifier = Modifier
+                    .width(12.dp)
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButtonEdit(
+                    modifierLayout = modifierButtonEdit,
+                    onClick = actionEdit
+                )
+                IconButtonDelete(
+                    modifierLayout = modifierButtonDelete,
+                    onClick = actionDelete
+                )
+            }
+        }
+        Spacer(
+            modifier = Modifier
+                .height(4.dp)
+        )
+        Text(text = text)
+    }
+}
+
+/**
+ * Date format for file object comment.
+ */
+@get:ReadOnlyComposable
+private val dateFormatForComment: DateTimeFormatter get() =
+    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")

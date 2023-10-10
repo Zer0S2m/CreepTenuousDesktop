@@ -3,38 +3,27 @@ package com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
-import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.FieldSearch
 import kotlinx.coroutines.CoroutineScope
-
-/**
- * Text used by accessibility services to describe what this image represents
- */
-@get:ReadOnlyComposable
-private val contentDescriptionIconAdd: String get() = "Add file object"
+import kotlinx.coroutines.launch
 
 /**
  * Content on the right side of the main dashboard
@@ -46,6 +35,7 @@ private val contentDescriptionIconAdd: String get() = "Add file object"
  * @param expandedStateSetColorPopup Current state of the modal
  * [PopupSetUserColorInFileObject] when setting a custom color
  * @param expandedStateModalRenameFileObject Current state of the modal [PopupRenameFileObject] rename file object.
+ * @param scaffoldStateCommentFileObject State of this scaffold widget.
  */
 @Composable
 internal fun RenderLayoutFilesObject(
@@ -54,8 +44,11 @@ internal fun RenderLayoutFilesObject(
     expandedStateSetCategoryPopup: MutableState<Boolean>,
     expandedStateSetColorPopup: MutableState<Boolean>,
     expandedStateCreateFileObjectTypeDirectory: MutableState<Boolean>,
-    expandedStateModalRenameFileObject: MutableState<Boolean>
+    expandedStateModalRenameFileObject: MutableState<Boolean>,
+    scaffoldStateCommentFileObject: ScaffoldState
 ) {
+    val scope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier
             .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 16.dp)
@@ -65,16 +58,20 @@ internal fun RenderLayoutFilesObject(
                 .padding(bottom = 28.dp)
         ) {
             RenderLayoutDirectories(
+                scope = scope,
                 directories = directories,
                 expandedStateSetCategoryPopup = expandedStateSetCategoryPopup,
                 expandedStateSetColorPopup = expandedStateSetColorPopup,
                 expandedStateCreateFileObjectTypeDirectory = expandedStateCreateFileObjectTypeDirectory,
-                expandedStateModalRenameFileObject = expandedStateModalRenameFileObject
+                expandedStateModalRenameFileObject = expandedStateModalRenameFileObject,
+                scaffoldStateCommentFileObject = scaffoldStateCommentFileObject
             )
             RenderLayoutFiles(
+                scope = scope,
                 files = files,
                 expandedStateSetCategoryPopup = expandedStateSetCategoryPopup,
-                expandedStateModalRenameFileObject = expandedStateModalRenameFileObject
+                expandedStateModalRenameFileObject = expandedStateModalRenameFileObject,
+                scaffoldStateCommentFileObject = scaffoldStateCommentFileObject
             )
         }
     }
@@ -83,20 +80,24 @@ internal fun RenderLayoutFilesObject(
 /**
  * Content renderer responsible for file objects with type - category
  *
+ * @param scope Defines a scope for new coroutines.
  * @param directories file objects with type - directory
  * @param expandedStateSetCategoryPopup Current state of the modal
  * [PopupSetUserCategoryInFileObject] when setting a custom category
  * @param expandedStateSetColorPopup Current state of the modal
  * [PopupSetUserColorInFileObject] when setting a custom color
  * @param expandedStateModalRenameFileObject Current state of the modal [PopupRenameFileObject] rename file object.
+ * @param scaffoldStateCommentFileObject State of this scaffold widget.
  */
 @Composable
 internal fun RenderLayoutDirectories(
+    scope: CoroutineScope,
     directories: MutableState<MutableList<FileObject>>,
     expandedStateSetCategoryPopup: MutableState<Boolean>,
     expandedStateSetColorPopup: MutableState<Boolean>,
     expandedStateCreateFileObjectTypeDirectory: MutableState<Boolean>,
-    expandedStateModalRenameFileObject: MutableState<Boolean>
+    expandedStateModalRenameFileObject: MutableState<Boolean>,
+    scaffoldStateCommentFileObject: ScaffoldState
 ) {
     Column(
         modifier = Modifier
@@ -107,19 +108,12 @@ internal fun RenderLayoutDirectories(
         ) {
             TitleCategoryFileObject("Folders", directories.value.size)
 
-            IconButton(
+            IconButtonAdd(
                 onClick = {
                     expandedStateCreateFileObjectTypeDirectory.value = true
-                }
-            ) {
-                Icon(
-                    painter = painterResource(resourcePath = Resources.ICON_ADD.path),
-                    contentDescription = contentDescriptionIconAdd,
-                    modifier = Modifier
-                        .pointerHoverIcon(PointerIcon.Hand),
-                    tint = Color.Gray
-                )
-            }
+                },
+                contentDescription = "Add file object"
+            )
         }
         LazyVerticalGrid(
             columns = GridCells.Adaptive(160.dp),
@@ -158,6 +152,13 @@ internal fun RenderLayoutDirectories(
                     actionRename = {
                         actionRename(directories.value[index].systemName)
                         expandedStateModalRenameFileObject.value = true
+                    },
+                    actionComments = {
+                        actionComments(
+                            scope = scope,
+                            scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
+                            systemName = directories.value[index].systemName
+                        )
                     }
                 ).render()
             }
@@ -168,16 +169,20 @@ internal fun RenderLayoutDirectories(
 /**
  * Content renderer responsible for file objects with type - file
  *
+ * @param scope Defines a scope for new coroutines.
  * @param files file objects with type - file
  * @param expandedStateSetCategoryPopup Current state of the modal [PopupSetUserCategoryInFileObject]
  * when setting a custom category
  * @param expandedStateModalRenameFileObject Current state of the modal [PopupRenameFileObject] rename file object.
+ * @param scaffoldStateCommentFileObject State of this scaffold widget.
  */
 @Composable
 internal fun RenderLayoutFiles(
+    scope: CoroutineScope,
     files: MutableState<MutableList<FileObject>>,
     expandedStateSetCategoryPopup: MutableState<Boolean>,
-    expandedStateModalRenameFileObject: MutableState<Boolean>
+    expandedStateModalRenameFileObject: MutableState<Boolean>,
+    scaffoldStateCommentFileObject: ScaffoldState
 ) {
     Column {
         TitleCategoryFileObject("Files", files.value.size)
@@ -205,6 +210,13 @@ internal fun RenderLayoutFiles(
                     actionRename = {
                         actionRename(files.value[index].systemName)
                         expandedStateModalRenameFileObject.value = true
+                    },
+                    actionComments = {
+                        actionComments(
+                            scope = scope,
+                            scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
+                            systemName = files.value[index].systemName
+                        )
                     }
                 ).render()
             }
@@ -314,4 +326,31 @@ private fun actionRename(systemName: String) {
         "currentFileObjectSetProperty",
         systemName
     )
+}
+
+/**
+ * Load comments for a file object and render.
+ *
+ * @param scope Defines a scope for new coroutines.
+ * @param scaffoldStateCommentFileObject State for [Scaffold] composable component.
+ * @param systemName System name of the file object.
+ */
+private fun actionComments(
+    scope: CoroutineScope,
+    scaffoldStateCommentFileObject: ScaffoldState,
+    systemName: String
+) {
+    if (scaffoldStateCommentFileObject.drawerState.isClosed) {
+        ReactiveLoader.resetIsLoad("commentsFileSystemObject")
+        scope.launch {
+            ContextScreen.set(
+                Screen.DASHBOARD_SCREEN,
+                "currentFileObject",
+                systemName
+            )
+
+            ReactiveLoader.load("commentsFileSystemObject")
+            scaffoldStateCommentFileObject.drawerState.open()
+        }
+    }
 }

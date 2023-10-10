@@ -146,14 +146,21 @@ internal fun BaseCardItemGrid(
 /**
  * Base element removal component. Extends a component [IconButton]
  *
+ * @param modifierLayout The modifier to be applied to the layout.
  * @param onClick The lambda to be invoked when this icon is pressed [IconButton]
  */
 @Composable
-internal fun IconButtonDelete(onClick: () -> Unit) {
+internal fun IconButtonDelete(
+    modifierLayout: Modifier = Modifier
+        .padding(4.dp)
+        .size(32.dp),
+    onClick: () -> Unit
+) {
     BaseIconButton(
         resourcePath = Resources.ICON_DELETE.path,
         contentDescription = contentDescriptionDelete,
         tint = Color.Red,
+        modifierLayout = modifierLayout,
         onClick = onClick
     )
 }
@@ -161,13 +168,20 @@ internal fun IconButtonDelete(onClick: () -> Unit) {
 /**
  * Base element edit component. Extends a component [IconButton]
  *
+ * @param modifierLayout The modifier to be applied to the layout.
  * @param onClick The lambda to be invoked when this icon is pressed [IconButton]
  */
 @Composable
-internal fun IconButtonEdit(onClick: () -> Unit) {
+internal fun IconButtonEdit(
+    modifierLayout: Modifier = Modifier
+        .padding(4.dp)
+        .size(32.dp),
+    onClick: () -> Unit
+) {
     BaseIconButton(
         resourcePath = Resources.ICON_EDIT.path,
         contentDescription = contentDescriptionEdit,
+        modifierLayout = modifierLayout,
         onClick = onClick
     )
 }
@@ -179,7 +193,9 @@ internal fun IconButtonEdit(onClick: () -> Unit) {
  * @param contentDescription Text used by accessibility services to describe what this icon represents.
  * @param tint Tint to be applied to painter.
  * @param enabled Controls the enabled state.
- * @param interactionSource [MutableInteractionSource] that will be used to dispatch [PressInteraction.Press] when this clickable is pressed.
+ * @param interactionSource [MutableInteractionSource] that will be used to dispatch [PressInteraction.Press]
+ * when this clickable is pressed.
+ * @param modifierLayout The modifier to be applied to the layout.
  * @param onClick The lambda to be invoked when this icon is pressed [IconButton]
  */
 @Composable
@@ -189,12 +205,11 @@ private fun BaseIconButton(
     tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    modifierLayout: Modifier,
     onClick: () -> Unit
 ) {
     Box(
-        modifier = Modifier
-            .padding(4.dp)
-            .size(32.dp)
+        modifier = modifierLayout
             .clickable(
                 onClick = onClick,
                 enabled = enabled,

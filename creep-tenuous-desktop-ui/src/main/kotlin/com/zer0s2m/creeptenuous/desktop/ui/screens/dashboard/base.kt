@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
@@ -671,6 +672,100 @@ internal fun PopupRenameFileObject(
                         }
                     ) {
                         Text("Rename")
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Modal window for creating or editing a comment for a file object.
+ *
+ * @param expandedState Modal window states.
+ * @param onDismissRequest Executes when the user clicks outside the popup.
+ * @param actionSave The action is triggered when the comment of a file object is changed.
+ */
+@Composable
+internal fun PopupInteractionCommentFileObject(
+    expandedState: MutableState<Boolean>,
+    onDismissRequest: () -> Unit = {},
+    actionSave: (comment: CommentFileObject) -> Unit
+) {
+    BaseModalPopup(
+        stateModal = expandedState,
+        onDismissRequest = onDismissRequest
+    ) {
+        Surface(
+            contentColor = contentColorFor(MaterialTheme.colors.surface),
+            modifier = Modifier
+                .width(360.dp)
+                .height(180.dp)
+                .shadow(24.dp, RoundedCornerShape(4.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .pointerInput({}) {
+                        detectTapGestures(onPress = {
+                            // Workaround to disable clicks on Surface background
+                            // https://github.com/JetBrains/compose-jb/issues/2581
+                        })
+                    },
+            ) {
+                val stateForm = FormState()
+                val comment: CommentFileObject = ContextScreen.get(
+                    Screen.DASHBOARD_SCREEN,
+                    "currentFileObjectForInteractive"
+                )
+
+                Text(
+                    text = "Comment",
+                    fontSize = 20.sp
+                )
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                )
+                Form(
+                    state = stateForm,
+                    fields = listOf(
+                        TextFieldAdvanced(
+                            textField = comment.comment,
+                            nameField = "text",
+                            labelField = "Enter text",
+                            validators = listOf(
+                                NotEmptyValidator()
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+                    )
+                )
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                )
+                Row(
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .pointerHoverIcon(PointerIcon.Hand),
+                        onClick = {
+                            if (stateForm.validateForm()) {
+                                expandedState.value = false
+
+                                val dataForm = stateForm.getData()
+
+                                comment.comment = dataForm["text"].toString().trim()
+                                actionSave(comment)
+                            }
+                        }
+                    ) {
+                        Text("Save")
                     }
                 }
             }
