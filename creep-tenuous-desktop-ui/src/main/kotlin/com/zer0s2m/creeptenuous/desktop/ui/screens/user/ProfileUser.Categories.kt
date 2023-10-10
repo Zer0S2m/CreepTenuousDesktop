@@ -169,7 +169,7 @@ private fun ItemCategory(
     actionEdit: () -> Unit,
     actionDelete: () -> Unit
 ) {
-    BaseCardItemGrid {
+    BaseCardItemGrid(height = 60.dp) {
         Text(text = userCategory.title)
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -183,7 +183,7 @@ private fun ItemCategory(
                     Box(
                         modifier = Modifier
                             .width(60.dp)
-                            .height(32.dp)
+                            .height(40.dp)
                             .background(
                                 color = Color(
                                     red = convertedColor.red,
@@ -194,6 +194,7 @@ private fun ItemCategory(
                             )
                     )
                 }
+                Spacer(modifier = Modifier.width(16.dp))
             }
             IconButtonEdit(onClick = actionEdit)
             Spacer(modifier = Modifier.width(8.dp))

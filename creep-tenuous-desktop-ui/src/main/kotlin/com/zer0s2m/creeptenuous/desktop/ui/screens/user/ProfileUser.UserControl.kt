@@ -25,9 +25,9 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
-import com.zer0s2m.creeptenuous.desktop.ui.components.DatePicker
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
+import com.zer0s2m.creeptenuous.desktop.ui.components.ModalSelectDate
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 import java.util.*
@@ -370,6 +370,7 @@ private fun AlertDialogDeleteOrUnblockUser(
             .height(180.dp)
     ) {
         Text(text = titleDialog)
+        Spacer(modifier = Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.Center) {
             Button(
                 modifier = Modifier
@@ -421,9 +422,9 @@ private fun ModalBlockUser(
     isErrorValidateDateEndBlockUser: MutableState<Boolean>,
     actionBlock: () -> Unit
 ) {
-    val heightModal: MutableState<Int> = mutableStateOf(225)
-    val isActiveBlockCompletely: MutableState<Boolean> = mutableStateOf(true)
-    val isActiveBlockTemporary: MutableState<Boolean> = mutableStateOf(false)
+    val heightModal: MutableState<Int> = remember { mutableStateOf(225) }
+    val isActiveBlockCompletely: MutableState<Boolean> = remember { mutableStateOf(true) }
+    val isActiveBlockTemporary: MutableState<Boolean> = remember { mutableStateOf(false) }
 
     ModalPopup(
         stateModal = expandedState,
@@ -501,13 +502,10 @@ private fun ModalBlockUser(
 
                         ContextScreen.set(
                             Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                            "isStartDateBlockUser",
-                            true
-                        )
-                        ContextScreen.set(
-                            Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                            "isEndDateBlockUser",
-                            false
+                            hashMapOf(
+                                "isStartDateBlockUser" to true,
+                                "isEndDateBlockUser" to false
+                            )
                         )
 
                         if (ContextScreen.containsValueByKey(
@@ -533,7 +531,6 @@ private fun ModalBlockUser(
                     labelError = "Please indicate the date",
                     actionOpen = {
                         expandedStateModalSelectDate.value = true
-
                         isStartDateBlockUser = false
                         isEndDateBlockUser = true
 
@@ -714,36 +711,6 @@ private fun Modifier.drawBehindIsActive(
             end = Offset(size.width, verticalOffset)
         )
     }) else this
-
-/**
- * Modal window for selecting a date.
- *
- * @param initDate Initial selected date state.
- * @param expandedState Modal window states.
- * @param onDismissRequest Cancel date selection.
- * @param onDateSelect Action that will be performed when the date is selected.
- */
-@Composable
-internal fun ModalSelectDate(
-    initDate: MutableState<Date>,
-    expandedState: MutableState<Boolean>,
-    onDismissRequest: () -> Unit,
-    onDateSelect: (Date) -> Unit
-) {
-    ModalPopup(
-        stateModal = expandedState,
-        modifierLayout = Modifier
-            .width(350.dp)
-            .height(520.dp)
-    ) {
-        DatePicker(
-            initDate = initDate.value,
-            onDismissRequest = onDismissRequest,
-            onDateSelect = onDateSelect,
-            minYear = GregorianCalendar().get(Calendar.YEAR)
-        )
-    }
-}
 
 /**
  * Text component for date picker.

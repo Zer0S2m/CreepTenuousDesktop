@@ -18,10 +18,10 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
 import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
+import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.FieldSearch
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -49,14 +49,8 @@ internal fun RenderLayoutFilesObject(
 ) {
     val scope = rememberCoroutineScope()
 
-    Column(
-        modifier = Modifier
-            .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 16.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(bottom = 28.dp)
-        ) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(bottom = 28.dp)) {
             RenderLayoutDirectories(
                 scope = scope,
                 directories = directories,
@@ -113,7 +107,8 @@ internal fun RenderLayoutDirectories(
         LazyVerticalGrid(
             columns = GridCells.Adaptive(160.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(top = 12.dp)
         ) {
             items(directories.value.size) { index ->
                 val categoryId: Int? = directories.value[index].categoryId
@@ -185,8 +180,7 @@ internal fun RenderLayoutFiles(
             columns = GridCells.Adaptive(160.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .padding(top = 12.dp)
+            modifier = Modifier.padding(top = 12.dp)
         ) {
             items(files.value.size) { index ->
                 val categoryId: Int? = files.value[index].categoryId
