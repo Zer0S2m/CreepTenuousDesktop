@@ -1,21 +1,20 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.user
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Slider
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.ConverterColor
@@ -25,8 +24,8 @@ import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonEdit
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
+import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
-import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 
 /**
  * Rendering part of the user profile screen [Screen.PROFILE_COLORS_SCREEN]
@@ -145,40 +144,35 @@ private fun ModalCreateCustomColor(
     stateModal: MutableState<Boolean>,
     listColors: MutableList<Color>
 ) {
-    BaseModalPopup(
+    ModalPopup(
+        modifierLayout = Modifier
+            .width(360.dp)
+            .height(400.dp),
         stateModal = stateModal
     ) {
-        Surface(
-            contentColor = contentColorFor(MaterialTheme.colors.surface),
-            modifier = Modifier
-                .width(360.dp)
-                .height(400.dp)
-                .shadow(24.dp, RoundedCornerShape(4.dp))
-        ) {
-            ModalCreateCustomColorContent(
-                isExists = isExists.value,
-                stateColor = stateColor,
-                actionCreate = {
-                    stateModal.value = false
-                    isExists.value = false
-                    listColors.add(it)
-                    ReactiveUser.userColors.addReactive(UserColor(
+        ModalCreateCustomColorContent(
+            isExists = isExists.value,
+            stateColor = stateColor,
+            actionCreate = {
+                stateModal.value = false
+                isExists.value = false
+                listColors.add(it)
+                ReactiveUser.userColors.addReactive(UserColor(
+                    color = "#${Integer.toHexString(it.toArgb()).substring(2)}"
+                ))
+            },
+            actionEdit = {
+                stateModal.value = false
+                isExists.value = false
+                listColors[currentIndexColor.value] = it
+                ReactiveUser.userColors.setReactive(
+                    index = currentIndexColor.value,
+                    element = UserColor(
                         color = "#${Integer.toHexString(it.toArgb()).substring(2)}"
-                    ))
-                },
-                actionEdit = {
-                    stateModal.value = false
-                    isExists.value = false
-                    listColors[currentIndexColor.value] = it
-                    ReactiveUser.userColors.setReactive(
-                        index = currentIndexColor.value,
-                        element = UserColor(
-                            color = "#${Integer.toHexString(it.toArgb()).substring(2)}"
-                        )
                     )
-                }
-            )
-        }
+                )
+            }
+        )
     }
 }
 
@@ -208,78 +202,64 @@ private fun ModalCreateCustomColorContent(
         alpha = 255
     )
 
+    Text(
+        text = if (isExists) "Edit a custom color" else "Create a custom color",
+        fontSize = 20.sp
+    )
+
+    Column(modifier = Modifier.padding(top = 12.dp)) {
+        Text(text = "Red ${red.toInt()}")
+        Slider(
+            value = red,
+            onValueChange = { red = it },
+            valueRange = 0f..255f,
+            modifier = Modifier
+                .pointerHoverIcon(PointerIcon.Hand)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(text = "Green ${green.toInt()}")
+        Slider(
+            value = green,
+            onValueChange = { green = it },
+            valueRange = 0f..255f,
+            modifier = Modifier
+                .pointerHoverIcon(PointerIcon.Hand)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(text = "Blue ${blue.toInt()}")
+        Slider(
+            value = blue,
+            onValueChange = { blue = it },
+            valueRange = 0f..255f,
+            modifier = Modifier
+                .pointerHoverIcon(PointerIcon.Hand)
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .pointerInput({}) {
-                detectTapGestures(onPress = {
-                    // Workaround to disable clicks on Surface background
-                    // https://github.com/JetBrains/compose-jb/issues/2581
-                })
-            },
+            .padding(top = 12.dp),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = if (isExists) "Edit a custom color" else "Create a custom color",
-            fontSize = 20.sp
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = color, RoundedCornerShape(4.dp))
+                .height(40.dp)
         )
-
-        Column(
+        Spacer(modifier = Modifier.height(12.dp))
+        Button(
             modifier = Modifier
-                .padding(top = 12.dp)
-        ) {
-            Text(text = "Red ${red.toInt()}")
-            Slider(
-                value = red,
-                onValueChange = { red = it },
-                valueRange = 0f..255f,
-                modifier = Modifier
-                    .pointerHoverIcon(PointerIcon.Hand)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = "Green ${green.toInt()}")
-            Slider(
-                value = green,
-                onValueChange = { green = it },
-                valueRange = 0f..255f,
-                modifier = Modifier
-                    .pointerHoverIcon(PointerIcon.Hand)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = "Blue ${blue.toInt()}")
-            Slider(
-                value = blue,
-                onValueChange = { blue = it },
-                valueRange = 0f..255f,
-                modifier = Modifier
-                    .pointerHoverIcon(PointerIcon.Hand)
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 12.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = color, RoundedCornerShape(4.dp))
-                    .height(40.dp)
-            )
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .pointerHoverIcon(PointerIcon.Hand),
-                onClick = {
-                    if (isExists) actionEdit(color) else actionCreate(color)
-                }
-            ) {
-                Text(if (isExists) "Edit" else "Create")
+                .fillMaxWidth()
+                .pointerHoverIcon(PointerIcon.Hand),
+            onClick = {
+                if (isExists) actionEdit(color) else actionCreate(color)
             }
+        ) {
+            Text(if (isExists) "Edit" else "Create")
         }
     }
 }

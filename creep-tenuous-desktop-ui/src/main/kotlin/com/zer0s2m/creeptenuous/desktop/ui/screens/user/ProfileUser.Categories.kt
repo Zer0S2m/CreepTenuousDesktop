@@ -1,20 +1,19 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.user
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,12 +25,12 @@ import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonEdit
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
+import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFormState
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
-import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.DropdownMenuSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.InputSelectColor
 
@@ -56,10 +55,7 @@ fun ProfileUser.ProfileCategories.render() {
         ReactiveUser.customCategories.toMutableStateList()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -223,61 +219,18 @@ private fun ModalCreateCategory(
     actionCreate: () -> Unit,
     actionEdit: () -> Unit
 ) {
-    BaseModalPopup(
-        stateModal = stateModal
-    ) {
-        Surface(
-            contentColor = contentColorFor(MaterialTheme.colors.surface),
-            modifier = Modifier
-                .width(360.dp)
-                .height(240.dp)
-                .shadow(24.dp, RoundedCornerShape(4.dp))
-        ) {
-            ModalCreateCategoryContent(
-                isExists = isExists,
-                stateUserCategory = stateUserCategory,
-                actionCreate = actionCreate,
-                actionEdit = actionEdit
-            )
-        }
-    }
-}
-
-/**
- * Content of the modal window for creating and editing a category
- *
- * @param isExists Does an object exist, depending on this, a certain action will occur
- * @param stateUserCategory The current state of the custom category
- * @param actionCreate [Button] click event create
- * @param actionEdit [Button] click event edit
- */
-@Composable
-private fun ModalCreateCategoryContent(
-    isExists: Boolean,
-    stateUserCategory: MutableState<UserCategory>,
-    actionCreate: () -> Unit,
-    actionEdit: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .pointerInput({}) {
-                detectTapGestures(onPress = {
-                    // Workaround to disable clicks on Surface background
-                    // https://github.com/JetBrains/compose-jb/issues/2581
-                })
-            },
-        verticalArrangement = Arrangement.SpaceBetween
+    ModalPopup(
+        stateModal = stateModal,
+        modifierLayout = Modifier
+            .width(360.dp)
+            .height(250.dp)
     ) {
         Text(
             text = if (isExists) "Edit a category" else "Create a category",
             fontSize = 20.sp
         )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
+        Spacer(modifier = Modifier.height(20.dp))
+        Column(modifier = Modifier.fillMaxWidth()) {
             // TODO: Make form state for all kinds of components
             Form(
                 state = stateForm.value,
@@ -294,22 +247,18 @@ private fun ModalCreateCategoryContent(
                     )
                 )
             )
-            Spacer(
-                modifier = Modifier
-                    .padding(top = 12.dp)
-            )
+            Spacer(modifier = Modifier.height(12.dp))
             SelectColorForCategory(stateUserCategory = stateUserCategory)
         }
-        Row(
-            horizontalArrangement = Arrangement.Center
-        ) {
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(horizontalArrangement = Arrangement.Center) {
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
                     .pointerHoverIcon(PointerIcon.Hand),
                 onClick = if (isExists) actionEdit else actionCreate
             ) {
-                Text(if (isExists) "Edit" else "Create")
+                Text(text = if (isExists) "Edit" else "Create")
             }
         }
     }
