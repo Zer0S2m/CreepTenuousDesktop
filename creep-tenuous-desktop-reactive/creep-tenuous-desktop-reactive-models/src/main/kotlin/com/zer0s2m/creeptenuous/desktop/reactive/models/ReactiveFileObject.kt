@@ -63,6 +63,7 @@ object ReactiveFileObject : ReactiveLazyObject {
         )
     )
     var commentsFileSystemObject: ReactiveMutableList<CommentFileObject> = mutableReactiveListOf(
+        triggerAdd = ReactiveTriggerReactiveFileObjectCreateCommentFileObject(),
         triggerRemove = ReactiveTriggerReactiveFileObjectRemoveCommentFileObject(),
         triggerSet = ReactiveTriggerReactiveFileObjectEditCommentFileObject()
     )

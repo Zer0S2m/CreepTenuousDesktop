@@ -3,36 +3,27 @@ package com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
-import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.FieldSearch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
-/**
- * Text used by accessibility services to describe what this image represents
- */
-@get:ReadOnlyComposable
-private val contentDescriptionIconAdd: String get() = "Add file object"
 
 /**
  * Content on the right side of the main dashboard
@@ -117,19 +108,12 @@ internal fun RenderLayoutDirectories(
         ) {
             TitleCategoryFileObject("Folders", directories.value.size)
 
-            IconButton(
+            IconButtonAdd(
                 onClick = {
                     expandedStateCreateFileObjectTypeDirectory.value = true
-                }
-            ) {
-                Icon(
-                    painter = painterResource(resourcePath = Resources.ICON_ADD.path),
-                    contentDescription = contentDescriptionIconAdd,
-                    modifier = Modifier
-                        .pointerHoverIcon(PointerIcon.Hand),
-                    tint = Color.Gray
-                )
-            }
+                },
+                contentDescription = "Add file object"
+            )
         }
         LazyVerticalGrid(
             columns = GridCells.Adaptive(160.dp),

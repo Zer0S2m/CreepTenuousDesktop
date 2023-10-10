@@ -683,15 +683,18 @@ internal fun PopupRenameFileObject(
  * Modal window for creating or editing a comment for a file object.
  *
  * @param expandedState Modal window states.
+ * @param onDismissRequest Executes when the user clicks outside the popup.
  * @param actionSave The action is triggered when the comment of a file object is changed.
  */
 @Composable
 internal fun PopupInteractionCommentFileObject(
     expandedState: MutableState<Boolean>,
+    onDismissRequest: () -> Unit = {},
     actionSave: (comment: CommentFileObject) -> Unit
 ) {
     BaseModalPopup(
-        stateModal = expandedState
+        stateModal = expandedState,
+        onDismissRequest = onDismissRequest
     ) {
         Surface(
             contentColor = contentColorFor(MaterialTheme.colors.surface),
@@ -752,8 +755,9 @@ internal fun PopupInteractionCommentFileObject(
                             .fillMaxWidth()
                             .pointerHoverIcon(PointerIcon.Hand),
                         onClick = {
-                            expandedState.value = false
                             if (stateForm.validateForm()) {
+                                expandedState.value = false
+
                                 val dataForm = stateForm.getData()
 
                                 comment.comment = dataForm["text"].toString().trim()

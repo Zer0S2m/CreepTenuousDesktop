@@ -162,3 +162,23 @@ class ReactiveTriggerReactiveFileObjectEditCommentFileObject : BaseReactiveTrigg
     }
 
 }
+
+/**
+ * A reactive trigger fires when a comment for a file object is created.
+ */
+class ReactiveTriggerReactiveFileObjectCreateCommentFileObject : BaseReactiveTrigger<CommentFileObject> {
+
+    companion object {
+        private val logger: Logger = logger()
+    }
+
+    /**
+     * Trigger execution.
+     *
+     * @param value The new value of a property or object.
+     */
+    override fun execution(value: CommentFileObject) {
+        logger.infoDev("Create a comment for file object\nDATA: $value")
+    }
+
+}

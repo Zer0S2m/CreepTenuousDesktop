@@ -7,6 +7,7 @@ import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandler
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.core.reactive.toReactiveMutableList
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.ReactiveTriggerReactiveFileObjectCreateCommentFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.ReactiveTriggerReactiveFileObjectEditCommentFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.ReactiveTriggerReactiveFileObjectRemoveCommentFileObject
 import io.ktor.client.call.*
@@ -34,6 +35,7 @@ object HandlerReactiveCommentsFileObject : ReactiveHandler<ReactiveMutableList<C
         }.body()
 
         return data.toReactiveMutableList(
+            triggerAdd = ReactiveTriggerReactiveFileObjectCreateCommentFileObject(),
             triggerRemove = ReactiveTriggerReactiveFileObjectRemoveCommentFileObject(),
             triggerSet = ReactiveTriggerReactiveFileObjectEditCommentFileObject()
         )

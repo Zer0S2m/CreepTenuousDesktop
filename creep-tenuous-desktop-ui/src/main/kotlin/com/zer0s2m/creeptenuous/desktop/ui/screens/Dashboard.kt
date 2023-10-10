@@ -43,6 +43,7 @@ import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartCommentForFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.BreadCrumbs
@@ -52,6 +53,8 @@ import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * The main dashboard for interacting with system file objects
@@ -217,13 +220,35 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         PopupInteractionCommentFileObject(
             expandedState = expandedStateModalInteractionCommentFileObject,
             actionSave = { comment: CommentFileObject ->
-                val indexComment: Int = ContextScreen.get(
+                val isEdit: Boolean = ContextScreen.get(
                     Screen.DASHBOARD_SCREEN,
-                    "currentIndexFileObjectForInteractive"
+                    "isEditFileObjectForInteractive"
                 )
-                ReactiveFileObject.commentsFileSystemObject.setReactive(indexComment, comment)
-                setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
-            }
+                val isCreate: Boolean = ContextScreen.get(
+                    Screen.DASHBOARD_SCREEN,
+                    "isCreateFileObjectForInteractive"
+                )
+
+                if (isEdit && !isCreate) {
+                    val indexComment: Int = ContextScreen.get(
+                        Screen.DASHBOARD_SCREEN,
+                        "currentIndexFileObjectForInteractive"
+                    )
+                    ReactiveFileObject.commentsFileSystemObject.setReactive(indexComment, comment)
+                    setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
+                } else if (!isEdit && isCreate) {
+                    ReactiveFileObject.commentsFileSystemObject.addReactive(comment)
+                    setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
+                }
+
+                ContextScreen.clearValueByKey(Screen.DASHBOARD_SCREEN, listOf(
+                    "isEditFileObjectForInteractive",
+                    "isCreateFileObjectForInteractive",
+                    "currentFileObjectForInteractive",
+                    "currentIndexFileObjectForInteractive"
+                ))
+            },
+            onDismissRequest = { ContextScreen.clearScreen(Screen.DASHBOARD_SCREEN) }
         )
 
         val scaffoldStateProfileUser = rememberScaffoldState()
@@ -495,12 +520,41 @@ private fun ContentCommentsInFileObjectModal(
     comments: SnapshotStateList<CommentFileObject>,
     expandedStateModelInteractiveComment: MutableState<Boolean>
 ) {
-    Text(
-        text = "File object comments",
-        color = Colors.TEXT.color,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Bold
-    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "File object comments",
+            color = Colors.TEXT.color,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        IconButtonAdd(
+            onClick = {
+                expandedStateModelInteractiveComment.value = true
+                val currentFileObject: String = ContextScreen.get(
+                    Screen.DASHBOARD_SCREEN,
+                    "currentFileObject"
+                )
+
+                ContextScreen.set(
+                    Screen.DASHBOARD_SCREEN,
+                    mapOf(
+                        "isEditFileObjectForInteractive" to false,
+                        "isCreateFileObjectForInteractive" to true,
+                        "currentFileObjectForInteractive" to CommentFileObject(
+                            id = null,
+                            fileSystemObject = currentFileObject,
+                            comment = "",
+                            createdAt = LocalDateTime.now()
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        )
+                    )
+                )
+            },
+            contentDescription = "Add a comment for file object"
+        )
+    }
     Spacer(
         modifier = Modifier
             .height(20.dp)
@@ -542,13 +596,12 @@ private fun LayoutCommentsInFileObject(
                     actionEdit = {
                         ContextScreen.set(
                             Screen.DASHBOARD_SCREEN,
-                            "currentFileObjectForInteractive",
-                            comment
-                        )
-                        ContextScreen.set(
-                            Screen.DASHBOARD_SCREEN,
-                            "currentIndexFileObjectForInteractive",
-                            index
+                            mapOf(
+                                "currentFileObjectForInteractive" to comment,
+                                "currentIndexFileObjectForInteractive" to index,
+                                "isEditFileObjectForInteractive" to true,
+                                "isCreateFileObjectForInteractive" to false
+                            )
                         )
                         expandedStateModelInteractiveComment.value = true
                     },
