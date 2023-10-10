@@ -24,6 +24,8 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonEdit
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
 import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFormState
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
@@ -172,10 +174,7 @@ private fun ItemCategory(
     actionDelete: () -> Unit
 ) {
     BaseCardItemGrid {
-        Text(
-            text = userCategory.title
-        )
-
+        Text(text = userCategory.title)
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -201,7 +200,8 @@ private fun ItemCategory(
                 }
             }
             IconButtonEdit(onClick = actionEdit)
-            IconButtonDelete(onClick = actionDelete)
+            Spacer(modifier = Modifier.width(8.dp))
+            IconButtonRemove(onClick = actionDelete)
         }
     }
 }

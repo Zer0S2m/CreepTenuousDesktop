@@ -529,6 +529,7 @@ private fun ContentCommentsInFileObjectModal(
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
         )
+        Spacer(modifier = Modifier.width(12.dp))
         IconButtonAdd(
             onClick = {
                 expandedStateModelInteractiveComment.value = true
@@ -555,10 +556,7 @@ private fun ContentCommentsInFileObjectModal(
             contentDescription = "Add a comment for file object"
         )
     }
-    Spacer(
-        modifier = Modifier
-            .height(20.dp)
-    )
+    Spacer(modifier = Modifier.height(20.dp))
     LayoutCommentsInFileObject(
         comments = comments,
         expandedStateModelInteractiveComment = expandedStateModelInteractiveComment

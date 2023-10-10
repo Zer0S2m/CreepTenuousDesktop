@@ -29,6 +29,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.ConverterColor
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
 import java.awt.event.KeyEvent
 
 /**
@@ -212,7 +213,6 @@ private val contentDescriptionIconDelete: String get() = "Delete property"
  * @param isDelete Whether to show the delete object button.
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 internal fun LayoutDeleteAndOpenInputSelect(
     actionDelete: () -> Unit = {},
     isDelete: Boolean = true
@@ -222,17 +222,10 @@ internal fun LayoutDeleteAndOpenInputSelect(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         if (isDelete) {
-            Icon(
-                painter = painterResource(resourcePath = Resources.ICON_DELETE.path),
-                contentDescription = contentDescriptionIconDelete,
-                tint = Color.Red,
-                modifier = Modifier
-                    .size(32.dp)
-                    .padding(end = 8.dp)
-                    .onClick {
-                        actionDelete()
-                    }
+            IconButtonRemove(
+                onClick = actionDelete
             )
+            Spacer(modifier = Modifier.width(8.dp))
         }
 
         Icon(

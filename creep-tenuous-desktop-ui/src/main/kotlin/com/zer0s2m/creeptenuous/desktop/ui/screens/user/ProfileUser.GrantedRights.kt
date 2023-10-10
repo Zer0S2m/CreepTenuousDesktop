@@ -23,6 +23,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.GrantedRightItemUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.TypeRight
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 
@@ -132,7 +133,7 @@ internal fun ProfileUser.ProfileGrantedRights.ItemGrantedRight(
             }
         }
 
-        IconButtonDelete(onClick = {
+        IconButtonRemove(onClick = {
             stateModal.value = true
             contextSelectDeleteRight.clear()
             contextSelectDeleteRight.addAll(item.rights)

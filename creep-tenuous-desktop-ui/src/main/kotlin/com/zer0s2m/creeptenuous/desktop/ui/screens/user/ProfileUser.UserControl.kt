@@ -29,6 +29,7 @@ import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
 import com.zer0s2m.creeptenuous.desktop.ui.components.DatePicker
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
@@ -303,18 +304,12 @@ internal fun ItemUser(
             }
 
             BaseTooltipAreaForItemUser(text = "Deleting a user") {
-                IconButton(
+                IconButtonRemove(
                     onClick = {
                         actionDelete(loginUser)
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(resourcePath = Resources.ICON_DELETE.path),
-                        contentDescription = contentDescriptionDelete,
-                        modifier = baseModifierIcon,
-                        tint = Color.Red
-                    )
-                }
+                    },
+                    contentDescription = contentDescriptionUnblock,
+                )
             }
         }
     }

@@ -23,6 +23,8 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.UserColor
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonEdit
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 
@@ -103,7 +105,7 @@ fun ProfileUser.ProfileColors.render() {
  *
  * @param color Color
  * @param actionEdit Actions on button click. Takes on color to elevate the event - editing
- * @param actionDelete Action detailed documentation щт [IconButtonDelete] in the argument `onClick`
+ * @param actionDelete Action detailed documentation щт [IconButtonRemove] in the argument `onClick`
  */
 @Composable
 private fun ColorItem(
@@ -121,7 +123,8 @@ private fun ColorItem(
 
         Row {
             IconButtonEdit(onClick = actionEdit)
-            IconButtonDelete(onClick = actionDelete)
+            Spacer(modifier = Modifier.width(8.dp))
+            IconButtonRemove(onClick = actionDelete)
         }
     }
 }

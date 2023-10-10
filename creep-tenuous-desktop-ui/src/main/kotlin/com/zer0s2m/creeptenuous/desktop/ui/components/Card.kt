@@ -30,8 +30,6 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
-import com.zer0s2m.creeptenuous.desktop.ui.screens.user.IconButtonDelete
-import com.zer0s2m.creeptenuous.desktop.ui.screens.user.IconButtonEdit
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -610,11 +608,11 @@ internal fun CartCommentForFileObject(
     text: String,
     createdAt: String,
     modifierButtonEdit: Modifier = Modifier
-        .size(26.dp)
-        .padding(4.dp),
+        .pointerHoverIcon(PointerIcon.Hand)
+        .size(24.dp),
     modifierButtonDelete: Modifier = Modifier
-        .size(26.dp)
-        .padding(4.dp),
+        .pointerHoverIcon(PointerIcon.Hand)
+        .size(24.dp),
     actionEdit: () -> Unit = {},
     actionDelete: () -> Unit = {}
 ) {
@@ -628,25 +626,20 @@ internal fun CartCommentForFileObject(
                 text = localCreatedAt,
                 color = MaterialTheme.colors.secondaryVariant.copy(0.8f),
             )
-            Spacer(
-                modifier = Modifier
-                    .width(12.dp)
-            )
+            Spacer(modifier = Modifier.width(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButtonEdit(
-                    modifierLayout = modifierButtonEdit,
-                    onClick = actionEdit
+                    onClick = actionEdit,
+                    modifier = modifierButtonEdit
                 )
-                IconButtonDelete(
-                    modifierLayout = modifierButtonDelete,
-                    onClick = actionDelete
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButtonRemove(
+                    onClick = actionDelete,
+                    modifier = modifierButtonDelete
                 )
             }
         }
-        Spacer(
-            modifier = Modifier
-                .height(4.dp)
-        )
+        Spacer(modifier = Modifier.height(4.dp))
         Text(text = text)
     }
 }

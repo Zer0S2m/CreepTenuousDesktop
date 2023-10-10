@@ -99,15 +99,10 @@ internal fun RenderLayoutDirectories(
     expandedStateModalRenameFileObject: MutableState<Boolean>,
     scaffoldStateCommentFileObject: ScaffoldState
 ) {
-    Column(
-        modifier = Modifier
-            .padding(bottom = 28.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+    Column(modifier = Modifier.padding(bottom = 28.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             TitleCategoryFileObject("Folders", directories.value.size)
-
+            Spacer(modifier = Modifier.width(12.dp))
             IconButtonAdd(
                 onClick = {
                     expandedStateCreateFileObjectTypeDirectory.value = true
