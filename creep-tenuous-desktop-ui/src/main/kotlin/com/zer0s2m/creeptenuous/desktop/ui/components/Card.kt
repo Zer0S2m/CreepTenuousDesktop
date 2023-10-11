@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -439,15 +440,27 @@ class CartFileObject(
                         .padding(0.dp)
                 ) {
                     if (userCategory.color != null) {
-                        CircleCategoryBox(userCategory.color!!, 10.dp)
+                        if (userCategory.color == color) {
+                            Box(
+                                modifier = Modifier
+                                    .background(Color.White, CircleShape)
+                                    .size(14.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircleCategoryBox(userCategory.color!!, 10.dp)
+                            }
+                        } else {
+                            CircleCategoryBox(userCategory.color!!, 10.dp)
+                        }
+                    }
+                    if (userCategory.color != null) {
+                        Spacer(modifier = Modifier.width(8.dp))
                     }
                     Text(
                         text = userCategory.title,
                         color = Color.Black,
                         fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = if (userCategory.color != null) Modifier
-                            .padding(start = 8.dp) else Modifier
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
