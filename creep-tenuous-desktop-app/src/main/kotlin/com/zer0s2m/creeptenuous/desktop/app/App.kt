@@ -44,13 +44,8 @@ fun App() {
                 ReactiveCommon,
                 ReactiveFileObject
             ),
-            injectionClasses = hashMapOf(
-                Dashboard::class to listOf(
-                    "setManagerFileObject",
-                    "setUserProfile",
-                    "setCommentsInFileObject",
-                    "setManagerFileObjectIsLoad"
-                )
+            injectionClasses = listOf(
+                Dashboard::class
             )
         )
     }
