@@ -1,8 +1,8 @@
 package com.zer0s2m.creeptenuous.desktop.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -10,12 +10,11 @@ import androidx.compose.material.MenuDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setAnimateColorAsStateInDropMenuItem
-import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInDropMenuItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDropdownMenu
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDropdownMenuItem
 
@@ -80,23 +79,18 @@ class DropdownMenuItemAdvanced(
     @Composable
     override fun render() {
         val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
-        val isHover: MutableState<Boolean> = remember { mutableStateOf(false) }
+        val isHover: State<Boolean> = interactionSource.collectIsHoveredAsState()
         val animatedMenuItemColor = setAnimateColorAsStateInDropMenuItem(isHover = isHover)
 
         if (isAnimation) {
-            modifierMenu = modifierMenu
-                .background(color = animatedMenuItemColor.value)
-                .hoverable(interactionSource = interactionSource)
-            setHoverInDropMenuItem(
-                interactionSource = interactionSource,
-                isHover = isHover
-            )
+            modifierMenu = modifierMenu.background(color = animatedMenuItemColor.value)
         }
 
         DropdownMenuItem(
             modifier = modifierMenu,
             contentPadding = contentPadding,
-            onClick = action
+            onClick = action,
+            interactionSource = interactionSource
         ) {
             Text(
                 text = text,

@@ -6,8 +6,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.runtime.*
 import androidx.compose.material.Card
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDropdownMenuItem
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
@@ -118,7 +118,7 @@ fun setAnimateColorAsStateInCard(
  */
 @Composable
 fun setAnimateColorAsStateInDropMenuItem(
-    isHover: MutableState<Boolean>
+    isHover: State<Boolean>
 ): State<Color> {
     return animateColorAsState(
         targetValue = if (isHover.value) Colors.DROP_MENU_ITEM_HOVER.color else Color.White,

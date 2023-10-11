@@ -491,16 +491,13 @@ class CartFileObject(
      */
     @Composable
     private fun DropdownMenu(expanded: MutableState<Boolean>) {
-        val modifierMenu: Modifier = Modifier
-            .pointerHoverIcon(icon = PointerIcon.Hand)
-        val contentPaddingMenu = PaddingValues(12.dp, 4.dp)
+        val modifierMenu: Modifier = Modifier.pointerHoverIcon(icon = PointerIcon.Hand)
 
         val items: MutableList<DropdownMenuItemAdvanced> = mutableListOf(
             DropdownMenuItemAdvanced(
                 text = "Download",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionDownload()
@@ -510,7 +507,6 @@ class CartFileObject(
                 text = "Rename",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionRename()
@@ -520,7 +516,6 @@ class CartFileObject(
                 text = "Copy",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionCopy()
@@ -530,7 +525,6 @@ class CartFileObject(
                 text = "Move",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionMove()
@@ -540,7 +534,6 @@ class CartFileObject(
                 text = "Delete",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionDelete()
@@ -550,7 +543,6 @@ class CartFileObject(
                 text = "Comments",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionComments()
@@ -560,7 +552,6 @@ class CartFileObject(
                 text = "Set category",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionSetCategory()
@@ -573,7 +564,6 @@ class CartFileObject(
                 text = "Set color",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionSetColor()
