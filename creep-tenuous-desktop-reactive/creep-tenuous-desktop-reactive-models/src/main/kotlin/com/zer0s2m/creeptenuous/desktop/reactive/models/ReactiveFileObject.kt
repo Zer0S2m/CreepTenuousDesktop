@@ -44,7 +44,13 @@ object ReactiveFileObject : ReactiveLazyObject {
                 event = "renameFileObject",
                 trigger = ReactiveTriggerReactiveFileObjectRenameFileObject::class
             )
-        ]
+        ],
+        sendIsLoad = ReactiveSendIsLoad(
+            isSend = true,
+            injection = ReactiveInjection(
+                method = "setManagerFileObjectIsLoad"
+            )
+        )
     )
     var managerFileSystemObjects: ManagerFileObject = ManagerFileObject(
         systemParents = listOf(),

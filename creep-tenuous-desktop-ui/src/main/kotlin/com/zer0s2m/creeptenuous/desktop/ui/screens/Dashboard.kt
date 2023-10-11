@@ -154,6 +154,20 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             commentsInFileObject.addAll(comments)
         }
 
+        /**
+         * Information about whether data has been downloaded.
+         */
+        private val managerFileObjectIsLoad: MutableState<Boolean> = mutableStateOf(false)
+
+        /**
+         * Set information about whether data has been downloaded.
+         *
+         * @param isLoad Information about whether data has been downloaded.
+         */
+        internal fun setManagerFileObjectIsLoad(isLoad: Boolean) {
+            managerFileObjectIsLoad.value = isLoad
+        }
+
     }
 
     /**

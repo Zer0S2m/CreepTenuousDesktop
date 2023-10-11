@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
  * 1) [Dashboard.setManagerFileObject]
  * 2) [Dashboard.setUserProfile]
  * 3) [Dashboard.setCommentsInFileObject]
+ * 4) [Dashboard.setManagerFileObjectIsLoad]
  */
 @Composable
 @Preview
@@ -47,7 +48,8 @@ fun App() {
                 Dashboard::class to listOf(
                     "setManagerFileObject",
                     "setUserProfile",
-                    "setCommentsInFileObject"
+                    "setCommentsInFileObject",
+                    "setManagerFileObjectIsLoad"
                 )
             )
         )
