@@ -1,26 +1,17 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.user
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.Card
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
+import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
 
 /**
  * Basic card for user interaction in the system. Extends a component [Card]
@@ -41,14 +32,13 @@ internal fun BaseCardForItemCardUser(
 ) {
     Card(
         modifier = Modifier
-            .height(72.dp)
+            .height(60.dp)
             .fillMaxWidth()
-            .padding(bottom = 12.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
+                .padding(12.dp, 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -74,6 +64,7 @@ internal fun BaseCardForItemCardUser(
             }
         }
     }
+    Spacer(modifier = Modifier.height(12.dp))
 }
 
 /**
@@ -105,32 +96,23 @@ private fun BaseInfoForItemCardUser(
 }
 
 /**
- * Text used by accessibility services to describe what this image represents
- */
-@Stable
-internal val contentDescriptionDelete: String get() = "Delete item icon"
-
-/**
- * Text used by accessibility services to describe what this image represents
- */
-@Stable
-internal val contentDescriptionEdit: String get() = "Edit item icon"
-
-/**
- * The base component for displaying a basic item grid card. Extends a component [Card]
+ * The base component for displaying a basic item grid card. Extends a component [Card].
  *
- * @param modifier The modifier to be applied to the [Row]
- * @param content Inner content of the component
+ * @param modifier The modifier to be applied to the [Row].
+ * @param height Component height.
+ * @param content Inner content of the component.
  */
 @Composable
 internal fun BaseCardItemGrid(
     modifier: Modifier = Modifier
         .padding(8.dp),
+    height: Dp? = null,
     content: @Composable () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .then(if (height != null) Modifier.height(height) else Modifier)
             .shadow(8.dp)
     ) {
         Row(
@@ -139,81 +121,6 @@ internal fun BaseCardItemGrid(
             modifier = modifier
         ) {
             content()
-        }
-    }
-}
-
-/**
- * Base element removal component. Extends a component [IconButton]
- *
- * @param onClick The lambda to be invoked when this icon is pressed [IconButton]
- */
-@Composable
-internal fun IconButtonDelete(onClick: () -> Unit) {
-    BaseIconButton(
-        resourcePath = Resources.ICON_DELETE.path,
-        contentDescription = contentDescriptionDelete,
-        tint = Color.Red,
-        onClick = onClick
-    )
-}
-
-/**
- * Base element edit component. Extends a component [IconButton]
- *
- * @param onClick The lambda to be invoked when this icon is pressed [IconButton]
- */
-@Composable
-internal fun IconButtonEdit(onClick: () -> Unit) {
-    BaseIconButton(
-        resourcePath = Resources.ICON_EDIT.path,
-        contentDescription = contentDescriptionEdit,
-        onClick = onClick
-    )
-}
-
-/**
- * The basic component for drawing an icon that performs some [onClick]
- *
- * @param resourcePath Painter to draw inside this Icon
- * @param contentDescription Text used by accessibility services to describe what this icon represents.
- * @param tint Tint to be applied to painter.
- * @param enabled Controls the enabled state.
- * @param interactionSource [MutableInteractionSource] that will be used to dispatch [PressInteraction.Press] when this clickable is pressed.
- * @param onClick The lambda to be invoked when this icon is pressed [IconButton]
- */
-@Composable
-private fun BaseIconButton(
-    resourcePath: String,
-    contentDescription: String? = null,
-    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
-    enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .padding(4.dp)
-            .size(32.dp)
-            .clickable(
-                onClick = onClick,
-                enabled = enabled,
-                role = Role.Button,
-                interactionSource = interactionSource,
-                indication = rememberRipple(bounded = false, radius = 20.dp)
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
-        CompositionLocalProvider(LocalContentAlpha provides contentAlpha) {
-            Icon(
-                painter = painterResource(resourcePath = resourcePath),
-                contentDescription = contentDescription,
-                modifier = Modifier
-                    .size(24.dp)
-                    .pointerHoverIcon(PointerIcon.Hand),
-                tint = tint
-            )
         }
     }
 }

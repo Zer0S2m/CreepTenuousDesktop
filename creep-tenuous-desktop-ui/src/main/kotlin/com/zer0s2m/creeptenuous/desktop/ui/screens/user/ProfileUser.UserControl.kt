@@ -1,7 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.user
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -10,13 +9,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,10 +25,11 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
-import com.zer0s2m.creeptenuous.desktop.ui.components.DatePicker
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
+import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
+import com.zer0s2m.creeptenuous.desktop.ui.components.ModalSelectDate
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
-import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 import java.util.*
 
 /**
@@ -142,9 +140,11 @@ fun ProfileUser.ProfileUserControl.render() {
                 final()
             } else if (!isBlockUserCompletely && isBlockUserTemporary) {
                 val existsStartDateBlockUser: Boolean = ContextScreen.containsValueByKey(
-                    Screen.PROFILE_USER_MANAGEMENT_SCREEN, "startDateBlockUser")
+                    Screen.PROFILE_USER_MANAGEMENT_SCREEN, "startDateBlockUser"
+                )
                 val existsEndDateBlockUser: Boolean = ContextScreen.containsValueByKey(
-                    Screen.PROFILE_USER_MANAGEMENT_SCREEN, "endDateBlockUser")
+                    Screen.PROFILE_USER_MANAGEMENT_SCREEN, "endDateBlockUser"
+                )
 
                 if (!existsStartDateBlockUser && existsEndDateBlockUser) {
                     ReactiveLoader.executionIndependentTrigger(
@@ -225,9 +225,10 @@ private val contentDescriptionUnblock: String get() = "User unlock icon"
  * optional [Modifier] for this [Icon]
  */
 @Stable
-private val baseModifierIcon: Modifier get() = Modifier
-    .size(24.dp)
-    .pointerHoverIcon(icon = PointerIcon.Hand)
+private val baseModifierIcon: Modifier
+    get() = Modifier
+        .size(24.dp)
+        .pointerHoverIcon(icon = PointerIcon.Hand)
 
 /**
  * The main card to show the user in the system
@@ -303,18 +304,12 @@ internal fun ItemUser(
             }
 
             BaseTooltipAreaForItemUser(text = "Deleting a user") {
-                IconButton(
+                IconButtonRemove(
                     onClick = {
                         actionDelete(loginUser)
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(resourcePath = Resources.ICON_DELETE.path),
-                        contentDescription = contentDescriptionDelete,
-                        modifier = baseModifierIcon,
-                        tint = Color.Red
-                    )
-                }
+                    },
+                    contentDescription = contentDescriptionUnblock,
+                )
             }
         }
     }
@@ -368,64 +363,41 @@ private fun AlertDialogDeleteOrUnblockUser(
     titleDialog: String,
     action: () -> Unit = {}
 ) {
-    BaseModalPopup(
-        stateModal = openDialog
+    ModalPopup(
+        stateModal = openDialog,
+        modifierLayout = Modifier
+            .width(360.dp)
+            .height(180.dp)
     ) {
-        Surface(
-            contentColor = contentColorFor(MaterialTheme.colors.surface),
-            modifier = Modifier
-                .width(360.dp)
-                .height(180.dp)
-                .shadow(24.dp, RoundedCornerShape(4.dp))
-        ) {
-            Column(
+        Text(text = titleDialog)
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(horizontalArrangement = Arrangement.Center) {
+            Button(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .pointerInput({}) {
-                        detectTapGestures(onPress = {
-                            // Workaround to disable clicks on Surface background
-                            // https://github.com/JetBrains/compose-jb/issues/2581
-                        })
-                    },
-                verticalArrangement = Arrangement.SpaceBetween
+                    .fillMaxWidth()
+                    .pointerHoverIcon(PointerIcon.Hand),
+                onClick = action,
+                colors = ButtonDefaults.textButtonColors(
+                    backgroundColor = Color.Red,
+                    contentColor = Color.White
+                )
             ) {
                 Text(
-                    text = titleDialog
+                    text = textButtonInAction,
+                    textAlign = TextAlign.Center
                 )
-                Row(
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .pointerHoverIcon(PointerIcon.Hand),
-                        onClick = action,
-                        colors = ButtonDefaults.textButtonColors(
-                            backgroundColor = Color.Red,
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text(
-                            text = textButtonInAction,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.Center) {
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .pointerHoverIcon(PointerIcon.Hand),
+                onClick = {
+                    openDialog.value = false
                 }
-                Row(
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .pointerHoverIcon(PointerIcon.Hand),
-                        onClick = {
-                            openDialog.value = false
-                        }
-                    ) {
-                        Text("Cancel")
-                    }
-                }
+            ) {
+                Text("Cancel")
             }
         }
     }
@@ -450,206 +422,188 @@ private fun ModalBlockUser(
     isErrorValidateDateEndBlockUser: MutableState<Boolean>,
     actionBlock: () -> Unit
 ) {
-    val heightModal: MutableState<Int> = mutableStateOf(225)
-    val isActiveBlockCompletely: MutableState<Boolean> = mutableStateOf(true)
-    val isActiveBlockTemporary: MutableState<Boolean> = mutableStateOf(false)
+    val heightModal: MutableState<Int> = remember { mutableStateOf(225) }
+    val isActiveBlockCompletely: MutableState<Boolean> = remember { mutableStateOf(true) }
+    val isActiveBlockTemporary: MutableState<Boolean> = remember { mutableStateOf(false) }
 
-    BaseModalPopup(
-        stateModal = expandedState
+    ModalPopup(
+        stateModal = expandedState,
+        modifierLayout = Modifier
+            .width(400.dp)
+            .height(heightModal.value.dp)
     ) {
-        Surface(
-            contentColor = contentColorFor(MaterialTheme.colors.surface),
+        Text(
+            text = "Blocking a user",
+            fontSize = 20.sp
+        )
+        Spacer(
             modifier = Modifier
-                .width(400.dp)
-                .height(heightModal.value.dp)
-                .shadow(24.dp, RoundedCornerShape(4.dp))
-        ) {
-            Column(
+                .padding(top = 12.dp)
+        )
+        Column {
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .width(368.dp)
-                    .pointerInput({}) {
-                        detectTapGestures(onPress = {
-                            // Workaround to disable clicks on Surface background
-                            // https://github.com/JetBrains/compose-jb/issues/2581
-                        })
-                    }
+                    .height(40.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "Blocking a user",
-                    fontSize = 20.sp
+                TextButton(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .pointerHoverIcon(PointerIcon.Hand)
+                        .drawBehindIsActive(isActiveBlockCompletely.value)
+                        .fillMaxWidth(0.5f),
+                    onClick = {
+                        isActiveBlockCompletely.value = true
+                        isActiveBlockTemporary.value = false
+                        heightModal.value = 225
+                        isBlockUserCompletely = true
+                        isBlockUserTemporary = false
+                    }
+                ) {
+                    Text(
+                        text = "Blocking completely",
+                        color = Color.White,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+                TextButton(
+                    modifier = Modifier
+                        .pointerHoverIcon(PointerIcon.Hand)
+                        .drawBehindIsActive(isActiveBlockTemporary.value)
+                        .fillMaxSize(),
+                    onClick = {
+                        isActiveBlockCompletely.value = false
+                        isActiveBlockTemporary.value = true
+                        heightModal.value = 410
+                        isBlockUserCompletely = false
+                        isBlockUserTemporary = true
+                    }
+                ) {
+                    Text(
+                        text = "Temporary blocking",
+                        color = Color.White,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+            }
+            if (!isActiveBlockCompletely.value && isActiveBlockTemporary.value) {
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                )
+                TextFieldSelectDate(
+                    textDate = if (selectDateStart.value != null) selectDateStart.value.toString()
+                    else "Select date...",
+                    label = "Blocking start date (if the date is not specified, " +
+                            "the current one is taken)",
+                    actionOpen = {
+                        expandedStateModalSelectDate.value = true
+
+                        ContextScreen.set(
+                            Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                            hashMapOf(
+                                "isStartDateBlockUser" to true,
+                                "isEndDateBlockUser" to false
+                            )
+                        )
+
+                        if (ContextScreen.containsValueByKey(
+                                Screen.PROFILE_USER_MANAGEMENT_SCREEN, "startDateBlockUser"
+                            )
+                        ) {
+                            currentDateUserBlock.value = startDateBlockUser
+                        } else {
+                            currentDateUserBlock.value = Date()
+                        }
+                    },
+                    isSelected = selectDateStart.value != null
                 )
                 Spacer(
                     modifier = Modifier
                         .padding(top = 12.dp)
                 )
-                Column {
-                    Row(
-                        modifier = Modifier
-                            .height(40.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        TextButton(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .pointerHoverIcon(PointerIcon.Hand)
-                                .drawBehindIsActive(isActiveBlockCompletely.value)
-                                .fillMaxWidth(0.5f),
-                            onClick = {
-                                isActiveBlockCompletely.value = true
-                                isActiveBlockTemporary.value = false
-                                heightModal.value = 225
-                                isBlockUserCompletely = true
-                                isBlockUserTemporary = false
-                            }
-                        ) {
-                            Text(
-                                text = "Blocking completely",
-                                color = Color.White,
-                                fontWeight = FontWeight.Normal
+                TextFieldSelectDate(
+                    textDate = if (selectDateEnd.value != null) selectDateEnd.value.toString()
+                    else "Select date...",
+                    label = "Blocking end date",
+                    isError = isErrorValidateDateEndBlockUser.value,
+                    labelError = "Please indicate the date",
+                    actionOpen = {
+                        expandedStateModalSelectDate.value = true
+                        isStartDateBlockUser = false
+                        isEndDateBlockUser = true
+
+                        if (ContextScreen.containsValueByKey(
+                                Screen.PROFILE_USER_MANAGEMENT_SCREEN, "endDateBlockUser"
                             )
-                        }
-                        TextButton(
-                            modifier = Modifier
-                                .pointerHoverIcon(PointerIcon.Hand)
-                                .drawBehindIsActive(isActiveBlockTemporary.value)
-                                .fillMaxSize(),
-                            onClick = {
-                                isActiveBlockCompletely.value = false
-                                isActiveBlockTemporary.value = true
-                                heightModal.value = 410
-                                isBlockUserCompletely = false
-                                isBlockUserTemporary = true
-                            }
                         ) {
-                            Text(
-                                text = "Temporary blocking",
-                                color = Color.White,
-                                fontWeight = FontWeight.Normal
-                            )
+                            currentDateUserBlock.value = endDateBlockUser
+                        } else {
+                            currentDateUserBlock.value = Date()
                         }
-                    }
-                    if (!isActiveBlockCompletely.value && isActiveBlockTemporary.value) {
-                        Spacer(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                        )
-                        TextFieldSelectDate(
-                            textDate = if (selectDateStart.value != null) selectDateStart.value.toString()
-                            else "Select date...",
-                            label = "Blocking start date (if the date is not specified, " +
-                                    "the current one is taken)",
-                            actionOpen = {
-                                expandedStateModalSelectDate.value = true
+                    },
+                    isSelected = selectDateEnd.value != null
+                )
+            }
+            Spacer(
+                modifier = Modifier
+                    .padding(top = 20.dp)
+            )
+            Row(
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .pointerHoverIcon(PointerIcon.Hand),
+                    onClick = {
+                        fun final() {
+                            expandedState.value = false
+                            isBlockUserCompletely = isActiveBlockCompletely.value
+                            isBlockUserTemporary = isActiveBlockTemporary.value
+                            actionBlock()
+                        }
 
-                                ContextScreen.set(
-                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                    "isStartDateBlockUser",
-                                    true
-                                )
-                                ContextScreen.set(
-                                    Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                    "isEndDateBlockUser",
-                                    false
-                                )
+                        if (isActiveBlockCompletely.value && !isActiveBlockTemporary.value) {
+                            final()
+                        } else if (!isActiveBlockCompletely.value && isActiveBlockTemporary.value) {
+                            val endDateBlockUser: Boolean = ContextScreen.containsValueByKey(
+                                Screen.PROFILE_USER_MANAGEMENT_SCREEN,
+                                "endDateBlockUser"
+                            )
+                            if (!isErrorValidateDateEndBlockUser.value && endDateBlockUser) {
+                                final()
+                            }
 
-                                if (ContextScreen.containsValueByKey(
-                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN, "startDateBlockUser")) {
-                                    currentDateUserBlock.value = startDateBlockUser
-                                } else {
-                                    currentDateUserBlock.value = Date()
-                                }
-                            },
-                            isSelected = selectDateStart.value != null
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .padding(top = 12.dp)
-                        )
-                        TextFieldSelectDate(
-                            textDate = if (selectDateEnd.value != null) selectDateEnd.value.toString()
-                                       else "Select date...",
-                            label = "Blocking end date",
-                            isError = isErrorValidateDateEndBlockUser.value,
-                            labelError = "Please indicate the date",
-                            actionOpen = {
-                                expandedStateModalSelectDate.value = true
-
-                                isStartDateBlockUser = false
-                                isEndDateBlockUser = true
-
-                                if (ContextScreen.containsValueByKey(
-                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN, "endDateBlockUser")) {
-                                    currentDateUserBlock.value = endDateBlockUser
-                                } else {
-                                    currentDateUserBlock.value = Date()
-                                }
-                            },
-                            isSelected = selectDateEnd.value != null
-                        )
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .padding(top = 20.dp)
+                            if (!endDateBlockUser) {
+                                isErrorValidateDateEndBlockUser.value = true
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        backgroundColor = Color.Red,
+                        contentColor = Color.White
                     )
-                    Row(
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .pointerHoverIcon(PointerIcon.Hand),
-                            onClick = {
-                                fun final() {
-                                    expandedState.value = false
-                                    isBlockUserCompletely = isActiveBlockCompletely.value
-                                    isBlockUserTemporary = isActiveBlockTemporary.value
-                                    actionBlock()
-                                }
-
-                                if (isActiveBlockCompletely.value && !isActiveBlockTemporary.value) {
-                                    final()
-                                } else if (!isActiveBlockCompletely.value && isActiveBlockTemporary.value) {
-                                    val endDateBlockUser: Boolean = ContextScreen.containsValueByKey(
-                                        Screen.PROFILE_USER_MANAGEMENT_SCREEN,
-                                        "endDateBlockUser"
-                                    )
-                                    if (!isErrorValidateDateEndBlockUser.value && endDateBlockUser) {
-                                        final()
-                                    }
-
-                                    if (!endDateBlockUser) {
-                                        isErrorValidateDateEndBlockUser.value = true
-                                    }
-                                }
-                            },
-                            colors = ButtonDefaults.textButtonColors(
-                                backgroundColor = Color.Red,
-                                contentColor = Color.White
-                            )
-                        ) {
-                            Text(
-                                text = "Block",
-                                textAlign = TextAlign.Center
-                            )
-                        }
+                ) {
+                    Text(
+                        text = "Block",
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+            Row(
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .pointerHoverIcon(PointerIcon.Hand),
+                    onClick = {
+                        expandedState.value = false
                     }
-                    Row(
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .pointerHoverIcon(PointerIcon.Hand),
-                            onClick = {
-                                expandedState.value = false
-                            }
-                        ) {
-                            Text("Cancel")
-                        }
-                    }
+                ) {
+                    Text("Cancel")
                 }
             }
         }
@@ -759,53 +713,6 @@ private fun Modifier.drawBehindIsActive(
     }) else this
 
 /**
- * Modal window for selecting a date.
- *
- * @param initDate Initial selected date state.
- * @param expandedState Modal window states.
- * @param onDismissRequest Cancel date selection.
- * @param onDateSelect Action that will be performed when the date is selected.
- */
-@Composable
-internal fun ModalSelectDate(
-    initDate: MutableState<Date>,
-    expandedState: MutableState<Boolean>,
-    onDismissRequest: () -> Unit,
-    onDateSelect: (Date) -> Unit
-) {
-    BaseModalPopup(
-        stateModal = expandedState
-    ) {
-        Surface(
-            contentColor = contentColorFor(MaterialTheme.colors.surface),
-            modifier = Modifier
-                .width(350.dp)
-                .height(520.dp)
-                .shadow(24.dp, RoundedCornerShape(4.dp))
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .width(368.dp)
-                    .pointerInput({}) {
-                        detectTapGestures(onPress = {
-                            // Workaround to disable clicks on Surface background
-                            // https://github.com/JetBrains/compose-jb/issues/2581
-                        })
-                    }
-            ) {
-                DatePicker(
-                    initDate = initDate.value,
-                    onDismissRequest = onDismissRequest,
-                    onDateSelect = onDateSelect,
-                    minYear = GregorianCalendar().get(Calendar.YEAR)
-                )
-            }
-        }
-    }
-}
-
-/**
  * Text component for date picker.
  *
  * @param textDate Initial text when opening.
@@ -846,8 +753,8 @@ private fun TextFieldSelectDate(
             Text(
                 text = textDate,
                 color = if (isSelected) Color.Unspecified
-                        else if (isError) MaterialTheme.colors.error.copy(0.60f)
-                        else Color(255, 255, 255, 160)
+                else if (isError) MaterialTheme.colors.error.copy(0.60f)
+                else Color(255, 255, 255, 160)
             )
 
             Icon(
@@ -867,7 +774,7 @@ private fun TextFieldSelectDate(
         text = if (!isError) label else labelError,
         fontSize = 12.sp,
         color = if (!isError) Color(255, 255, 255, 160)
-                else MaterialTheme.colors.error,
+        else MaterialTheme.colors.error,
     )
 }
 

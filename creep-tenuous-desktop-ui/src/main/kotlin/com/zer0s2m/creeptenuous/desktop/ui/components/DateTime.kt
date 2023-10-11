@@ -300,4 +300,34 @@ private fun DayName(day: String) {
     }
 }
 
-
+/**
+ * Modal window for selecting a date.
+ *
+ * @param initDate Initial selected date state.
+ * @param expandedState Modal window states.
+ * @param onDismissRequest Cancel date selection.
+ * @param onDateSelect Action that will be performed when the date is selected.
+ */
+@Composable
+internal fun ModalSelectDate(
+    initDate: MutableState<Date>,
+    expandedState: MutableState<Boolean>,
+    onDismissRequest: () -> Unit,
+    onDateSelect: (Date) -> Unit
+) {
+    ModalPopup(
+        stateModal = expandedState,
+        modifierLayout = Modifier
+            .width(350.dp)
+            .height(520.dp),
+        modifierLayoutContent = Modifier
+            .fillMaxSize()
+    ) {
+        DatePicker(
+            initDate = initDate.value,
+            onDismissRequest = onDismissRequest,
+            onDateSelect = onDateSelect,
+            minYear = GregorianCalendar().get(Calendar.YEAR)
+        )
+    }
+}

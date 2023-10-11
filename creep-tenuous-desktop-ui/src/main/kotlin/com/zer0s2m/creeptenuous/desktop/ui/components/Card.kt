@@ -5,12 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,8 +29,9 @@ import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInCard
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardPanelBaseFolderUser
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.CircleCategoryBox
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 /**
@@ -202,6 +201,7 @@ class CardPanelBaseFolderUser(
  * @param actionCopy Action called when a file object is copied
  * @param actionMove Action called when a file object is moved
  * @param actionDelete Action called when a file object is deleted
+ * @param actionComments Action called when comments are opened.
  * @param actionSetCategory Action called when a custom category is set on a file object
  * @param actionSetColor Action called when a custom color is set on a file object
  */
@@ -217,6 +217,7 @@ class CartFileObject(
     override val actionCopy: () -> Unit = {},
     override val actionMove: () -> Unit = {},
     override val actionDelete: () -> Unit = {},
+    override val actionComments: () -> Unit = {},
     override val actionSetCategory: () -> Unit = {},
     override val actionSetColor: () -> Unit = {},
 ) : BaseCardFileObject {
@@ -325,18 +326,31 @@ class CartFileObject(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .padding(12.dp, 8.dp)
+                    .fillMaxSize()
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
+                        .fillMaxSize()
                 ) {
-                    content()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        content()
+                        if (categoryId != null) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                            ) {
+                                CategoryLayout()
+                            }
+                        }
+                    }
+                    IconMenu()
                 }
-
-                renderCategoryLayout()
             }
         }
     }
@@ -347,7 +361,7 @@ class CartFileObject(
     @Composable
     private fun renderDirectory() {
         renderBase {
-            renderDirectoryContent()
+            DirectoryContent()
         }
     }
 
@@ -355,7 +369,7 @@ class CartFileObject(
      * Renders the main content of a [isDirectory]
      */
     @Composable
-    private fun renderDirectoryContent() {
+    private fun DirectoryContent() {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -373,7 +387,6 @@ class CartFileObject(
                 fontSize = 14.sp
             )
         }
-        renderIconMenu()
     }
 
     /**
@@ -382,7 +395,7 @@ class CartFileObject(
     @Composable
     private fun renderFile() {
         renderBase {
-            renderFileContent()
+            FileContent()
         }
     }
 
@@ -390,7 +403,7 @@ class CartFileObject(
      * Renders the main content of a [isFile]
      */
     @Composable
-    private fun renderFileContent() {
+    private fun FileContent() {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -408,14 +421,13 @@ class CartFileObject(
                 fontSize = 14.sp
             )
         }
-        renderIconMenu()
     }
 
     /**
      * Rendering the component responsible for binding a custom category to a file object
      */
     @Composable
-    private fun renderCategoryLayout() {
+    private fun CategoryLayout() {
         if (categoryId != null) {
             val userCategory = ReactiveUser.customCategories.find {
                 it.id == categoryId
@@ -428,15 +440,27 @@ class CartFileObject(
                         .padding(0.dp)
                 ) {
                     if (userCategory.color != null) {
-                        CircleCategoryBox(userCategory.color!!, 10.dp)
+                        if (userCategory.color == color) {
+                            Box(
+                                modifier = Modifier
+                                    .background(Color.White, CircleShape)
+                                    .size(14.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircleCategoryBox(userCategory.color!!, 10.dp)
+                            }
+                        } else {
+                            CircleCategoryBox(userCategory.color!!, 10.dp)
+                        }
+                    }
+                    if (userCategory.color != null) {
+                        Spacer(modifier = Modifier.width(8.dp))
                     }
                     Text(
                         text = userCategory.title,
                         color = Color.Black,
                         fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = if (userCategory.color != null) Modifier
-                            .padding(start = 8.dp) else Modifier
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -447,10 +471,11 @@ class CartFileObject(
      * Rendering a component - opening a menu for the underlying file system object
      */
     @Composable
-    private fun renderIconMenu() {
+    private fun IconMenu() {
         Box(
             modifier = Modifier
-                .fillMaxHeight()
+                .fillMaxHeight(),
+            contentAlignment = Alignment.Center
         ) {
             IconButton(
                 onClick = {
@@ -468,7 +493,7 @@ class CartFileObject(
                 )
             }
 
-            renderDropDownMenu(expandedMenu)
+            DropdownMenu(expandedMenu)
         }
     }
 
@@ -478,17 +503,14 @@ class CartFileObject(
      * @param expanded Variable value holder for opening and closing the menu for the user
      */
     @Composable
-    private fun renderDropDownMenu(expanded: MutableState<Boolean>) {
-        val modifierMenu: Modifier = Modifier
-            .pointerHoverIcon(icon = PointerIcon.Hand)
-        val contentPaddingMenu = PaddingValues(12.dp, 4.dp)
+    private fun DropdownMenu(expanded: MutableState<Boolean>) {
+        val modifierMenu: Modifier = Modifier.pointerHoverIcon(icon = PointerIcon.Hand)
 
         val items: MutableList<DropdownMenuItemAdvanced> = mutableListOf(
             DropdownMenuItemAdvanced(
                 text = "Download",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionDownload()
@@ -498,7 +520,6 @@ class CartFileObject(
                 text = "Rename",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionRename()
@@ -508,7 +529,6 @@ class CartFileObject(
                 text = "Copy",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionCopy()
@@ -518,7 +538,6 @@ class CartFileObject(
                 text = "Move",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionMove()
@@ -528,17 +547,24 @@ class CartFileObject(
                 text = "Delete",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionDelete()
                 }
             ),
             DropdownMenuItemAdvanced(
+                text = "Comments",
+                colorText = Color.Black,
+                modifierMenu = modifierMenu,
+                action = {
+                    expandedMenu.value = false
+                    actionComments()
+                }
+            ),
+            DropdownMenuItemAdvanced(
                 text = "Set category",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionSetCategory()
@@ -551,7 +577,6 @@ class CartFileObject(
                 text = "Set color",
                 colorText = Color.Black,
                 modifierMenu = modifierMenu,
-                contentPadding = contentPaddingMenu,
                 action = {
                     expandedMenu.value = false
                     actionSetColor()
@@ -569,3 +594,61 @@ class CartFileObject(
     }
 
 }
+
+/**
+ * Component for rendering a comment for a file object.
+ *
+ * @param text Comment text.
+ * @param createdAt Date the comment was created.
+ * @param modifierButtonEdit The modifier to be applied to the layout for button edit.
+ * @param modifierButtonDelete The modifier to be applied to the layout. for button delete
+ * @param actionEdit The lambda to be invoked when this icon is pressed [IconButton]. Event - edit.
+ * @param actionDelete The lambda to be invoked when this icon is pressed [IconButton]. Event - delete.
+ */
+@Composable
+internal fun CartCommentForFileObject(
+    text: String,
+    createdAt: String,
+    modifierButtonEdit: Modifier = Modifier
+        .pointerHoverIcon(PointerIcon.Hand)
+        .size(24.dp),
+    modifierButtonDelete: Modifier = Modifier
+        .pointerHoverIcon(PointerIcon.Hand)
+        .size(24.dp),
+    actionEdit: () -> Unit = {},
+    actionDelete: () -> Unit = {}
+) {
+    val localCreatedAt = DateTimeFormatter
+        .ofPattern("MMMM dd, yyyy HH:mm:ss")
+        .format(LocalDateTime.parse(createdAt, dateFormatForComment))
+
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = localCreatedAt,
+                color = MaterialTheme.colors.secondaryVariant.copy(0.8f),
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButtonEdit(
+                    onClick = actionEdit,
+                    modifier = modifierButtonEdit
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButtonRemove(
+                    onClick = actionDelete,
+                    modifier = modifierButtonDelete
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = text)
+    }
+}
+
+/**
+ * Date format for file object comment.
+ */
+@get:ReadOnlyComposable
+private val dateFormatForComment: DateTimeFormatter get() =
+    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")

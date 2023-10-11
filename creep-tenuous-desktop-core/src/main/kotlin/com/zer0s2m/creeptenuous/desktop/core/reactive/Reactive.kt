@@ -50,6 +50,11 @@ annotation class Reactive<T>(
      * Reactive pipelines that are called before or after the completion of a reactive trigger.
      * [BaseReactiveIndependentTrigger] or [BaseReactiveTrigger].
      */
-    val pipelines: Array<ReactivePipeline<Any>> = []
+    val pipelines: Array<ReactivePipeline<Any>> = [],
+
+    /**
+     * Should I send information that the data has been downloaded.
+     */
+    val sendIsLoad: ReactiveSendIsLoad = ReactiveSendIsLoad()
 
 )

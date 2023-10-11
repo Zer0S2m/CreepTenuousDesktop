@@ -1,4 +1,4 @@
-package com.zer0s2m.creeptenuous.desktop.ui.components.misc
+package com.zer0s2m.creeptenuous.desktop.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

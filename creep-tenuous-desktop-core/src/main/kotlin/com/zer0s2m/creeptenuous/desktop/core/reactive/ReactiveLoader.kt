@@ -57,7 +57,13 @@ internal data class ReactiveLazy(
 
     val injectionMethod: String = "",
 
-    var isLoad: Boolean = false
+    var isLoad: Boolean = false,
+
+    var sendIsLoad: Boolean,
+
+    val sendIsLoadInjectionClass: KClass<out ReactiveInjectionClass>? = null,
+
+    val sendIsLoadInjectionMethod: String = ""
 
 )
 
@@ -149,12 +155,15 @@ object ReactiveLoader {
         var injectionClass: KClass<out ReactiveInjectionClass>? = null
         var injectionMethod = ""
 
+        var sendIsLoadInjectionClass: KClass<out ReactiveInjectionClass>? = null
+        var sendIsLoadInjectionMethod = ""
+
         /**
          * Sets the mentee for dependency injection
          *
          * @param injection Information about the injection
          */
-        fun setReactiveInjection(injection: ReactiveInjection) {
+        fun setReactiveInjection(injection: ReactiveInjection, type: Int) {
             if (injection.method.isNotEmpty()) {
                 val filteredInjectionClasses = injectionClasses.filterValues {
                     it.contains(injection.method)
@@ -162,8 +171,13 @@ object ReactiveLoader {
 
                 val (key, _) = filteredInjectionClasses.entries.iterator().next()
 
-                injectionClass = key
-                injectionMethod = injection.method
+                if (type == 1) {
+                    injectionClass = key
+                    injectionMethod = injection.method
+                } else if (type == 2) {
+                    sendIsLoadInjectionClass = key
+                    sendIsLoadInjectionMethod = injection.method
+                }
             }
         }
 
@@ -174,7 +188,8 @@ object ReactiveLoader {
                 if (annotationLazy != null) {
                     val propertyNode: Node = annotationLazy.node
 
-                    setReactiveInjection(annotationLazy.injection)
+                    setReactiveInjection(annotationLazy.injection, 1)
+                    setReactiveInjection(annotationLazy.sendIsLoad.injection, 2)
 
                     @Suppress("NAME_SHADOWING")
                     val reactiveLazyObject = ReactiveLazy(
@@ -187,7 +202,10 @@ object ReactiveLoader {
                         triggers = collectTriggers(annotationLazy.triggers),
                         independentTriggers = collectIndependentTriggers(annotationLazy.independentTriggers),
                         injectionClass = injectionClass,
-                        injectionMethod = injectionMethod
+                        injectionMethod = injectionMethod,
+                        sendIsLoad = annotationLazy.sendIsLoad.isSend,
+                        sendIsLoadInjectionClass = sendIsLoadInjectionClass,
+                        sendIsLoadInjectionMethod = sendIsLoadInjectionMethod
                     )
                     mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
                     if (propertyNode.type != NodeType.NONE) {
@@ -199,7 +217,8 @@ object ReactiveLoader {
                 } else if (annotationReactive != null) {
                     val propertyNode: Node = annotationReactive.node
 
-                    setReactiveInjection(annotationReactive.injection)
+                    setReactiveInjection(annotationReactive.injection, 1)
+                    setReactiveInjection(annotationReactive.sendIsLoad.injection, 2)
 
                     @Suppress("NAME_SHADOWING")
                     val reactiveLazyObject = ReactiveLazy(
@@ -212,7 +231,10 @@ object ReactiveLoader {
                         triggers = collectTriggers(annotationReactive.triggers),
                         independentTriggers = collectIndependentTriggers(annotationReactive.independentTriggers),
                         injectionClass = injectionClass,
-                        injectionMethod = injectionMethod
+                        injectionMethod = injectionMethod,
+                        sendIsLoad = annotationReactive.sendIsLoad.isSend,
+                        sendIsLoadInjectionClass = sendIsLoadInjectionClass,
+                        sendIsLoadInjectionMethod = sendIsLoadInjectionMethod
                     )
                     mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
                     if (propertyNode.type != NodeType.NONE) {
@@ -227,6 +249,8 @@ object ReactiveLoader {
 
                 injectionClass = null
                 injectionMethod = ""
+                sendIsLoadInjectionClass = null
+                sendIsLoadInjectionMethod = ""
             }
         }
 
@@ -254,6 +278,22 @@ object ReactiveLoader {
 
             logger.infoDev("Loading a lazy property:\n\t[" +
                     "${lazyObject.reactiveLazyObject.javaClass.canonicalName}] [$nameProperty]")
+        }
+    }
+
+    /**
+     * Reactive property purification.
+     *
+     * @param nameProperty The name of the lazy behavior property is specified using an annotation
+     * [Lazy] or [Reactive]
+     */
+    fun resetIsLoad(nameProperty: String) {
+        val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
+        if (reactiveLazyObject != null) {
+            reactiveLazyObject.isLoad = false
+
+            logger.infoDev("Reactive property purification:\n\t[" +
+                    "${reactiveLazyObject.reactiveLazyObject.javaClass.canonicalName}] [$nameProperty]")
         }
     }
 
@@ -303,7 +343,6 @@ object ReactiveLoader {
             val trigger: KClass<out BaseReactiveIndependentTrigger>? = reactiveLazyObject.independentTriggers[event]
 
             val pipelines: Iterable<String> = gePipelinesByNameProperty(nameProperty)
-
 
             pipelineLaunch(pipelines, data, ReactivePipelineType.BEFORE)
             trigger?.createInstance()?.execution(*data)
@@ -498,6 +537,21 @@ internal fun runInjectionMethod(reactiveLazyObject: ReactiveLazy, objectFromHand
             compObject.functions.find {
                 it.name == reactiveLazyObject.injectionMethod
             }?.call(reactiveLazyObject.injectionClass.companionObjectInstance, objectFromHandler)
+        }
+
+        sendIsLoadData(reactiveLazyObject)
+    }
+}
+
+internal fun sendIsLoadData(reactiveLazyObject: ReactiveLazy) {
+    if (reactiveLazyObject.sendIsLoadInjectionClass != null
+        && reactiveLazyObject.sendIsLoadInjectionMethod.isNotEmpty()
+        && reactiveLazyObject.sendIsLoad) {
+        val compObject = reactiveLazyObject.sendIsLoadInjectionClass.companionObject
+        if (compObject != null) {
+            compObject.functions.find {
+                it.name == reactiveLazyObject.sendIsLoadInjectionMethod
+            }?.call(reactiveLazyObject.sendIsLoadInjectionClass.companionObjectInstance, true)
         }
     }
 }

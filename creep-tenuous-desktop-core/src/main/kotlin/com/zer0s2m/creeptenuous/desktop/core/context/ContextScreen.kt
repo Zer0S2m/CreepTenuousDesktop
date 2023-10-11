@@ -20,9 +20,21 @@ object ContextScreen {
         if (context.containsKey(screen)) {
             context[screen]?.set(key, value)
         } else {
-            context[screen] = mutableMapOf(
-                key to value
-            )
+            context[screen] = mutableMapOf(key to value)
+        }
+    }
+
+    /**
+     * Set data to a specific area.
+     *
+     * @param screen The area of the screen for which the value will be set.
+     * @param map Hash data map.
+     */
+    fun set(screen: Screen, map: Map<String, Any?>) {
+        if (context.containsKey(screen)) {
+            context[screen]?.putAll(map)
+        } else {
+            context[screen] = map.toMutableMap()
         }
     }
 
@@ -63,6 +75,16 @@ object ContextScreen {
      */
     fun clearValueByKey(screen: Screen, key: String) {
         context[screen]?.remove(key)
+    }
+
+    /**
+     * Removes the specified key and its corresponding value from the selected screen.
+     *
+     * @param screen The area of the screen from which data will be taken.
+     * @param key Property names.
+     */
+    fun clearValueByKey(screen: Screen, key: Iterable<String>) {
+        key.forEach { context[screen]?.remove(it) }
     }
 
 }
