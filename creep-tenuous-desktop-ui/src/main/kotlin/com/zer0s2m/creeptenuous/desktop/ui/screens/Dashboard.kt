@@ -4,11 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -291,10 +290,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                     )
                 }
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
+                Column(modifier = Modifier.fillMaxSize()) {
                     Column (
                         modifier = Modifier
                             .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
@@ -313,16 +309,32 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                             .background(Color.White),
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        RenderLayoutFilesObject(
-                            directories = directories,
-                            files = files,
-                            expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
-                            expandedStateSetColorPopup = expandedStateModalSetColorPopup,
-                            expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory,
-                            expandedStateModalRenameFileObject = expandedStateModalRenameFileObject,
-                            scaffoldStateCommentFileObject = scaffoldStateCommentFileObject
-                        )
+                        when {
+                            !managerFileObjectIsLoad.value -> {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        color = MaterialTheme.colors.secondaryVariant,
+                                        modifier = Modifier.size(40.dp)
+                                    )
+                                }
+                            }
 
+                            else -> {
+                                RenderLayoutFilesObject(
+                                    directories = directories,
+                                    files = files,
+                                    expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
+                                    expandedStateSetColorPopup = expandedStateModalSetColorPopup,
+                                    expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory,
+                                    expandedStateModalRenameFileObject = expandedStateModalRenameFileObject,
+                                    scaffoldStateCommentFileObject = scaffoldStateCommentFileObject
+                                )
+                            }
+                        }
                         BreadCrumbs(
                             items = listOf(
                                 BreadCrumbsItem(
