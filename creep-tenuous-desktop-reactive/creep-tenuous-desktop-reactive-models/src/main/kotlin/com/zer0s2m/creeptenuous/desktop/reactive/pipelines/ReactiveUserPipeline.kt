@@ -21,6 +21,28 @@ class ReactivePipelineHandlerDeleteUserColorCleanInFileObject : ReactivePipeline
         ReactiveFileObject.managerFileSystemObjects.objects.forEach {
             if (it.color == value.color) {
                 it.color = null
+                it.colorId = null
+            }
+        }
+    }
+
+}
+
+/**
+ * The reactive pipeline is called when the user's color palette is updated
+ * and file objects are set to the new color.
+ */
+class ReactivePipelineHandlerUpdateUserColorSetNewColorInFileObject : ReactivePipelineHandler<UserColor> {
+
+    /**
+     * Jet pipeline launch.
+     *
+     * @param value Data.
+     */
+    override fun launch(value: UserColor) {
+        ReactiveFileObject.managerFileSystemObjects.objects.forEach {
+            if ((it.colorId == value.id) && it.colorId != null) {
+                it.color = value.color
             }
         }
     }
@@ -42,6 +64,28 @@ class ReactivePipelineHandlerDeleteUserColorCleanInUserCategory : ReactivePipeli
         ReactiveUser.customCategories.forEach {
             if (it.color == value.color) {
                 it.color = null
+                it.colorId = null
+            }
+        }
+    }
+
+}
+
+/**
+ * The reactive pipeline is called when the user's color palette changes,
+ * and categories apply the new color palette.
+ */
+class ReactivePipelineHandlerUpdateUserColorSetNewColorInUserCategory : ReactivePipelineHandler<UserColor> {
+
+    /**
+     * Jet pipeline launch.
+     *
+     * @param value Data.
+     */
+    override fun launch(value: UserColor) {
+        ReactiveUser.customCategories.forEach {
+            if ((it.colorId == value.id) && it.colorId != null) {
+                it.color = value.color
             }
         }
     }

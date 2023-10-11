@@ -30,6 +30,10 @@ object HandlerReactiveUserColor : ReactiveHandler<ReactiveMutableList<UserColor>
             pipelinesRemove = listOf(
                 "deleteUserColorAndCleanFileObject",
                 "deleteUserColorAndCleanUserCategory"
+            ),
+            pipelinesSet = listOf(
+                "updateUserColorAndSetNewColorUserCategory",
+                "updateUserColorAndSetNewColorFileObject"
             )
         )
     }

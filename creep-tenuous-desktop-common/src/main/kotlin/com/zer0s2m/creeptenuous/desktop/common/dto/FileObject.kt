@@ -18,6 +18,8 @@ data class FileObject(
 
     var color: String? = null,
 
+    var colorId: Int? = null,
+
     var categoryId: Int? = null
 
 )

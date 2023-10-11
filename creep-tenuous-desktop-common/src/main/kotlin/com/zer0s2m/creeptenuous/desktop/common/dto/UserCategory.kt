@@ -12,6 +12,8 @@ data class UserCategory(
 
     var title: String,
 
-    var color: String? = null
+    var color: String? = null,
+
+    var colorId: Int? = null,
 
 )

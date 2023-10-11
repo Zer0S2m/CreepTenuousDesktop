@@ -168,6 +168,7 @@ private fun ModalCreateCustomColor(
                 ReactiveUser.userColors.setReactive(
                     index = currentIndexColor.value,
                     element = UserColor(
+                        id = ReactiveUser.userColors[currentIndexColor.value].id,
                         color = "#${Integer.toHexString(it.toArgb()).substring(2)}"
                     )
                 )

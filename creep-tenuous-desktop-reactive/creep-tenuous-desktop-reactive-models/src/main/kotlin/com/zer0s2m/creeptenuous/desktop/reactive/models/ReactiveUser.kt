@@ -6,9 +6,7 @@ import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipeline
 import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipelineType
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.*
-import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserCategoryCleanInFileObject
-import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserColorCleanInFileObject
-import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserColorCleanInUserCategory
+import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.*
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.user.*
 
 /**
@@ -65,9 +63,19 @@ object ReactiveUser : ReactiveLazyObject {
                 pipeline = ReactivePipelineHandlerDeleteUserColorCleanInFileObject::class
             ),
             ReactivePipeline(
+                title = "updateUserColorAndSetNewColorFileObject",
+                type = ReactivePipelineType.AFTER,
+                pipeline = ReactivePipelineHandlerUpdateUserColorSetNewColorInFileObject::class
+            ),
+            ReactivePipeline(
                 title = "deleteUserColorAndCleanUserCategory",
                 type = ReactivePipelineType.AFTER,
                 pipeline = ReactivePipelineHandlerDeleteUserColorCleanInUserCategory::class
+            ),
+            ReactivePipeline(
+                title = "updateUserColorAndSetNewColorUserCategory",
+                type = ReactivePipelineType.AFTER,
+                pipeline = ReactivePipelineHandlerUpdateUserColorSetNewColorInUserCategory::class
             )
         ]
     )
@@ -78,6 +86,10 @@ object ReactiveUser : ReactiveLazyObject {
         pipelinesRemove = listOf(
             "deleteUserColorAndCleanFileObject",
             "deleteUserColorAndCleanUserCategory"
+        ),
+        pipelinesSet = listOf(
+            "updateUserColorAndSetNewColorUserCategory",
+            "updateUserColorAndSetNewColorFileObject"
         )
     )
 
