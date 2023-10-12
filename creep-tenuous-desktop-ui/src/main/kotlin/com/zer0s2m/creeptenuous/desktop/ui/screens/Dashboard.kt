@@ -322,65 +322,92 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                                 .background(Color.White),
                             verticalArrangement = Arrangement.SpaceBetween
                         ) {
-                            when {
-                                !managerFileObjectIsLoad.value -> {
-                                    Column(
-                                        modifier = Modifier.fillMaxSize(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Center
-                                    ) {
-                                        CircularProgressIndicator(
-                                            color = MaterialTheme.colors.secondaryVariant,
-                                            modifier = Modifier.size(40.dp)
-                                        )
-                                    }
-                                }
-
-                                else -> {
-                                    RenderLayoutFilesObject(
-                                        directories = directories,
-                                        files = files,
-                                        expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
-                                        expandedStateSetColorPopup = expandedStateModalSetColorPopup,
-                                        expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory,
-                                        expandedStateModalRenameFileObject = expandedStateModalRenameFileObject,
-                                        scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
-                                        scaffoldStateInfoFileObject = scaffoldStateInfoFileObject
-                                    )
-                                }
-                            }
-                            BreadCrumbs(
-                                items = listOf(
-                                    BreadCrumbsItem(
-                                        text = "Folder 1",
-                                        action = {
-                                            println(true)
-                                        }
-                                    ),
-                                    BreadCrumbsItem(
-                                        text = "Folder 2",
-                                        action = {
-                                            println(true)
-                                        }
-                                    ),
-                                    BreadCrumbsItem(
-                                        text = "Folder 3",
-                                        action = {
-                                            println(true)
-                                        }
-                                    )
-                                ),
+                            Column(
                                 modifier = Modifier
-                                    .height(40.dp)
-                                    .background(Colors.BREAD_CRUMBS_BASE.color)
                                     .fillMaxWidth()
-                                    .padding(4.dp, 8.dp)
-                            ).render()
+                                    .fillMaxHeight(0.94f)
+                            ) {
+                                LayoutFileObjects(
+                                    directories = directories,
+                                    files = files,
+                                    scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
+                                    scaffoldStateInfoFileObject = scaffoldStateInfoFileObject
+                                )
+                            }
+                            Column(modifier = Modifier.fillMaxSize()) {
+                                LayoutBreadCrumbs()
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    @Composable
+    private fun LayoutFileObjects(
+        directories: MutableState<MutableList<FileObject>>,
+        files: MutableState<MutableList<FileObject>>,
+        scaffoldStateCommentFileObject: ScaffoldState,
+        scaffoldStateInfoFileObject: ScaffoldState
+    ) {
+        when {
+            !managerFileObjectIsLoad.value -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colors.secondaryVariant,
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+            }
+
+            else -> {
+                RenderLayoutFilesObject(
+                    directories = directories,
+                    files = files,
+                    expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
+                    expandedStateSetColorPopup = expandedStateModalSetColorPopup,
+                    expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory,
+                    expandedStateModalRenameFileObject = expandedStateModalRenameFileObject,
+                    scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
+                    scaffoldStateInfoFileObject = scaffoldStateInfoFileObject
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun LayoutBreadCrumbs() {
+        BreadCrumbs(
+            items = listOf(
+                BreadCrumbsItem(
+                    text = "Folder 1",
+                    action = {
+                        println(true)
+                    }
+                ),
+                BreadCrumbsItem(
+                    text = "Folder 2",
+                    action = {
+                        println(true)
+                    }
+                ),
+                BreadCrumbsItem(
+                    text = "Folder 3",
+                    action = {
+                        println(true)
+                    }
+                )
+            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Colors.BREAD_CRUMBS_BASE.color)
+                .padding(4.dp, 8.dp)
+        ).render()
     }
 
 }
