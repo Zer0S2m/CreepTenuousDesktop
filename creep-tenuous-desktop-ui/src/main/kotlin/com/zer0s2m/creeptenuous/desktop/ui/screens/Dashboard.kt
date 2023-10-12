@@ -26,6 +26,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreenPage
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
@@ -107,6 +108,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
          *
          * @param managerFileObject information about file objects by nesting level.
          */
+        @ReactiveInjection
         internal fun setManagerFileObject(managerFileObject: ManagerFileObject) {
             this.managerFileObject.value = managerFileObject
 
@@ -133,6 +135,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
          *
          * @param userProfile User profile information.
          */
+        @ReactiveInjection
         internal fun setUserProfile(userProfile: UserProfileSettings) {
             this.userProfile.value = userProfile
         }
@@ -148,6 +151,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
          *
          * @param comments Comments for a file object.
          */
+        @ReactiveInjection
         internal fun setCommentsInFileObject(comments: ReactiveMutableList<CommentFileObject>) {
             commentsInFileObject.clear()
             commentsInFileObject.addAll(comments)
@@ -163,6 +167,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
          *
          * @param isLoad Information about whether data has been downloaded.
          */
+        @ReactiveInjection
         internal fun setManagerFileObjectIsLoad(isLoad: Boolean) {
             managerFileObjectIsLoad.value = isLoad
         }

@@ -95,6 +95,17 @@ private data class InfoPipeline(
 )
 
 /**
+ * Information about reactive injections.
+ */
+private data class InfoInjectionClass(
+
+    val method: String = "",
+
+    val injectionClass: KClass<out ReactiveInjectionClass>? = null
+
+)
+
+/**
  * The name of the method for inverting a reactive property. [ReactiveHandler.handler]
  */
 internal const val HANDLER_NAME = "handler"
@@ -105,7 +116,7 @@ internal const val HANDLER_NAME = "handler"
 internal const val HANDLER_AFTER_NAME = "action"
 
 /**
- * Main data loader
+ * Main class for regulating reactive and lazy properties.
  */
 object ReactiveLoader {
 
@@ -148,39 +159,63 @@ object ReactiveLoader {
      * @param injectionClasses Map of classes to which reactive and lazy properties will be
      * implemented through the specified methods
      */
+    @Deprecated("Get rid of explicitly specifying the injection method when loading a " +
+            "reactive property and specify it through an annotation")
     suspend fun collectLoader(
         classes: Collection<ReactiveLazyObject>,
         injectionClasses: HashMap<KClass<out ReactiveInjectionClass>, Collection<String>> = hashMapOf()
     ) {
-        var injectionClass: KClass<out ReactiveInjectionClass>? = null
-        var injectionMethod = ""
+        buildReactiveAndLazyClasses(classes, injectionClasses)
+        loadNode()
+        writeLogsToConsoleForCollectObjects()
+        setReactiveValues(
+            isReactive = true,
+            isLazy = false
+        )
+    }
 
-        var sendIsLoadInjectionClass: KClass<out ReactiveInjectionClass>? = null
-        var sendIsLoadInjectionMethod = ""
+    /**
+     * Collect all reactive classes for loading data and building an auxiliary map for loading data
+     *
+     * @param classes Reactive classes for collecting data
+     * @param injectionClasses collection of classes in which static methods are marked as
+     * reactive injections in which a future value will be set.
+     */
+    suspend fun collectLoader(
+        classes: Collection<ReactiveLazyObject>,
+        injectionClasses: Iterable<KClass<out ReactiveInjectionClass>> = listOf()
+    ) {
+        val mapInjectionClasses: MutableMap<KClass<out ReactiveInjectionClass>, Collection<String>> = mutableMapOf()
 
-        /**
-         * Sets the mentee for dependency injection
-         *
-         * @param injection Information about the injection
-         */
-        fun setReactiveInjection(injection: ReactiveInjection, type: Int) {
-            if (injection.method.isNotEmpty()) {
-                val filteredInjectionClasses = injectionClasses.filterValues {
-                    it.contains(injection.method)
-                }
-
-                val (key, _) = filteredInjectionClasses.entries.iterator().next()
-
-                if (type == 1) {
-                    injectionClass = key
-                    injectionMethod = injection.method
-                } else if (type == 2) {
-                    sendIsLoadInjectionClass = key
-                    sendIsLoadInjectionMethod = injection.method
-                }
+        injectionClasses.forEach { klass ->
+            val injectionMethods = klass.companionObject?.functions?.filter {
+                it.findAnnotations<ReactiveInjection>().isNotEmpty()
+            }
+            if (injectionMethods != null) {
+                mapInjectionClasses[klass] = injectionMethods.map { it.name }
             }
         }
 
+        buildReactiveAndLazyClasses(classes, mapInjectionClasses)
+        loadNode()
+        writeLogsToConsoleForCollectObjects()
+        setReactiveValues(
+            isReactive = true,
+            isLazy = false
+        )
+    }
+
+    /**
+     * Collect all reactive classes to load data for use.
+     *
+     * @param classes Reactive classes for collecting data.
+     * @param injectionClasses Map of classes to which reactive and lazy properties will be
+     * implemented through the specified methods.
+     */
+    private fun buildReactiveAndLazyClasses(
+        classes: Collection<ReactiveLazyObject>,
+        injectionClasses: Map<KClass<out ReactiveInjectionClass>, Collection<String>>
+    ) {
         classes.forEach { reactiveLazyObject ->
             reactiveLazyObject::class.memberProperties.forEach { kProperty ->
                 val annotationLazy = kProperty.findAnnotation<Lazy<Any>>()
@@ -188,8 +223,8 @@ object ReactiveLoader {
                 if (annotationLazy != null) {
                     val propertyNode: Node = annotationLazy.node
 
-                    setReactiveInjection(annotationLazy.injection, 1)
-                    setReactiveInjection(annotationLazy.sendIsLoad.injection, 2)
+                    val injectionData = setReactiveInjection(annotationLazy.injection, injectionClasses)
+                    val injectionIsLoad = setReactiveInjection(annotationLazy.sendIsLoad.injection, injectionClasses)
 
                     @Suppress("NAME_SHADOWING")
                     val reactiveLazyObject = ReactiveLazy(
@@ -201,11 +236,11 @@ object ReactiveLoader {
                         handlerAfter = annotationLazy.handlerAfter,
                         triggers = collectTriggers(annotationLazy.triggers),
                         independentTriggers = collectIndependentTriggers(annotationLazy.independentTriggers),
-                        injectionClass = injectionClass,
-                        injectionMethod = injectionMethod,
+                        injectionClass = injectionData.injectionClass,
+                        injectionMethod = injectionData.method,
                         sendIsLoad = annotationLazy.sendIsLoad.isSend,
-                        sendIsLoadInjectionClass = sendIsLoadInjectionClass,
-                        sendIsLoadInjectionMethod = sendIsLoadInjectionMethod
+                        sendIsLoadInjectionClass = injectionIsLoad.injectionClass,
+                        sendIsLoadInjectionMethod = injectionIsLoad.method
                     )
                     mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
                     if (propertyNode.type != NodeType.NONE) {
@@ -217,8 +252,9 @@ object ReactiveLoader {
                 } else if (annotationReactive != null) {
                     val propertyNode: Node = annotationReactive.node
 
-                    setReactiveInjection(annotationReactive.injection, 1)
-                    setReactiveInjection(annotationReactive.sendIsLoad.injection, 2)
+                    val injectionData = setReactiveInjection(annotationReactive.injection, injectionClasses)
+                    val injectionIsLoad = setReactiveInjection(
+                        annotationReactive.sendIsLoad.injection, injectionClasses)
 
                     @Suppress("NAME_SHADOWING")
                     val reactiveLazyObject = ReactiveLazy(
@@ -230,11 +266,11 @@ object ReactiveLoader {
                         handlerAfter = annotationReactive.handlerAfter,
                         triggers = collectTriggers(annotationReactive.triggers),
                         independentTriggers = collectIndependentTriggers(annotationReactive.independentTriggers),
-                        injectionClass = injectionClass,
-                        injectionMethod = injectionMethod,
+                        injectionClass = injectionData.injectionClass,
+                        injectionMethod = injectionData.method,
                         sendIsLoad = annotationReactive.sendIsLoad.isSend,
-                        sendIsLoadInjectionClass = sendIsLoadInjectionClass,
-                        sendIsLoadInjectionMethod = sendIsLoadInjectionMethod
+                        sendIsLoadInjectionClass = injectionIsLoad.injectionClass,
+                        sendIsLoadInjectionMethod = injectionIsLoad.method
                     )
                     mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
                     if (propertyNode.type != NodeType.NONE) {
@@ -246,22 +282,33 @@ object ReactiveLoader {
                 } else if (kProperty.hasAnnotation<Lazy<Any>>() && kProperty.hasAnnotation<Reactive<Any>>()) {
                     throw ReactiveLoaderException("Parameter [${kProperty.name}] must have only one annotation")
                 }
+            }
+        }
+    }
 
-                injectionClass = null
-                injectionMethod = ""
-                sendIsLoadInjectionClass = null
-                sendIsLoadInjectionMethod = ""
+    /**
+     * Sets the mentee for dependency injection.
+     *
+     * @param injection Information about the injection.
+     * @param injection Map of classes to which reactive and lazy properties will be
+     * implemented through the specified methods.
+     */
+    private fun setReactiveInjection(
+        injection: ReactiveInjection,
+        injectionClasses: Map<KClass<out ReactiveInjectionClass>, Collection<String>>
+    ): InfoInjectionClass {
+        if (injection.method.isNotEmpty()) {
+            val filteredInjectionClasses = injectionClasses.filterValues {
+                it.contains(injection.method)
+            }
+
+            if (filteredInjectionClasses.isNotEmpty()) {
+                val (key, _) = filteredInjectionClasses.entries.iterator().next()
+                return InfoInjectionClass(injection.method, key)
             }
         }
 
-        loadNode()
-
-        writeLogsToConsoleForCollectObjects()
-
-        setReactiveValues(
-            isReactive = true,
-            isLazy = false
-        )
+        return InfoInjectionClass()
     }
 
     /**
