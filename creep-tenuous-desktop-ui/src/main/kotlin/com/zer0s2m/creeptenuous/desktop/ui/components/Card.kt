@@ -196,6 +196,7 @@ class CardPanelBaseFolderUser(
  * @param isAnimation Set background change animation for a component
  * @param color Color palette for file object type - directory
  * @param categoryId The user category to which the file object is linked
+ * @param actionInfo Action called when information about a file object is loaded.
  * @param actionDownload Action called when a file object is downloaded
  * @param actionRename Action called when a file object is renamed
  * @param actionCopy Action called when a file object is copied
@@ -212,6 +213,7 @@ class CartFileObject(
     override val isAnimation: Boolean = true,
     override val color: String? = null,
     override val categoryId: Int? = null,
+    override val actionInfo: () -> Unit = {},
     override val actionDownload: () -> Unit = {},
     override val actionRename: () -> Unit = {},
     override val actionCopy: () -> Unit = {},
@@ -507,6 +509,15 @@ class CartFileObject(
         val modifierMenu: Modifier = Modifier.pointerHoverIcon(icon = PointerIcon.Hand)
 
         val items: MutableList<DropdownMenuItemAdvanced> = mutableListOf(
+            DropdownMenuItemAdvanced(
+                text = "Info",
+                colorText = Color.Black,
+                modifierMenu = modifierMenu,
+                action = {
+                    expandedMenu.value = false
+                    actionInfo()
+                }
+            ),
             DropdownMenuItemAdvanced(
                 text = "Download",
                 colorText = Color.Black,

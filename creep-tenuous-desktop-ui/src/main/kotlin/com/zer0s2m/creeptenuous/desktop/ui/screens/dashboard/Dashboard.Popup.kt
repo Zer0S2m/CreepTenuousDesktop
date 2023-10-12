@@ -663,3 +663,13 @@ private fun LayoutCommentsInFileObject(
         )
     }
 }
+
+@Composable
+internal fun PopupContentInfoFileObjectModal() {
+    Text(
+        text = "Information",
+        color = Colors.TEXT.color,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold
+    )
+}
