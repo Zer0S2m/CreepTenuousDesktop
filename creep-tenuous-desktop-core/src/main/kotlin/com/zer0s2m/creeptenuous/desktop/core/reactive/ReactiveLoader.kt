@@ -116,7 +116,7 @@ internal const val HANDLER_NAME = "handler"
 internal const val HANDLER_AFTER_NAME = "action"
 
 /**
- * Main data loader
+ * Main class for regulating reactive and lazy properties.
  */
 object ReactiveLoader {
 
