@@ -26,6 +26,8 @@ annotation class Reactive<T>(
      */
     val node: Node = Node(),
 
+    val priority: Int = 1,
+
     /**
      * List of handlers that run after the object is loaded [handler]
      */

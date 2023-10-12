@@ -20,7 +20,7 @@ import kotlin.reflect.full.*
 /**
  * The main storage of values that will be loaded or will be loaded
  */
-private val mapReactiveLazyObjects: MutableMap<String, ReactiveLazy> = mutableMapOf()
+internal val mapReactiveLazyObjects: MutableMap<String, ReactiveLazy> = mutableMapOf()
 
 /**
  * Core node storage for reactive and lazy properties
@@ -40,6 +40,8 @@ internal data class ReactiveLazy(
     val isLazy: Boolean,
 
     val isReactive: Boolean,
+
+    val priority: Int = 1,
 
     val field: Field,
 
@@ -260,6 +262,7 @@ object ReactiveLoader {
                     val reactiveLazyObject = ReactiveLazy(
                         isLazy = false,
                         isReactive = true,
+                        priority = annotationReactive.priority,
                         field = reactiveLazyObject::class.java.getDeclaredField(kProperty.name),
                         reactiveLazyObject = reactiveLazyObject,
                         handler = annotationReactive.handler,
@@ -284,6 +287,24 @@ object ReactiveLoader {
                 }
             }
         }
+
+        sortByPriority()
+    }
+
+    /**
+     * Sort reactive and lazy objects by priority.
+     */
+    private fun sortByPriority() {
+        val newMap: MutableMap<String, ReactiveLazy> = mutableMapOf()
+
+        mapReactiveLazyObjects.entries
+            .sortedWith(compareByDescending { it.value.priority })
+            .map {
+                newMap.put(it.key, it.value)
+            }
+
+        mapReactiveLazyObjects.clear()
+        mapReactiveLazyObjects.putAll(newMap)
     }
 
     /**
@@ -323,9 +344,22 @@ object ReactiveLoader {
             setReactiveValue(reactiveLazyObject = lazyObject)
             lazyObject.isLoad = true
 
-            logger.infoDev("Loading a lazy property:\n\t[" +
+            logger.infoDev("Loading a lazy o reactive property:\n\t[" +
                     "${lazyObject.reactiveLazyObject.javaClass.canonicalName}] [$nameProperty]")
         }
+    }
+
+    suspend fun <T> loadNotSet(nameProperty: String): Result<T> {
+        val lazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
+
+        if (lazyObject != null) {
+            val loadedData: Any? = setReactiveValue(reactiveLazyObject = lazyObject, isSetData = false)
+            if (loadedData != null) {
+                return Result.success(loadedData as T)
+            }
+        }
+
+        return Result.failure(ReactiveLoaderException("Reactive or lazy property not found"))
     }
 
     /**
@@ -550,7 +584,10 @@ private suspend fun setReactiveValues(isReactive: Boolean, isLazy: Boolean) {
 /**
  * Set reactive value via map
  */
-private suspend fun setReactiveValue(reactiveLazyObject: ReactiveLazy) {
+private suspend fun setReactiveValue(
+    reactiveLazyObject: ReactiveLazy,
+    isSetData: Boolean = true
+): Any? {
     val field = reactiveLazyObject.field
     val methodHandler = reactiveLazyObject.handler.declaredMemberFunctions.find {
         it.name == HANDLER_NAME
@@ -564,17 +601,23 @@ private suspend fun setReactiveValue(reactiveLazyObject: ReactiveLazy) {
 
         val objectFromHandler = methodHandler.callSuspend(reactiveLazyObject.handler.objectInstance)
 
-        field.set(reactiveLazyObject.reactiveLazyObject, objectFromHandler)
+        if (isSetData) {
+            field.set(reactiveLazyObject.reactiveLazyObject, objectFromHandler)
 
-        reactiveLazyObject.isLoad = true
+            reactiveLazyObject.isLoad = true
 
-        if (methodHandlerAfter != null
-            && reactiveLazyObject.handlerAfter.objectInstance != null) {
-            methodHandlerAfter.callSuspend(reactiveLazyObject.handlerAfter.objectInstance)
+            if (methodHandlerAfter != null
+                && reactiveLazyObject.handlerAfter.objectInstance != null) {
+                methodHandlerAfter.callSuspend(reactiveLazyObject.handlerAfter.objectInstance)
+            }
+
+            runInjectionMethod(reactiveLazyObject, objectFromHandler)
         }
 
-        runInjectionMethod(reactiveLazyObject, objectFromHandler)
+        return objectFromHandler
     }
+
+    return null
 }
 
 internal fun runInjectionMethod(reactiveLazyObject: ReactiveLazy, objectFromHandler: Any?) {

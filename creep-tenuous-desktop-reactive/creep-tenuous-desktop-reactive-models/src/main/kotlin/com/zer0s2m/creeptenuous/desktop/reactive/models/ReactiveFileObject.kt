@@ -18,6 +18,7 @@ object ReactiveFileObject : ReactiveLazyObject {
      */
     @Reactive<ManagerFileObject>(
         handler = HandlerReactiveFileObjectManagerFileSystemObjects::class,
+        priority = 9999,
         injection = ReactiveInjection(
             method = "setManagerFileObject"
         ),
