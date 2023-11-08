@@ -19,6 +19,7 @@ object ReactiveUser : ReactiveLazyObject {
      */
     @Reactive<ReactiveMutableList<UserCategory>>(
         handler = HandlerReactiveUserCustomCategories::class,
+        priority = 15,
         pipelines = [
             ReactivePipeline(
                 title = "deleteUserCategoryAndCleanFileObject",
@@ -56,6 +57,7 @@ object ReactiveUser : ReactiveLazyObject {
      */
     @Reactive<ReactiveMutableList<UserColor>>(
         handler = HandlerReactiveUserColor::class,
+        priority = 20,
         pipelines = [
             ReactivePipeline(
                 title = "deleteUserColorAndCleanFileObject",

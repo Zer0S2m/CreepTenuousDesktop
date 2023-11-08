@@ -1,11 +1,13 @@
 package com.zer0s2m.creeptenuous.desktop.reactive.models
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
+import com.zer0s2m.creeptenuous.desktop.common.dto.InfoFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveCommentsFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveFileObjectManagerFileSystemObjects
+import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveInfoFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.*
 
 /**
@@ -18,7 +20,7 @@ object ReactiveFileObject : ReactiveLazyObject {
      */
     @Reactive<ManagerFileObject>(
         handler = HandlerReactiveFileObjectManagerFileSystemObjects::class,
-        priority = 9999,
+        priority = 10,
         injection = ReactiveInjection(
             method = "setManagerFileObject"
         ),
@@ -74,5 +76,14 @@ object ReactiveFileObject : ReactiveLazyObject {
         triggerRemove = ReactiveTriggerReactiveFileObjectRemoveCommentFileObject(),
         triggerSet = ReactiveTriggerReactiveFileObjectEditCommentFileObject()
     )
+
+    /**
+     * File object information.
+     */
+    @Lazy<InfoFileObject?>(
+        event = "Fires when a request for information occurs",
+        handler = HandlerReactiveInfoFileObject::class
+    )
+     var infoFileObject: InfoFileObject? = null
 
 }

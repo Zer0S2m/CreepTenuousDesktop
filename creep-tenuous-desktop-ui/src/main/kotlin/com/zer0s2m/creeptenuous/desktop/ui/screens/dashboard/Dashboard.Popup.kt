@@ -9,8 +9,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.v2.ScrollbarAdapter
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -24,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
+import com.zer0s2m.creeptenuous.desktop.common.dto.InfoFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
@@ -664,12 +664,137 @@ private fun LayoutCommentsInFileObject(
     }
 }
 
+/**
+ * Rendering a modal window responsible for information about a file object.
+ *
+ * @param scaffoldState State of this scaffold widget.
+ */
 @Composable
-internal fun PopupContentInfoFileObjectModal() {
+internal fun PopupContentInfoFileObjectModal(
+    scaffoldState: ScaffoldState
+) {
     Text(
         text = "Information",
         color = Colors.TEXT.color,
-        fontSize = 18.sp,
+        fontSize = 20.sp,
         fontWeight = FontWeight.Bold
     )
+    Spacer(modifier = Modifier.height(20.dp))
+    Column {
+        Text(
+            text = "Basic",
+            color = Colors.TEXT.color,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium
+        )
+        Column(modifier = Modifier.padding(start = 8.dp)) {
+            PopupContentInfoFileObjectModalBlockBasic(
+                scaffoldStatePopup = scaffoldState
+            )
+        }
+    }
+    Spacer(modifier = Modifier.height(12.dp))
+    Column {
+        Text(
+            text = "Systematization",
+            color = Colors.TEXT.color,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }
+    Spacer(modifier = Modifier.height(12.dp))
+    Column {
+        Text(
+            text = "Granted rights",
+            color = Colors.TEXT.color,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+/**
+ * Content for basic information about a file object
+ *
+ * @param scaffoldStatePopup The state of this parent scaffold widget.
+ */
+@Composable
+private fun PopupContentInfoFileObjectModalBlockBasic(
+    scaffoldStatePopup: ScaffoldState
+) {
+    val data: MutableState<InfoFileObject?> = remember { mutableStateOf(null) }
+    val isLoading: MutableState<Boolean> = remember { mutableStateOf(true) }
+
+    if (scaffoldStatePopup.drawerState.isOpen) {
+        LaunchedEffect(data) {
+            isLoading.value = true
+            ReactiveLoader.loadNotSet<InfoFileObject?>("infoFileObject")
+                .onSuccess {
+                    data.value = it
+                }
+                .onFailure {
+                    data.value = null
+                }
+            isLoading.value = false
+        }
+    }
+
+    when {
+        isLoading.value -> {
+            Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colors.secondaryVariant,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            }
+        }
+
+        else -> {
+            if (data.value == null) {
+                Text("No information found")
+            } else {
+                Column {
+                    Text(
+                        text = "Type",
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = if (data.value!!.isDirectory) "Directory" else "File"
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Column {
+                    Text(
+                        text = "Title",
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(data.value!!.realName)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Column {
+                    Text(
+                        text = "System title",
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(data.value!!.systemName)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Column {
+                    val createdAt: String = LocalDateTime.parse(data.value!!.createdAt)
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        .toString()
+                    Text(
+                        text = "Creation date and time",
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(createdAt)
+                }
+            }
+        }
+    }
 }

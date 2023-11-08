@@ -196,6 +196,10 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             managerFileObject_Files
         }
 
+        val scaffoldStateProfileUser = rememberScaffoldState()
+        val scaffoldStateCommentFileObject = rememberScaffoldState()
+        val scaffoldStateInfoFileObject = rememberScaffoldState()
+
         PopupSetUserCategoryInFileObject(
             expandedState = expandedStateModalSetCategoryPopup,
             actionSetCategory = {
@@ -257,9 +261,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             onDismissRequest = { ContextScreen.clearScreen(Screen.DASHBOARD_SCREEN) }
         )
 
-        val scaffoldStateProfileUser = rememberScaffoldState()
-        val scaffoldStateCommentFileObject = rememberScaffoldState()
-        val scaffoldStateInfoFileObject = rememberScaffoldState()
         val scope = rememberCoroutineScope()
 
         val modifierDrawerInternal: Modifier = Modifier
@@ -285,7 +286,9 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
         modalInfoFileObject.render(
             drawerContent = {
-                PopupContentInfoFileObjectModal()
+                PopupContentInfoFileObjectModal(
+                    scaffoldState = scaffoldStateInfoFileObject
+                )
             }
         ) {
             modalCommentsFileObject.render(
