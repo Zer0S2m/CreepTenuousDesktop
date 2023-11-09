@@ -26,6 +26,8 @@ data class InfoFileObject(
 
     val colorId: Int? = null,
 
-    val categoryId: Int? = null
+    val categoryId: Int? = null,
+
+    val owner: String
 
 )

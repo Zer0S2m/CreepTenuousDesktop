@@ -794,6 +794,19 @@ private fun PopupContentInfoFileObjectModalBlockBasic(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Column {
+                    Text(
+                        text = "Owner",
+                        fontWeight = FontWeight.Medium
+                    )
+                    if (ReactiveUser.profileSettings != null &&
+                        ReactiveUser.profileSettings!!.login == data.value!!.owner) {
+                         Text("I owner")
+                    } else {
+                        Text(data.value!!.owner)
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Column {
                     val createdAt: String = LocalDateTime.parse(data.value!!.createdAt)
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                         .toString()
