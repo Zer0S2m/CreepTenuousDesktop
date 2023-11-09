@@ -18,6 +18,8 @@ data class GrantedRightItem(
 
     val systemName: String,
 
+    val realName: String,
+
     val rights: Collection<GrantedRightItemUser>
 
 )

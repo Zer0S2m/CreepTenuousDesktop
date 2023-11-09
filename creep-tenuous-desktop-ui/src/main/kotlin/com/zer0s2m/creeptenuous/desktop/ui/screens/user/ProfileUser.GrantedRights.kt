@@ -85,7 +85,7 @@ private fun ItemGrantedRight(
         Column {
             Row {
                 Text(
-                    text = item.systemName
+                    text = item.realName
                 )
             }
             Column(
