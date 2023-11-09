@@ -1,12 +1,10 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard
 
-import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.v2.ScrollbarAdapter
 import androidx.compose.material.*
@@ -685,50 +683,57 @@ internal fun PopupContentInfoFileObjectModal(
         }
     }
 
-    Text(
-        text = "Information",
-        color = Colors.TEXT.color,
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Bold
-    )
-    Spacer(modifier = Modifier.height(20.dp))
-    Column {
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         Text(
-            text = "Basic",
+            text = "Information",
             color = Colors.TEXT.color,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
         )
-        Column(modifier = Modifier.padding(start = 8.dp)) {
-            PopupContentInfoFileObjectModalBlockBasic(
-                data = data,
-                isLoading = isLoading
+        Spacer(modifier = Modifier.height(20.dp))
+        Column {
+            Text(
+                text = "Basic",
+                color = Colors.TEXT.color,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium
             )
+            Column(modifier = Modifier.padding(start = 8.dp)) {
+                PopupContentInfoFileObjectModalBlockBasic(
+                    data = data,
+                    isLoading = isLoading
+                )
+            }
         }
-    }
-    Spacer(modifier = Modifier.height(12.dp))
-    Column {
-        Text(
-            text = "Systematization",
-            color = Colors.TEXT.color,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium
-        )
-        Column(modifier = Modifier.padding(start = 8.dp)) {
-            PopupContentInfoFileObjectModalBlockSystematization(
-                data = data,
-                isLoading = isLoading
+        Spacer(modifier = Modifier.height(12.dp))
+        Column {
+            Text(
+                text = "Systematization",
+                color = Colors.TEXT.color,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium
             )
+            Column(modifier = Modifier.padding(start = 8.dp)) {
+                PopupContentInfoFileObjectModalBlockSystematization(
+                    data = data,
+                    isLoading = isLoading
+                )
+            }
         }
-    }
-    Spacer(modifier = Modifier.height(12.dp))
-    Column {
-        Text(
-            text = "Granted rights",
-            color = Colors.TEXT.color,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium
-        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Column {
+            Text(
+                text = "Granted rights",
+                color = Colors.TEXT.color,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Column(modifier = Modifier.padding(start = 8.dp)) {
+                PopupContentInfoFileObjectModalBlockGrantedRights(
+                    scaffoldStatePopup = scaffoldState
+                )
+            }
+        }
     }
 }
 
@@ -878,6 +883,78 @@ private fun PopupContentInfoFileObjectModalBlockSystematization(
                     } else {
                         Text("Category not set")
                     }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Content for granting rights to interact with file objects.
+ *
+ * @param scaffoldStatePopup The state of the [Scaffold] composite parent component.
+ */
+@Composable
+private fun PopupContentInfoFileObjectModalBlockGrantedRights(
+    scaffoldStatePopup: ScaffoldState
+) {
+    val data: MutableState<GrantedRight?> = remember { mutableStateOf(null) }
+    val isLoading: MutableState<Boolean> = remember { mutableStateOf(true) }
+
+    if (scaffoldStatePopup.drawerState.isOpen) {
+        LaunchedEffect(data) {
+            isLoading.value = true
+            ReactiveLoader.loadNotSet<GrantedRight?>("grantedRightsFileObjects")
+                .onSuccess {
+                    data.value = it
+                    println(it)
+                }
+                .onFailure {
+                    data.value = null
+                }
+            isLoading.value = false
+        }
+    }
+
+    when {
+        isLoading.value -> {
+            Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colors.secondaryVariant,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            }
+        }
+
+        else -> {
+            if (data.value == null) {
+                Text("No information found")
+            } else {
+                val currentFileObject: String = ContextScreen.get(Screen.DASHBOARD_SCREEN, "currentFileObject")
+                if (data.value!!.rights.isNotEmpty()) {
+                    var isRights = false
+
+                    data.value!!.rights.forEach {
+                        if (it.systemName == currentFileObject) {
+                            it.rights.forEach { right ->
+                                Text(
+                                    "User: ${right.user} - types: ${right.rights.joinToString(", ")}")
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                            isRights = true
+                        }
+                    }
+
+                    if (!isRights) {
+                        Text("No rights granted")
+                    }
+                } else {
+                    Text("No rights granted")
                 }
             }
         }
