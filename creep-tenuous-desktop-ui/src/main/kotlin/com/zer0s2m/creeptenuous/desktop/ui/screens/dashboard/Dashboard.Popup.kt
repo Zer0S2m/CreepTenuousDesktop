@@ -21,10 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
-import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
-import com.zer0s2m.creeptenuous.desktop.common.dto.InfoFileObject
-import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
+import com.zer0s2m.creeptenuous.desktop.common.dto.*
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
@@ -32,10 +29,7 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
-import com.zer0s2m.creeptenuous.desktop.ui.components.CartCommentForFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
-import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
-import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.*
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFormState
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
@@ -43,6 +37,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import com.zer0s2m.creeptenuous.desktop.ui.screens.common.DropdownMenuSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.common.InputSelectColor
+import com.zer0s2m.creeptenuous.desktop.ui.screens.common.RenderLayoutUserCategory
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -673,6 +668,23 @@ private fun LayoutCommentsInFileObject(
 internal fun PopupContentInfoFileObjectModal(
     scaffoldState: ScaffoldState
 ) {
+    val data: MutableState<InfoFileObject?> = remember { mutableStateOf(null) }
+    val isLoading: MutableState<Boolean> = remember { mutableStateOf(true) }
+
+    if (scaffoldState.drawerState.isOpen) {
+        LaunchedEffect(data) {
+            isLoading.value = true
+            ReactiveLoader.loadNotSet<InfoFileObject?>("infoFileObject")
+                .onSuccess {
+                    data.value = it
+                }
+                .onFailure {
+                    data.value = null
+                }
+            isLoading.value = false
+        }
+    }
+
     Text(
         text = "Information",
         color = Colors.TEXT.color,
@@ -689,7 +701,8 @@ internal fun PopupContentInfoFileObjectModal(
         )
         Column(modifier = Modifier.padding(start = 8.dp)) {
             PopupContentInfoFileObjectModalBlockBasic(
-                scaffoldStatePopup = scaffoldState
+                data = data,
+                isLoading = isLoading
             )
         }
     }
@@ -701,6 +714,12 @@ internal fun PopupContentInfoFileObjectModal(
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium
         )
+        Column(modifier = Modifier.padding(start = 8.dp)) {
+            PopupContentInfoFileObjectModalBlockSystematization(
+                data = data,
+                isLoading = isLoading
+            )
+        }
     }
     Spacer(modifier = Modifier.height(12.dp))
     Column {
@@ -714,31 +733,16 @@ internal fun PopupContentInfoFileObjectModal(
 }
 
 /**
- * Content for basic information about a file object
+ * Content for basic information about a file object.
  *
- * @param scaffoldStatePopup The state of this parent scaffold widget.
+ * @param data File object data.
+ * @param isLoading Whether information about the file object is being loaded.
  */
 @Composable
 private fun PopupContentInfoFileObjectModalBlockBasic(
-    scaffoldStatePopup: ScaffoldState
+    data: MutableState<InfoFileObject?>,
+    isLoading: MutableState<Boolean>
 ) {
-    val data: MutableState<InfoFileObject?> = remember { mutableStateOf(null) }
-    val isLoading: MutableState<Boolean> = remember { mutableStateOf(true) }
-
-    if (scaffoldStatePopup.drawerState.isOpen) {
-        LaunchedEffect(data) {
-            isLoading.value = true
-            ReactiveLoader.loadNotSet<InfoFileObject?>("infoFileObject")
-                .onSuccess {
-                    data.value = it
-                }
-                .onFailure {
-                    data.value = null
-                }
-            isLoading.value = false
-        }
-    }
-
     when {
         isLoading.value -> {
             Spacer(modifier = Modifier.height(8.dp))
@@ -793,6 +797,87 @@ private fun PopupContentInfoFileObjectModalBlockBasic(
                         fontWeight = FontWeight.Medium
                     )
                     Text(createdAt)
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Content for systematization information about a file object.
+ *
+ * @param data File object data.
+ * @param isLoading Whether information about the file object is being loaded.
+ */
+@Composable
+private fun PopupContentInfoFileObjectModalBlockSystematization(
+    data: MutableState<InfoFileObject?>,
+    isLoading: MutableState<Boolean>
+) {
+    when {
+        isLoading.value -> {
+            Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colors.secondaryVariant,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            }
+        }
+
+        else -> {
+            if (data.value == null) {
+                Text("No information found")
+            } else {
+                Column {
+                    Text(
+                        text = "Color",
+                        fontWeight = FontWeight.Medium
+                    )
+                    if (data.value!!.colorId != null && data.value!!.color != null) {
+                        val userColor: UserColor? = data.value!!.colorId?.let {
+                            ReactiveUser.findUserColor(it)
+                        }
+                        if (userColor != null) {
+                            LayoutUserColor(
+                                userColor = userColor,
+                                modifier = Modifier
+                                    .height(32.dp)
+                                    .width(80.dp),
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                        } else {
+                            Text("Color palette not found")
+                        }
+                    } else {
+                        Text("Color palette not set")
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Column {
+                    Text(
+                        text = "Category",
+                        fontWeight = FontWeight.Medium
+                    )
+                    if (data.value!!.categoryId != null) {
+                        val userCategory: UserCategory? = data.value!!.categoryId?.let {
+                            ReactiveUser.findCustomCategory(
+                                it
+                            )
+                        }
+                        if (userCategory != null) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                            RenderLayoutUserCategory(userCategory = userCategory)
+                        } else {
+                            Text("Category not found")
+                        }
+                    } else {
+                        Text("Category not set")
+                    }
                 }
             }
         }

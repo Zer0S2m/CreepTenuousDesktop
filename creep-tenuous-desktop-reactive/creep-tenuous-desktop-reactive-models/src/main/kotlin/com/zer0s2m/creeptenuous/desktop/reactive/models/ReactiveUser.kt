@@ -142,4 +142,12 @@ object ReactiveUser : ReactiveLazyObject {
 
     }
 
+    fun findCustomCategory(id: Int): UserCategory? {
+        return customCategories.find { it.id == id }
+    }
+
+    fun findUserColor(id: Int): UserColor? {
+        return userColors.find { it.id == id }
+    }
+
 }

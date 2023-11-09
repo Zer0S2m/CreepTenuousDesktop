@@ -19,10 +19,9 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
-import com.zer0s2m.creeptenuous.desktop.ui.components.CircleCategoryBox
 import com.zer0s2m.creeptenuous.desktop.ui.screens.common.LayoutDeleteAndOpenInputSelect
+import com.zer0s2m.creeptenuous.desktop.ui.screens.common.RenderLayoutUserCategory
 
 /**
  * Width of category selection area from list
@@ -104,27 +103,5 @@ internal fun SelectUserCategoryForFileObject(
                 }
             }
         }
-    }
-}
-
-/**
- * Component responsible for minimal information about the user category
- *
- * @param userCategory User category information
- */
-@Composable
-private fun RenderLayoutUserCategory(userCategory: UserCategory) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        if (userCategory.color != null) {
-            CircleCategoryBox(userCategory.color!!, 16.dp)
-        }
-        Text(
-            text = userCategory.title,
-            modifier = if (userCategory.color != null) Modifier
-                .padding(start = 8.dp) else Modifier
-        )
     }
 }
