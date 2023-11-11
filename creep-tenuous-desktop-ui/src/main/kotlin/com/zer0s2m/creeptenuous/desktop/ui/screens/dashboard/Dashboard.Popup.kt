@@ -721,17 +721,43 @@ internal fun PopupContentInfoFileObjectModal(
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
-        Column {
-            Text(
-                text = "Granted rights",
-                color = Colors.TEXT.color,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium
-            )
-            Column(modifier = Modifier.padding(start = 8.dp)) {
-                PopupContentInfoFileObjectModalBlockGrantedRights(
-                    scaffoldStatePopup = scaffoldState
-                )
+        when {
+            isLoading.value -> {
+                Spacer(modifier = Modifier.height(8.dp))
+                LoadingIndicator()
+            }
+
+            // Differentiation of display rights
+            else -> {
+                if (data.value!!.owner == ReactiveUser.profileSettings!!.login) {
+                    Column {
+                        Text(
+                            text = "Granted rights",
+                            color = Colors.TEXT.color,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Column(modifier = Modifier.padding(start = 8.dp)) {
+                            PopupContentInfoFileObjectModalBlockGrantedRights(
+                                scaffoldStatePopup = scaffoldState
+                            )
+                        }
+                    }
+                } else {
+                    Column {
+                        Text(
+                            text = "Assigned rights",
+                            color = Colors.TEXT.color,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Column(modifier = Modifier.padding(start = 8.dp)) {
+                            PopupContentInfoFileObjectModalBlockAssignedRights(
+                                scaffoldStatePopup = scaffoldState
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -751,16 +777,7 @@ private fun PopupContentInfoFileObjectModalBlockBasic(
     when {
         isLoading.value -> {
             Spacer(modifier = Modifier.height(8.dp))
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colors.secondaryVariant,
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp
-                )
-            }
+            LoadingIndicator()
         }
 
         else -> {
@@ -835,16 +852,7 @@ private fun PopupContentInfoFileObjectModalBlockSystematization(
     when {
         isLoading.value -> {
             Spacer(modifier = Modifier.height(8.dp))
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colors.secondaryVariant,
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp
-                )
-            }
+            LoadingIndicator()
         }
 
         else -> {
@@ -903,7 +911,7 @@ private fun PopupContentInfoFileObjectModalBlockSystematization(
 }
 
 /**
- * Content for granting rights to interact with file objects.
+ * Content for granted user rights to interact with file objects.
  *
  * @param scaffoldStatePopup The state of the [Scaffold] composite parent component.
  */
@@ -932,16 +940,7 @@ private fun PopupContentInfoFileObjectModalBlockGrantedRights(
     when {
         isLoading.value -> {
             Spacer(modifier = Modifier.height(8.dp))
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colors.secondaryVariant,
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp
-                )
-            }
+            LoadingIndicator()
         }
 
         else -> {
@@ -971,5 +970,60 @@ private fun PopupContentInfoFileObjectModalBlockGrantedRights(
                 }
             }
         }
+    }
+}
+
+/**
+ * Content for issued user rights to interact with file objects.
+ *
+ * @param scaffoldStatePopup The state of the [Scaffold] composite parent component.
+ */
+@Composable
+private fun PopupContentInfoFileObjectModalBlockAssignedRights(
+    scaffoldStatePopup: ScaffoldState
+) {
+    val data: MutableState<IssuedRights?> = remember { mutableStateOf(null) }
+    val isLoading: MutableState<Boolean> = remember { mutableStateOf(true) }
+
+    if (scaffoldStatePopup.drawerState.isOpen) {
+        LaunchedEffect(data) {
+            isLoading.value = true
+            ReactiveLoader.loadNotSet<IssuedRights?>("assignedRightsFileObjects")
+                .onSuccess {
+                    data.value = it
+                    println(it)
+                }
+                .onFailure {
+                    data.value = null
+                }
+            isLoading.value = false
+        }
+    }
+
+    when {
+        isLoading.value -> {
+            Spacer(modifier = Modifier.height(8.dp))
+            LoadingIndicator()
+        }
+
+        else -> {
+            Text(
+                text = "Types: ${data.value!!.rights.joinToString(", ")}"
+            )
+        }
+    }
+}
+
+@Composable
+private fun LoadingIndicator() {
+    Column(
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator(
+            color = MaterialTheme.colors.secondaryVariant,
+            modifier = Modifier.size(20.dp),
+            strokeWidth = 2.dp
+        )
     }
 }

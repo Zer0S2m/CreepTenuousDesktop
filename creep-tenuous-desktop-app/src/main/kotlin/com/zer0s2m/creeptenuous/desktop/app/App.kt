@@ -41,6 +41,7 @@ fun App() {
                 ReactiveUser,
                 ReactiveUser.UserSettings,
                 ReactiveUser.GrantedRights,
+                ReactiveUser.AssignedRights,
                 ReactiveCommon,
                 ReactiveFileObject
             ),

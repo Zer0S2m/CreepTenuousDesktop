@@ -142,6 +142,22 @@ object ReactiveUser : ReactiveLazyObject {
 
     }
 
+    /**
+     * Storage of issued rights to file objects.
+     */
+    object AssignedRights: ReactiveLazyObject {
+
+        /**
+         * Issued rights to interact with a file object.
+         */
+        @Lazy<IssuedRights>(
+            event = "Fires when a request for information occurs",
+            handler = HandlerReactiveUserAssignedRights::class
+        )
+        var assignedRightsFileObjects: IssuedRights? = null
+
+    }
+
     fun findCustomCategory(id: Int): UserCategory? {
         return customCategories.find { it.id == id }
     }
