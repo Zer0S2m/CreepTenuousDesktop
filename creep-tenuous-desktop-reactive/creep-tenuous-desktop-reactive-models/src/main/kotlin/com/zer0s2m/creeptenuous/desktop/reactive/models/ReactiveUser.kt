@@ -19,6 +19,7 @@ object ReactiveUser : ReactiveLazyObject {
      */
     @Reactive<ReactiveMutableList<UserCategory>>(
         handler = HandlerReactiveUserCustomCategories::class,
+        priority = 15,
         pipelines = [
             ReactivePipeline(
                 title = "deleteUserCategoryAndCleanFileObject",
@@ -56,6 +57,7 @@ object ReactiveUser : ReactiveLazyObject {
      */
     @Reactive<ReactiveMutableList<UserColor>>(
         handler = HandlerReactiveUserColor::class,
+        priority = 20,
         pipelines = [
             ReactivePipeline(
                 title = "deleteUserColorAndCleanFileObject",
@@ -138,6 +140,30 @@ object ReactiveUser : ReactiveLazyObject {
         )
         var grantedRightsFileObjects: GrantedRight = GrantedRight()
 
+    }
+
+    /**
+     * Storage of issued rights to file objects.
+     */
+    object AssignedRights: ReactiveLazyObject {
+
+        /**
+         * Issued rights to interact with a file object.
+         */
+        @Lazy<IssuedRights>(
+            event = "Fires when a request for information occurs",
+            handler = HandlerReactiveUserAssignedRights::class
+        )
+        var assignedRightsFileObjects: IssuedRights? = null
+
+    }
+
+    fun findCustomCategory(id: Int): UserCategory? {
+        return customCategories.find { it.id == id }
+    }
+
+    fun findUserColor(id: Int): UserColor? {
+        return userColors.find { it.id == id }
     }
 
 }

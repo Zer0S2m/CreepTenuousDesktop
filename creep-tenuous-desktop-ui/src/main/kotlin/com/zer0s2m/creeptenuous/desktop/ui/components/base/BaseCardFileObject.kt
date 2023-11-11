@@ -38,6 +38,11 @@ interface BaseCardFileObject : BaseComponent, BaseAnimation {
         get() = null
 
     /**
+     *Action called when information about a file object is loaded.
+     */
+    val actionInfo: () -> Unit
+
+    /**
      * Action called when a file object is downloaded
      */
     val actionDownload: () -> Unit

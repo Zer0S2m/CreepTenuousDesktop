@@ -1,16 +1,13 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard
 
-import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.v2.ScrollbarAdapter
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -22,9 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
-import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
-import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
+import com.zer0s2m.creeptenuous.desktop.common.dto.*
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
@@ -32,10 +27,7 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
-import com.zer0s2m.creeptenuous.desktop.ui.components.CartCommentForFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
-import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
-import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.*
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseFormState
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
@@ -43,6 +35,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import com.zer0s2m.creeptenuous.desktop.ui.screens.common.DropdownMenuSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.common.InputSelectColor
+import com.zer0s2m.creeptenuous.desktop.ui.screens.common.RenderLayoutUserCategory
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -660,6 +653,377 @@ private fun LayoutCommentsInFileObject(
                 .background(Color.Gray.copy(0.8f), RoundedCornerShape(4.dp))
                 .fillMaxHeight(),
             adapter = adapterScroll
+        )
+    }
+}
+
+/**
+ * Rendering a modal window responsible for information about a file object.
+ *
+ * @param scaffoldState State of this scaffold widget.
+ */
+@Composable
+internal fun PopupContentInfoFileObjectModal(
+    scaffoldState: ScaffoldState
+) {
+    val data: MutableState<InfoFileObject?> = remember { mutableStateOf(null) }
+    val isLoading: MutableState<Boolean> = remember { mutableStateOf(true) }
+
+    if (scaffoldState.drawerState.isOpen) {
+        LaunchedEffect(data) {
+            isLoading.value = true
+            ReactiveLoader.loadNotSet<InfoFileObject?>("infoFileObject")
+                .onSuccess {
+                    data.value = it
+                }
+                .onFailure {
+                    data.value = null
+                }
+            isLoading.value = false
+        }
+    }
+
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Text(
+            text = "Information",
+            color = Colors.TEXT.color,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        Column {
+            Text(
+                text = "Basic",
+                color = Colors.TEXT.color,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Column(modifier = Modifier.padding(start = 8.dp)) {
+                PopupContentInfoFileObjectModalBlockBasic(
+                    data = data,
+                    isLoading = isLoading
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        Column {
+            Text(
+                text = "Systematization",
+                color = Colors.TEXT.color,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Column(modifier = Modifier.padding(start = 8.dp)) {
+                PopupContentInfoFileObjectModalBlockSystematization(
+                    data = data,
+                    isLoading = isLoading
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        when {
+            isLoading.value -> {
+                Spacer(modifier = Modifier.height(8.dp))
+                LoadingIndicator()
+            }
+
+            // Differentiation of display rights
+            else -> {
+                if (data.value!!.owner == ReactiveUser.profileSettings!!.login) {
+                    Column {
+                        Text(
+                            text = "Granted rights",
+                            color = Colors.TEXT.color,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Column(modifier = Modifier.padding(start = 8.dp)) {
+                            PopupContentInfoFileObjectModalBlockGrantedRights(
+                                scaffoldStatePopup = scaffoldState
+                            )
+                        }
+                    }
+                } else {
+                    Column {
+                        Text(
+                            text = "Assigned rights",
+                            color = Colors.TEXT.color,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Column(modifier = Modifier.padding(start = 8.dp)) {
+                            PopupContentInfoFileObjectModalBlockAssignedRights(
+                                scaffoldStatePopup = scaffoldState
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Content for basic information about a file object.
+ *
+ * @param data File object data.
+ * @param isLoading Whether information about the file object is being loaded.
+ */
+@Composable
+private fun PopupContentInfoFileObjectModalBlockBasic(
+    data: MutableState<InfoFileObject?>,
+    isLoading: MutableState<Boolean>
+) {
+    when {
+        isLoading.value -> {
+            Spacer(modifier = Modifier.height(8.dp))
+            LoadingIndicator()
+        }
+
+        else -> {
+            if (data.value == null) {
+                Text("No information found")
+            } else {
+                Column {
+                    Text(
+                        text = "Type",
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = if (data.value!!.isDirectory) "Directory" else "File"
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Column {
+                    Text(
+                        text = "Title",
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(data.value!!.realName)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Column {
+                    Text(
+                        text = "System title",
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(data.value!!.systemName)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Column {
+                    Text(
+                        text = "Owner",
+                        fontWeight = FontWeight.Medium
+                    )
+                    if (ReactiveUser.profileSettings != null &&
+                        ReactiveUser.profileSettings!!.login == data.value!!.owner) {
+                         Text("I owner")
+                    } else {
+                        Text(data.value!!.owner)
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Column {
+                    val createdAt: String = LocalDateTime.parse(data.value!!.createdAt)
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        .toString()
+                    Text(
+                        text = "Creation date and time",
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(createdAt)
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Content for systematization information about a file object.
+ *
+ * @param data File object data.
+ * @param isLoading Whether information about the file object is being loaded.
+ */
+@Composable
+private fun PopupContentInfoFileObjectModalBlockSystematization(
+    data: MutableState<InfoFileObject?>,
+    isLoading: MutableState<Boolean>
+) {
+    when {
+        isLoading.value -> {
+            Spacer(modifier = Modifier.height(8.dp))
+            LoadingIndicator()
+        }
+
+        else -> {
+            if (data.value == null) {
+                Text("No information found")
+            } else {
+                Column {
+                    Text(
+                        text = "Color",
+                        fontWeight = FontWeight.Medium
+                    )
+                    if (data.value!!.colorId != null && data.value!!.color != null) {
+                        val userColor: UserColor? = data.value!!.colorId?.let {
+                            ReactiveUser.findUserColor(it)
+                        }
+                        if (userColor != null) {
+                            LayoutUserColor(
+                                userColor = userColor,
+                                modifier = Modifier
+                                    .height(32.dp)
+                                    .width(80.dp),
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                        } else {
+                            Text("Color palette not found")
+                        }
+                    } else {
+                        Text("Color palette not set")
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Column {
+                    Text(
+                        text = "Category",
+                        fontWeight = FontWeight.Medium
+                    )
+                    if (data.value!!.categoryId != null) {
+                        val userCategory: UserCategory? = data.value!!.categoryId?.let {
+                            ReactiveUser.findCustomCategory(
+                                it
+                            )
+                        }
+                        if (userCategory != null) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                            RenderLayoutUserCategory(userCategory = userCategory)
+                        } else {
+                            Text("Category not found")
+                        }
+                    } else {
+                        Text("Category not set")
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Content for granted user rights to interact with file objects.
+ *
+ * @param scaffoldStatePopup The state of the [Scaffold] composite parent component.
+ */
+@Composable
+private fun PopupContentInfoFileObjectModalBlockGrantedRights(
+    scaffoldStatePopup: ScaffoldState
+) {
+    val data: MutableState<GrantedRight?> = remember { mutableStateOf(null) }
+    val isLoading: MutableState<Boolean> = remember { mutableStateOf(true) }
+
+    if (scaffoldStatePopup.drawerState.isOpen) {
+        LaunchedEffect(data) {
+            isLoading.value = true
+            ReactiveLoader.loadNotSet<GrantedRight?>("grantedRightsFileObjects")
+                .onSuccess {
+                    data.value = it
+                    println(it)
+                }
+                .onFailure {
+                    data.value = null
+                }
+            isLoading.value = false
+        }
+    }
+
+    when {
+        isLoading.value -> {
+            Spacer(modifier = Modifier.height(8.dp))
+            LoadingIndicator()
+        }
+
+        else -> {
+            if (data.value == null) {
+                Text("No information found")
+            } else {
+                val currentFileObject: String = ContextScreen.get(Screen.DASHBOARD_SCREEN, "currentFileObject")
+                if (data.value!!.rights.isNotEmpty()) {
+                    var isRights = false
+
+                    data.value!!.rights.forEach {
+                        if (it.systemName == currentFileObject) {
+                            it.rights.forEach { right ->
+                                Text(
+                                    "User: ${right.user} - types: ${right.rights.joinToString(", ")}")
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                            isRights = true
+                        }
+                    }
+
+                    if (!isRights) {
+                        Text("No rights granted")
+                    }
+                } else {
+                    Text("No rights granted")
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Content for issued user rights to interact with file objects.
+ *
+ * @param scaffoldStatePopup The state of the [Scaffold] composite parent component.
+ */
+@Composable
+private fun PopupContentInfoFileObjectModalBlockAssignedRights(
+    scaffoldStatePopup: ScaffoldState
+) {
+    val data: MutableState<IssuedRights?> = remember { mutableStateOf(null) }
+    val isLoading: MutableState<Boolean> = remember { mutableStateOf(true) }
+
+    if (scaffoldStatePopup.drawerState.isOpen) {
+        LaunchedEffect(data) {
+            isLoading.value = true
+            ReactiveLoader.loadNotSet<IssuedRights?>("assignedRightsFileObjects")
+                .onSuccess {
+                    data.value = it
+                    println(it)
+                }
+                .onFailure {
+                    data.value = null
+                }
+            isLoading.value = false
+        }
+    }
+
+    when {
+        isLoading.value -> {
+            Spacer(modifier = Modifier.height(8.dp))
+            LoadingIndicator()
+        }
+
+        else -> {
+            Text(
+                text = "Types: ${data.value!!.rights.joinToString(", ")}"
+            )
+        }
+    }
+}
+
+@Composable
+private fun LoadingIndicator() {
+    Column(
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator(
+            color = MaterialTheme.colors.secondaryVariant,
+            modifier = Modifier.size(20.dp),
+            strokeWidth = 2.dp
         )
     }
 }

@@ -196,6 +196,10 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             managerFileObject_Files
         }
 
+        val scaffoldStateProfileUser = rememberScaffoldState()
+        val scaffoldStateCommentFileObject = rememberScaffoldState()
+        val scaffoldStateInfoFileObject = rememberScaffoldState()
+
         PopupSetUserCategoryInFileObject(
             expandedState = expandedStateModalSetCategoryPopup,
             actionSetCategory = {
@@ -257,120 +261,156 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             onDismissRequest = { ContextScreen.clearScreen(Screen.DASHBOARD_SCREEN) }
         )
 
-        val scaffoldStateProfileUser = rememberScaffoldState()
-        val scaffoldStateCommentFileObject = rememberScaffoldState()
         val scope = rememberCoroutineScope()
+
+        val modifierDrawerInternal: Modifier = Modifier
+            .fillMaxSize()
+            .padding(12.dp)
+            .background(Color.White)
 
         val modalProfileUser = ModalRightSheetLayout(
             state = scaffoldStateProfileUser,
-            modifier = Modifier
-                .fillMaxSize(),
-            modifierDrawerInternal = Modifier
-                .fillMaxSize()
-                .padding(12.dp)
-                .background(Color.White)
+            modifier = Modifier.fillMaxSize(),
+            modifierDrawerInternal = modifierDrawerInternal
         )
         val modalCommentsFileObject = ModalRightSheetLayout(
             state = scaffoldStateCommentFileObject,
-            modifier = Modifier
-                .fillMaxSize(),
-            modifierDrawerInternal = Modifier
-                .fillMaxSize()
-                .padding(12.dp)
-                .background(Color.White)
+            modifier = Modifier.fillMaxSize(),
+            modifierDrawerInternal = modifierDrawerInternal
+        )
+        val modalInfoFileObject = ModalRightSheetLayout(
+            state = scaffoldStateInfoFileObject,
+            modifier = Modifier.fillMaxSize(),
+            modifierDrawerInternal = modifierDrawerInternal
         )
 
-        modalCommentsFileObject.render(
+        modalInfoFileObject.render(
             drawerContent = {
-                PopupContentCommentsInFileObjectModal(
-                    comments = commentsInFileObject,
-                    expandedStateModelInteractiveComment = expandedStateModalInteractionCommentFileObject
+                PopupContentInfoFileObjectModal(
+                    scaffoldState = scaffoldStateInfoFileObject
                 )
             }
         ) {
-            modalProfileUser.render(
+            modalCommentsFileObject.render(
                 drawerContent = {
-                    ContentProfileUserModal(
-                        navigationState = navigationState
+                    PopupContentCommentsInFileObjectModal(
+                        comments = commentsInFileObject,
+                        expandedStateModelInteractiveComment = expandedStateModalInteractionCommentFileObject
                     )
                 }
             ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Column (
-                        modifier = Modifier
-                            .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
-                    ) {
-                        TopPanelDashboard(
-                            scaffoldState = scaffoldStateProfileUser,
-                            scope = scope,
-                            avatar = if (userProfile.value != null)
-                                mutableStateOf(userProfile.value!!.avatar)
-                            else mutableStateOf(null)
+                modalProfileUser.render(
+                    drawerContent = {
+                        ContentProfileUserModal(
+                            navigationState = navigationState
                         )
                     }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.White),
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        when {
-                            !managerFileObjectIsLoad.value -> {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    CircularProgressIndicator(
-                                        color = MaterialTheme.colors.secondaryVariant,
-                                        modifier = Modifier.size(40.dp)
-                                    )
-                                }
-                            }
-
-                            else -> {
-                                RenderLayoutFilesObject(
+                ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Column (
+                            modifier = Modifier
+                                .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
+                        ) {
+                            TopPanelDashboard(
+                                scaffoldState = scaffoldStateProfileUser,
+                                scope = scope,
+                                avatar = if (userProfile.value != null)
+                                    mutableStateOf(userProfile.value!!.avatar)
+                                else mutableStateOf(null)
+                            )
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.White),
+                            verticalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(0.94f)
+                            ) {
+                                LayoutFileObjects(
                                     directories = directories,
                                     files = files,
-                                    expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
-                                    expandedStateSetColorPopup = expandedStateModalSetColorPopup,
-                                    expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory,
-                                    expandedStateModalRenameFileObject = expandedStateModalRenameFileObject,
-                                    scaffoldStateCommentFileObject = scaffoldStateCommentFileObject
+                                    scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
+                                    scaffoldStateInfoFileObject = scaffoldStateInfoFileObject
                                 )
                             }
+                            Column(modifier = Modifier.fillMaxSize()) {
+                                LayoutBreadCrumbs()
+                            }
                         }
-                        BreadCrumbs(
-                            items = listOf(
-                                BreadCrumbsItem(
-                                    text = "Folder 1",
-                                    action = {
-                                        println(true)
-                                    }
-                                ),
-                                BreadCrumbsItem(
-                                    text = "Folder 2",
-                                    action = {
-                                        println(true)
-                                    }
-                                ),
-                                BreadCrumbsItem(
-                                    text = "Folder 3",
-                                    action = {
-                                        println(true)
-                                    }
-                                )
-                            ),
-                            modifier = Modifier
-                                .height(40.dp)
-                                .background(Colors.BREAD_CRUMBS_BASE.color)
-                                .fillMaxWidth()
-                                .padding(4.dp, 8.dp)
-                        ).render()
                     }
                 }
             }
         }
+    }
+
+    @Composable
+    private fun LayoutFileObjects(
+        directories: MutableState<MutableList<FileObject>>,
+        files: MutableState<MutableList<FileObject>>,
+        scaffoldStateCommentFileObject: ScaffoldState,
+        scaffoldStateInfoFileObject: ScaffoldState
+    ) {
+        when {
+            !managerFileObjectIsLoad.value -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colors.secondaryVariant,
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+            }
+
+            else -> {
+                RenderLayoutFilesObject(
+                    directories = directories,
+                    files = files,
+                    expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
+                    expandedStateSetColorPopup = expandedStateModalSetColorPopup,
+                    expandedStateCreateFileObjectTypeDirectory = expandedStateModalCreateDirectory,
+                    expandedStateModalRenameFileObject = expandedStateModalRenameFileObject,
+                    scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
+                    scaffoldStateInfoFileObject = scaffoldStateInfoFileObject
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun LayoutBreadCrumbs() {
+        BreadCrumbs(
+            items = listOf(
+                BreadCrumbsItem(
+                    text = "Folder 1",
+                    action = {
+                        println(true)
+                    }
+                ),
+                BreadCrumbsItem(
+                    text = "Folder 2",
+                    action = {
+                        println(true)
+                    }
+                ),
+                BreadCrumbsItem(
+                    text = "Folder 3",
+                    action = {
+                        println(true)
+                    }
+                )
+            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Colors.BREAD_CRUMBS_BASE.color)
+                .padding(4.dp, 8.dp)
+        ).render()
     }
 
 }
