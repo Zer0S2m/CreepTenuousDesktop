@@ -1,8 +1,12 @@
 package com.zer0s2m.creeptenuous.desktop.reactive.models
 
 import com.zer0s2m.creeptenuous.desktop.common.dto.*
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
+import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipeline
+import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipelineType
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.*
+import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.*
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.user.*
 
 /**
@@ -14,12 +18,23 @@ object ReactiveUser : ReactiveLazyObject {
      * Custom categories for the user
      */
     @Reactive<ReactiveMutableList<UserCategory>>(
-        handler = HandlerReactiveUserCustomCategories::class
+        handler = HandlerReactiveUserCustomCategories::class,
+        priority = 15,
+        pipelines = [
+            ReactivePipeline(
+                title = "deleteUserCategoryAndCleanFileObject",
+                type = ReactivePipelineType.AFTER,
+                pipeline = ReactivePipelineHandlerDeleteUserCategoryCleanInFileObject::class
+            )
+        ]
     )
     var customCategories: ReactiveMutableList<UserCategory> = mutableReactiveListOf(
         triggerAdd = ReactiveTriggerUserCategoryAdd(),
         triggerRemove = ReactiveTriggerUserCategoryRemove(),
-        triggerSet = ReactiveTriggerUserCategorySet()
+        triggerSet = ReactiveTriggerUserCategorySet(),
+        pipelinesRemove = listOf(
+            "deleteUserCategoryAndCleanFileObject"
+        )
     )
 
     /**
@@ -30,6 +45,9 @@ object ReactiveUser : ReactiveLazyObject {
         node = Node(
             type = NodeType.KTOR,
             unit = "userProfile"
+        ),
+        injection = ReactiveInjection(
+            method = "setUserProfile"
         )
     )
     var profileSettings: UserProfileSettings? = null
@@ -38,12 +56,43 @@ object ReactiveUser : ReactiveLazyObject {
      * Custom colors
      */
     @Reactive<ReactiveMutableList<UserColor>>(
-        handler = HandlerReactiveUserColor::class
+        handler = HandlerReactiveUserColor::class,
+        priority = 20,
+        pipelines = [
+            ReactivePipeline(
+                title = "deleteUserColorAndCleanFileObject",
+                type = ReactivePipelineType.AFTER,
+                pipeline = ReactivePipelineHandlerDeleteUserColorCleanInFileObject::class
+            ),
+            ReactivePipeline(
+                title = "updateUserColorAndSetNewColorFileObject",
+                type = ReactivePipelineType.AFTER,
+                pipeline = ReactivePipelineHandlerUpdateUserColorSetNewColorInFileObject::class
+            ),
+            ReactivePipeline(
+                title = "deleteUserColorAndCleanUserCategory",
+                type = ReactivePipelineType.AFTER,
+                pipeline = ReactivePipelineHandlerDeleteUserColorCleanInUserCategory::class
+            ),
+            ReactivePipeline(
+                title = "updateUserColorAndSetNewColorUserCategory",
+                type = ReactivePipelineType.AFTER,
+                pipeline = ReactivePipelineHandlerUpdateUserColorSetNewColorInUserCategory::class
+            )
+        ]
     )
     var userColors: ReactiveMutableList<UserColor> = mutableReactiveListOf(
         triggerAdd = ReactiveTriggerUserColorAdd(),
         triggerRemove = ReactiveTriggerUserColorRemove(),
-        triggerSet = ReactiveTriggerUserColorSet()
+        triggerSet = ReactiveTriggerUserColorSet(),
+        pipelinesRemove = listOf(
+            "deleteUserColorAndCleanFileObject",
+            "deleteUserColorAndCleanUserCategory"
+        ),
+        pipelinesSet = listOf(
+            "updateUserColorAndSetNewColorUserCategory",
+            "updateUserColorAndSetNewColorFileObject"
+        )
     )
 
     /**
@@ -91,6 +140,30 @@ object ReactiveUser : ReactiveLazyObject {
         )
         var grantedRightsFileObjects: GrantedRight = GrantedRight()
 
+    }
+
+    /**
+     * Storage of issued rights to file objects.
+     */
+    object AssignedRights: ReactiveLazyObject {
+
+        /**
+         * Issued rights to interact with a file object.
+         */
+        @Lazy<IssuedRights>(
+            event = "Fires when a request for information occurs",
+            handler = HandlerReactiveUserAssignedRights::class
+        )
+        var assignedRightsFileObjects: IssuedRights? = null
+
+    }
+
+    fun findCustomCategory(id: Int): UserCategory? {
+        return customCategories.find { it.id == id }
+    }
+
+    fun findUserColor(id: Int): UserColor? {
+        return userColors.find { it.id == id }
     }
 
 }

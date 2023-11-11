@@ -27,8 +27,8 @@ import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
 import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.*
@@ -154,10 +154,10 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
                     .fillMaxWidth()
                     .padding(baseHorizontalPadding, 0.dp)
             ) {
-                renderUserAvatar()
+                UserAvatar()
             }
             Column {
-                renderMenu()
+                Menu()
             }
         }
     }
@@ -224,7 +224,7 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
      * Render user icon and name
      */
     @Composable
-    private fun renderUserAvatar() {
+    private fun UserAvatar() {
         val coroutineScope = rememberCoroutineScope()
 
         Row(
@@ -236,16 +236,20 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
             Row(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .fillMaxWidth(0.75f),
+                    .fillMaxWidth(0.8f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val avatar: String? = if (ReactiveUser.profileSettings != null)
+                    ReactiveUser.profileSettings!!.avatar else null
+
                 Avatar(
                     modifierIcon = Modifier
                         .padding(0.dp)
                         .pointerHoverIcon(icon = PointerIcon.Hand)
                         .width(32.dp)
                         .height(32.dp),
-                    enabled = false
+                    enabled = false,
+                    avatar = avatar
                 ).render()
                 Text(
                     text = ReactiveUser.profileSettings!!.name,
@@ -289,7 +293,7 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
      * Render main section for user settings
      */
     @Composable
-    private fun renderMenu() {
+    private fun Menu() {
         TitleSectionInMenu(text = Sections.MAIN_PROFILE.title)
         Sections.MAIN_PROFILE.sections
             .zip(Sections.MAIN_PROFILE.routes) { item, route ->
@@ -332,7 +336,7 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
  * @param text The text to be displayed [Text]
  */
 @Composable
-private fun TitleSectionInMenu(text: String = "") {
+private fun TitleSectionInMenu(text: String) {
     Row(
         modifier = Modifier
             .height(40.dp)
@@ -344,8 +348,7 @@ private fun TitleSectionInMenu(text: String = "") {
             text = text,
             color = Colors.TEXT.color,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier
-                .padding(baseHorizontalPadding, 6.dp)
+            modifier = Modifier.padding(baseHorizontalPadding, 6.dp)
         )
     }
 }
@@ -357,11 +360,12 @@ private fun TitleSectionInMenu(text: String = "") {
  * @param enabled Controls the enabled state of the surface [Surface]
  * @param navigation Internal navigational user profile screen handler
  * @param route Screen name for changing the current state
+ * @param section User profile section.
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ItemSectionInMenu(
-    text: String = "",
+    text: String,
     enabled: Boolean = true,
     navigation: State<NavigationController>,
     route: Screen,

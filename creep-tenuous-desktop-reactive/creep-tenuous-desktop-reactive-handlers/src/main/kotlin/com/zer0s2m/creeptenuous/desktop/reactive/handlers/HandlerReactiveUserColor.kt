@@ -26,7 +26,15 @@ object HandlerReactiveUserColor : ReactiveHandler<ReactiveMutableList<UserColor>
         return data.toReactiveMutableList(
             triggerAdd = ReactiveTriggerUserColorAdd(),
             triggerRemove = ReactiveTriggerUserColorRemove(),
-            triggerSet = ReactiveTriggerUserColorSet()
+            triggerSet = ReactiveTriggerUserColorSet(),
+            pipelinesRemove = listOf(
+                "deleteUserColorAndCleanFileObject",
+                "deleteUserColorAndCleanUserCategory"
+            ),
+            pipelinesSet = listOf(
+                "updateUserColorAndSetNewColorUserCategory",
+                "updateUserColorAndSetNewColorFileObject"
+            )
         )
     }
 

@@ -18,7 +18,7 @@ object HttpClient {
         if (Environment.IS_DEV) install(Logging) {
             logger = Logger.DEFAULT
             level = LogLevel.INFO
-        } else { }
+        }
 
         install(ContentNegotiation) {
             json(

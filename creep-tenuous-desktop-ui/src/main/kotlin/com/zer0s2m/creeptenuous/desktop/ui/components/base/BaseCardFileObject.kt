@@ -38,6 +38,11 @@ interface BaseCardFileObject : BaseComponent, BaseAnimation {
         get() = null
 
     /**
+     *Action called when information about a file object is loaded.
+     */
+    val actionInfo: () -> Unit
+
+    /**
      * Action called when a file object is downloaded
      */
     val actionDownload: () -> Unit
@@ -61,6 +66,11 @@ interface BaseCardFileObject : BaseComponent, BaseAnimation {
      * Action called when a file object is deleted
      */
     val actionDelete: () -> Unit
+
+    /**
+     * Action called when comments are opened.
+     */
+    val actionComments: () -> Unit
 
     /**
      * Action called when a custom category is set on a file object

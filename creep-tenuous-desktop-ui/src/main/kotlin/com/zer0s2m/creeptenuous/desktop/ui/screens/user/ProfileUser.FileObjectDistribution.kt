@@ -31,6 +31,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
  * Rendering part of the user profile screen [Screen.PROFILE_FILE_OBJECT_DISTRIBUTION]
  */
 @Composable
+@Suppress("UnusedReceiverParameter")
 fun ProfileUser.ProfileFileObjectDistribution.render() {
     Column(
         modifier = Modifier
@@ -46,7 +47,7 @@ fun ProfileUser.ProfileFileObjectDistribution.render() {
                     .fillMaxSize()
             ) {
                 BaseTitle("Delete them if necessary (has the highest priority)")
-                switch()
+                Switch()
             }
         }
 
@@ -83,7 +84,7 @@ private fun BaseTitle(text: String) = Text(
  * Distribution setting switch
  */
 @Composable
-internal fun ProfileUser.ProfileFileObjectDistribution.switch() {
+private fun Switch() {
     val isDeletingFilesWhenDeletingUser: Boolean =
         ReactiveUser.UserSettings.userSettingsFileObjectDistribution.isDeletingFilesWhenDeletingUser!!
     val checkedState = remember { mutableStateOf(isDeletingFilesWhenDeletingUser) }
@@ -110,7 +111,7 @@ internal fun ProfileUser.ProfileFileObjectDistribution.switch() {
  * Selecting a user to set up a distribution
  */
 @Composable
-internal fun ProfileUser.ProfileFileObjectDistribution.SelectUserDropMenu() {
+internal fun SelectUserDropMenu() {
     val selectedUserItem: MutableState<String?> = remember { mutableStateOf(
         ReactiveUser.UserSettings.userSettingsFileObjectDistribution.passingFilesToUser
     ) }

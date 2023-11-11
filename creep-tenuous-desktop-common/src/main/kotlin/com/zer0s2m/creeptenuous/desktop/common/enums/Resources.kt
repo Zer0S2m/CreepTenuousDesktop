@@ -35,9 +35,9 @@ enum class Resources(val path: String) {
 
     ICON_UNBLOCK("drawable/unblock.svg"),
 
-    ICON_EDIT("drawable/base_edit.svg"),
+    ICON_EDIT("drawable/edit.svg"),
 
-    ICON_ADD("drawable/add.svg"),
+    ICON_ADD("drawable/add.png"),
 
     ICON_DATE("drawable/date.png")
 

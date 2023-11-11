@@ -1,19 +1,14 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.user
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,14 +18,15 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.GrantedRightItemUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.TypeRight
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
+import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
-import com.zer0s2m.creeptenuous.desktop.ui.screens.base.BaseModalPopup
 
 /**
  * Rendering part of the user profile screen [Screen.PROFILE_GRANTED_RIGHTS_SCREEN]
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
+@Suppress("UnusedReceiverParameter")
 fun ProfileUser.ProfileGrantedRights.render() {
     val grantedRight: GrantedRight = ReactiveUser.GrantedRights.grantedRightsFileObjects
 
@@ -75,8 +71,7 @@ private const val basePaddingElementRight: Int = 16
  * Basic grant card for interacting with file objects
  */
 @Composable
-@Suppress("UnusedReceiverParameter")
-internal fun ProfileUser.ProfileGrantedRights.ItemGrantedRight(
+private fun ItemGrantedRight(
     item: GrantedRightItem
 ) {
     val stateModal: MutableState<Boolean> = remember { mutableStateOf(false) }
@@ -90,7 +85,7 @@ internal fun ProfileUser.ProfileGrantedRights.ItemGrantedRight(
         Column {
             Row {
                 Text(
-                    text = item.systemName
+                    text = item.realName
                 )
             }
             Column(
@@ -132,7 +127,7 @@ internal fun ProfileUser.ProfileGrantedRights.ItemGrantedRight(
             }
         }
 
-        IconButtonDelete(onClick = {
+        IconButtonRemove(onClick = {
             stateModal.value = true
             contextSelectDeleteRight.clear()
             contextSelectDeleteRight.addAll(item.rights)
@@ -174,33 +169,11 @@ private fun PopupDeleteRight(
     height: Int,
     width: Int
 ) {
-    BaseModalPopup(
-        stateModal = stateModal
-    ) {
-        Surface(
-            contentColor = contentColorFor(MaterialTheme.colors.surface),
-            modifier = Modifier
-                .width(width.dp)
-                .height(height.dp)
-                .shadow(24.dp, RoundedCornerShape(4.dp))
-        ) {
-            PopupDeleteRightContent()
-        }
-    }
-}
-
-@Composable
-private fun PopupDeleteRightContent() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .pointerInput({}) {
-                detectTapGestures(onPress = {
-                    // Workaround to disable clicks on Surface background
-                    // https://github.com/JetBrains/compose-jb/issues/2581
-                })
-            }
+    ModalPopup(
+        stateModal = stateModal,
+        modifierLayout = Modifier
+            .width(width.dp)
+            .height(height.dp)
     ) {
         Text(
             text = "Removing rights",
@@ -224,7 +197,7 @@ private fun PopupDeleteRightContent() {
                             text = block.user
                         )
                         block.rights.forEach { typeRight ->
-                            PopupItemDeleteRight(typeRight)
+                            ItemDeleteRight(typeRight)
                         }
                     }
                 }
@@ -248,7 +221,7 @@ private fun PopupDeleteRightContent() {
  * @param typeRight Type of right to delete
  */
 @Composable
-private fun PopupItemDeleteRight(typeRight: TypeRight) {
+private fun ItemDeleteRight(typeRight: TypeRight) {
     val checkedState: MutableState<Boolean> = remember { mutableStateOf(false) }
 
     Surface(

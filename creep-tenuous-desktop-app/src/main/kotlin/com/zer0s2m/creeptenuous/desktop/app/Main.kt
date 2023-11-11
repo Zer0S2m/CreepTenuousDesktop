@@ -7,13 +7,11 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
 fun main() = application {
-    val windowState = rememberWindowState(
-        size = DpSize(width = 1280.dp, height = 740.dp)
-    )
-
     Window(
         onCloseRequest = ::exitApplication,
-        state = windowState,
+        state = rememberWindowState(
+            size = DpSize(width = 1280.dp, height = 740.dp)
+        ),
         title = "CreepTenuous"
     ) {
         App()

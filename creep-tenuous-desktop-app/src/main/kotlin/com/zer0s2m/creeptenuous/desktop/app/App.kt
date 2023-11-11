@@ -25,6 +25,9 @@ import kotlinx.coroutines.launch
  *
  * Classes and their methods for dependency injection:
  * 1) [Dashboard.setManagerFileObject]
+ * 2) [Dashboard.setUserProfile]
+ * 3) [Dashboard.setCommentsInFileObject]
+ * 4) [Dashboard.setManagerFileObjectIsLoad]
  */
 @Composable
 @Preview
@@ -38,11 +41,12 @@ fun App() {
                 ReactiveUser,
                 ReactiveUser.UserSettings,
                 ReactiveUser.GrantedRights,
+                ReactiveUser.AssignedRights,
                 ReactiveCommon,
                 ReactiveFileObject
             ),
-            injectionClasses = hashMapOf(
-                Dashboard::class to listOf("setManagerFileObject")
+            injectionClasses = listOf(
+                Dashboard::class
             )
         )
     }
