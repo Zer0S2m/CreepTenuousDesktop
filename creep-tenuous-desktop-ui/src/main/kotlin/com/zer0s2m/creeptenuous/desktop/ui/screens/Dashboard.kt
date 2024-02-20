@@ -1,12 +1,30 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,7 +58,16 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
-import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.*
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupContentCommentsInFileObjectModal
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupContentInfoFileObjectModal
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupCreateFileObjectTypeDirectory
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupInteractionCommentFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupRenameFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupSetUserCategoryInFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupSetUserColorInFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLayoutFilesObject
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLeftContentDashboard
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.TopPanelDashboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -179,8 +206,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             Screen.DASHBOARD_SCREEN,
             mapOf(
                 "currentLevelManagerDirectory" to 0,
-                "currentParentsManagerDirectory" to listOf<String>(),
-                "currentSystemParentsManagerDirectory" to listOf<String>()
+                "currentParentsManagerDirectory" to listOf<String>().toMutableList(),
+                "currentSystemParentsManagerDirectory" to listOf<String>().toMutableList()
             )
         )
     }
@@ -349,6 +376,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                                     .fillMaxHeight(0.94f)
                             ) {
                                 LayoutFileObjects(
+                                    scope = scope,
                                     directories = directories,
                                     files = files,
                                     scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
@@ -367,6 +395,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
     @Composable
     private fun LayoutFileObjects(
+        scope: CoroutineScope,
         directories: MutableState<MutableList<FileObject>>,
         files: MutableState<MutableList<FileObject>>,
         scaffoldStateCommentFileObject: ScaffoldState,
@@ -388,6 +417,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
             else -> {
                 RenderLayoutFilesObject(
+                    scope = scope,
                     directories = directories,
                     files = files,
                     expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,

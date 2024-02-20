@@ -15,7 +15,16 @@ import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
 import org.slf4j.Logger
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
-import kotlin.reflect.full.*
+import kotlin.reflect.full.callSuspend
+import kotlin.reflect.full.companionObject
+import kotlin.reflect.full.companionObjectInstance
+import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.declaredMemberFunctions
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.findAnnotations
+import kotlin.reflect.full.functions
+import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.memberProperties
 
 /**
  * The main storage of values that will be loaded or will be loaded
@@ -381,6 +390,7 @@ object ReactiveLoader {
         val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
         if (reactiveLazyObject != null) {
             reactiveLazyObject.isLoad = false
+            sendIsLoadData(reactiveLazyObject, false)
 
             logger.infoDev("Reactive property purification:\n\t[" +
                     "${reactiveLazyObject.reactiveLazyObject.javaClass.canonicalName}] [$nameProperty]")
@@ -650,7 +660,7 @@ internal fun runInjectionMethod(reactiveLazyObject: ReactiveLazy, objectFromHand
     }
 }
 
-internal fun sendIsLoadData(reactiveLazyObject: ReactiveLazy) {
+internal fun sendIsLoadData(reactiveLazyObject: ReactiveLazy, isLoad: Boolean = true) {
     if (reactiveLazyObject.sendIsLoadInjectionClass != null
         && reactiveLazyObject.sendIsLoadInjectionMethod.isNotEmpty()
         && reactiveLazyObject.sendIsLoad) {
@@ -658,7 +668,7 @@ internal fun sendIsLoadData(reactiveLazyObject: ReactiveLazy) {
         if (compObject != null) {
             compObject.functions.find {
                 it.name == reactiveLazyObject.sendIsLoadInjectionMethod
-            }?.call(reactiveLazyObject.sendIsLoadInjectionClass.companionObjectInstance, true)
+            }?.call(reactiveLazyObject.sendIsLoadInjectionClass.companionObjectInstance, isLoad)
         }
     }
 }

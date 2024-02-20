@@ -1,6 +1,14 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Scaffold
@@ -8,7 +16,6 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -40,6 +47,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 internal fun RenderLayoutFilesObject(
+    scope: CoroutineScope,
     directories: MutableState<MutableList<FileObject>>,
     files: MutableState<MutableList<FileObject>>,
     expandedStateSetCategoryPopup: MutableState<Boolean>,
@@ -49,8 +57,6 @@ internal fun RenderLayoutFilesObject(
     scaffoldStateCommentFileObject: ScaffoldState,
     scaffoldStateInfoFileObject: ScaffoldState
 ) {
-    val scope = rememberCoroutineScope()
-
     Column(modifier = Modifier.padding(16.dp)) {
         Column(modifier = Modifier.padding(bottom = 28.dp)) {
             RenderLayoutDirectories(
@@ -119,6 +125,7 @@ internal fun RenderLayoutDirectories(
             items(directories.value.size) { index ->
                 val categoryId: Int? = directories.value[index].categoryId
                 val color: String? = directories.value[index].color
+
                 CartFileObject(
                     isDirectory = true,
                     isFile = false,
@@ -164,6 +171,33 @@ internal fun RenderLayoutDirectories(
                             scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
                             systemName = directories.value[index].systemName
                         )
+                    },
+                    actionDoubleClick = {
+                        val directory: FileObject = directories.value[index]
+
+                        val currentLevelManagerDirectory: Int = ContextScreen.get(
+                            Screen.DASHBOARD_SCREEN, "currentLevelManagerDirectory")
+                        val currentParentsManagerDirectory: MutableList<String> = ContextScreen.get(
+                            Screen.DASHBOARD_SCREEN, "currentParentsManagerDirectory")
+                        val currentSystemParentsManagerDirectory: MutableList<String> = ContextScreen.get(
+                            Screen.DASHBOARD_SCREEN, "currentSystemParentsManagerDirectory")
+
+                        scope.launch {
+                            currentParentsManagerDirectory.add(directory.realName)
+                            currentSystemParentsManagerDirectory.add(directory.systemName)
+
+                            ContextScreen.set(
+                                Screen.DASHBOARD_SCREEN,
+                                mapOf(
+                                    "currentLevelManagerDirectory" to currentLevelManagerDirectory + 1,
+                                    "currentParentsManagerDirectory" to currentParentsManagerDirectory,
+                                    "currentSystemParentsManagerDirectory" to currentSystemParentsManagerDirectory
+                                )
+                            )
+
+                            ReactiveLoader.resetIsLoad("managerFileSystemObjects")
+                            ReactiveLoader.load("managerFileSystemObjects")
+                        }
                     }
                 ).render()
             }
