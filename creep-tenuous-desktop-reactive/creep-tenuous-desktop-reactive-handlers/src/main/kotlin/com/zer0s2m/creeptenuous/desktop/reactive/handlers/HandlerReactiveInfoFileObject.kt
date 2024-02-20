@@ -1,5 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.reactive.handlers
 
+import com.zer0s2m.creeptenuous.desktop.common.data.DataFileSystemObjectInfo
 import com.zer0s2m.creeptenuous.desktop.common.dto.InfoFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.InfoFileObjects
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
@@ -8,6 +9,7 @@ import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandler
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 
 object HandlerReactiveInfoFileObject : ReactiveHandler<InfoFileObject?> {
 
@@ -22,7 +24,11 @@ object HandlerReactiveInfoFileObject : ReactiveHandler<InfoFileObject?> {
         }
 
         val currentFileObject: String = ContextScreen.get(Screen.DASHBOARD_SCREEN, "currentFileObject")
-        val data: InfoFileObjects = HttpClient.client.get("/api/v1/file-system-object/info").body()
+        val data: InfoFileObjects = HttpClient.client.post("/api/v1/file-system-object/info") {
+            header("Authorization", "Bearer ${HttpClient.accessToken}")
+            contentType(ContentType.Application.Json)
+            setBody(DataFileSystemObjectInfo(listOf(currentFileObject)))
+        }.body()
 
         data.objects.forEach {
             if (it.systemName == currentFileObject) {

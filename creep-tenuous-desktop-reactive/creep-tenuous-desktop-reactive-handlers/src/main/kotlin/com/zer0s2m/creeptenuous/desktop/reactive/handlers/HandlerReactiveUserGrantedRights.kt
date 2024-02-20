@@ -17,7 +17,9 @@ object HandlerReactiveUserGrantedRights : ReactiveHandler<GrantedRight> {
      * @return result
      */
     override suspend fun handler(): GrantedRight {
-        return HttpClient.client.get("/api/v1/user/global/right/list-all").body()
+        return HttpClient.client.get("/api/v1/user/global/right/list-all") {
+            header("Authorization", "Bearer ${HttpClient.accessToken}")
+        }.body()
     }
 
 }

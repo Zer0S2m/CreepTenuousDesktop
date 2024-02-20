@@ -26,6 +26,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonEdit
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
+import kotlinx.coroutines.launch
 
 /**
  * Rendering part of the user profile screen [Screen.PROFILE_COLORS_SCREEN]
@@ -42,6 +43,7 @@ fun ProfileUser.ProfileColors.render() {
     val listColors: MutableList<Color> = remember {
         getUserColorRgbFromHex().toMutableStateList()
     }
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -82,7 +84,10 @@ fun ProfileUser.ProfileColors.render() {
                         },
                         actionDelete = {
                             listColors.removeAt(index)
-                            ReactiveUser.userColors.removeAtReactive(index)
+
+                            scope.launch {
+                                ReactiveUser.userColors.removeAtReactive(index)
+                            }
                         }
                     )
                 }
@@ -144,6 +149,8 @@ private fun ModalCreateCustomColor(
     stateModal: MutableState<Boolean>,
     listColors: MutableList<Color>
 ) {
+    val scope = rememberCoroutineScope()
+
     ModalPopup(
         modifierLayout = Modifier
             .width(360.dp)
@@ -157,21 +164,27 @@ private fun ModalCreateCustomColor(
                 stateModal.value = false
                 isExists.value = false
                 listColors.add(it)
-                ReactiveUser.userColors.addReactive(UserColor(
-                    color = "#${Integer.toHexString(it.toArgb()).substring(2)}"
-                ))
+
+                scope.launch {
+                    ReactiveUser.userColors.addReactive(UserColor(
+                        color = "#${Integer.toHexString(it.toArgb()).substring(2)}"
+                    ))
+                }
             },
             actionEdit = {
                 stateModal.value = false
                 isExists.value = false
                 listColors[currentIndexColor.value] = it
-                ReactiveUser.userColors.setReactive(
-                    index = currentIndexColor.value,
-                    element = UserColor(
-                        id = ReactiveUser.userColors[currentIndexColor.value].id,
-                        color = "#${Integer.toHexString(it.toArgb()).substring(2)}"
+
+                scope.launch {
+                    ReactiveUser.userColors.setReactive(
+                        index = currentIndexColor.value,
+                        element = UserColor(
+                            id = ReactiveUser.userColors[currentIndexColor.value].id,
+                            color = "#${Integer.toHexString(it.toArgb()).substring(2)}"
+                        )
                     )
-                )
+                }
             }
         )
     }

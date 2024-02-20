@@ -1,10 +1,41 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.user
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.TooltipArea
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,6 +61,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalSelectDate
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
+import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -38,6 +70,7 @@ import java.util.*
 @Composable
 @Suppress("UnusedReceiverParameter")
 fun ProfileUser.ProfileUserControl.render() {
+    val scope = rememberCoroutineScope()
     val openDialogDeleteUser: MutableState<Boolean> = remember { mutableStateOf(false) }
     val openDialogUnblockUser: MutableState<Boolean> = remember { mutableStateOf(false) }
     val openDialogBlockUser: MutableState<Boolean> = remember { mutableStateOf(false) }
@@ -50,16 +83,23 @@ fun ProfileUser.ProfileUserControl.render() {
     val currentDateUserBlock: MutableState<Date> = mutableStateOf(Date())
     val isErrorValidateDateEndBlockUser: MutableState<Boolean> = mutableStateOf(false)
 
-    Column(
+    LazyColumn (
         modifier = Modifier
             .fillMaxSize()
     ) {
-        users.value.forEachIndexed { index, user ->
+        itemsIndexed(users.value) { index: Int, user: User ->
+            var isBLocked = false
+            if (user.isBlocked || user.isTemporarilyBlocked) {
+                isBLocked = true
+            }
+
+            // TODO: Bug - fix changing the button to block or unlock the user
+
             ItemUser(
                 nameUser = user.name,
                 loginUser = user.login,
                 roleUser = user.role[0].title,
-                isBlocked = user.isBlocked,
+                isBlocked = isBLocked,
                 avatar = user.avatar,
                 actionDelete = { _ ->
                     openDialogDeleteUser.value = true
@@ -87,8 +127,10 @@ fun ProfileUser.ProfileUserControl.render() {
         action = {
             openDialogDeleteUser.value = false
             currentUser.value?.let {
-                users.value.remove(currentUser.value)
-                ReactiveCommon.systemUsers.removeReactive(it)
+                scope.launch {
+                    ReactiveCommon.systemUsers.removeReactive(it)
+                    users.value.remove(currentUser.value)
+                }
             }
         }
     )
@@ -100,14 +142,20 @@ fun ProfileUser.ProfileUserControl.render() {
             openDialogUnblockUser.value = false
             currentUser.value?.let {
                 if (currentIndexUser.value != -1) {
-                    currentUser.value!!.isBlocked = false
-                    ReactiveLoader.executionIndependentTrigger(
-                        "systemUsers",
-                        "unblockSystemUser",
-                        currentUser.value
-                    )
-                    ReactiveCommon.systemUsers[currentIndexUser.value] = currentUser.value!!
-                    users.value = ReactiveCommon.systemUsers
+                    scope.launch {
+                        currentUser.value!!.isBlocked = false
+                        currentUser.value!!.isTemporarilyBlocked = false
+                        ReactiveCommon.systemUsers[currentIndexUser.value] = currentUser.value!!
+                        users.value = ReactiveCommon.systemUsers
+
+                        ReactiveLoader.executionIndependentTrigger(
+                            "systemUsers",
+                            "unblockSystemUser",
+                            currentUser.value
+                        )
+                    }
+
+                    ContextScreen.clearScreen(Screen.PROFILE_USER_MANAGEMENT_SCREEN)
                 }
             }
         }
@@ -121,9 +169,17 @@ fun ProfileUser.ProfileUserControl.render() {
         currentDateUserBlock = currentDateUserBlock,
         isErrorValidateDateEndBlockUser = isErrorValidateDateEndBlockUser,
         actionBlock = {
+            openDialogBlockUser.value = false
+
             fun final() {
-                if (isBlockUserCompletely || isBlockUserTemporary) {
+                if (isBlockUserCompletely) {
                     currentUser.value!!.isBlocked = true
+                }
+                if (isBlockUserTemporary) {
+                    currentUser.value!!.isTemporarilyBlocked = true
+                }
+
+                if (isBlockUserCompletely || isBlockUserTemporary) {
                     ReactiveCommon.systemUsers[currentIndexUser.value] = currentUser.value!!
                     users.value = ReactiveCommon.systemUsers
                 }
@@ -132,11 +188,14 @@ fun ProfileUser.ProfileUserControl.render() {
             }
 
             if (isBlockUserCompletely && !isBlockUserTemporary) {
-                ReactiveLoader.executionIndependentTrigger(
-                    "systemUsers",
-                    "blockSystemUserCompletely",
-                    currentUser.value
-                )
+                scope.launch {
+                    ReactiveLoader.executionIndependentTrigger(
+                        "systemUsers",
+                        "blockSystemUserCompletely",
+                        currentUser.value
+                    )
+                }
+
                 final()
             } else if (!isBlockUserCompletely && isBlockUserTemporary) {
                 val existsStartDateBlockUser: Boolean = ContextScreen.containsValueByKey(
@@ -147,22 +206,28 @@ fun ProfileUser.ProfileUserControl.render() {
                 )
 
                 if (!existsStartDateBlockUser && existsEndDateBlockUser) {
-                    ReactiveLoader.executionIndependentTrigger(
-                        "systemUsers",
-                        "blockSystemUserTemporary",
-                        null,
-                        endDateBlockUser,
-                        currentUser.value
-                    )
+                    scope.launch {
+                        ReactiveLoader.executionIndependentTrigger(
+                            "systemUsers",
+                            "blockSystemUserTemporary",
+                            null,
+                            selectDateEndUserBlock.value,
+                            currentUser.value
+                        )
+                    }
+
                     final()
                 } else if (existsStartDateBlockUser && existsEndDateBlockUser) {
-                    ReactiveLoader.executionIndependentTrigger(
-                        "systemUsers",
-                        "blockSystemUserTemporary",
-                        startDateBlockUser,
-                        endDateBlockUser,
-                        currentUser.value
-                    )
+                    scope.launch {
+                        ReactiveLoader.executionIndependentTrigger(
+                            "systemUsers",
+                            "blockSystemUserTemporary",
+                            selectDateStartUserBlock.value,
+                            selectDateEndUserBlock.value,
+                            currentUser.value
+                        )
+                    }
+
                     final()
                 }
             }

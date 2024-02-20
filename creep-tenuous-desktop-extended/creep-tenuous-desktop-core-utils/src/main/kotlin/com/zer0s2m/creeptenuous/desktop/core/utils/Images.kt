@@ -16,7 +16,7 @@ import javax.imageio.ImageIO
  * @param url Image upload URL.
  */
 suspend fun loadImage(url: String): Result<ImageBitmap> {
-    val urlImage = URL(url)
+    val urlImage = URL("http://localhost:8080/${url}")
 
     return try {
         val connection = withContext(Dispatchers.IO) {

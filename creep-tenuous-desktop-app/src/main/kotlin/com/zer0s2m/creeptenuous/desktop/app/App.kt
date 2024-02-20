@@ -6,7 +6,12 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import com.zer0s2m.creeptenuous.desktop.common.dto.ConfigState
+import com.zer0s2m.creeptenuous.desktop.common.dto.JwtTokens
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.common.utils.loadStorageConfigStateDesktop
+import com.zer0s2m.creeptenuous.desktop.core.auth.AuthorizationHandler
+import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.navigation.runtime.rememberNavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
@@ -19,6 +24,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenSettin
 import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import com.zer0s2m.creeptenuous.desktop.ui.theme.darkColors
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * Application launch
@@ -32,8 +38,26 @@ import kotlinx.coroutines.launch
 @Composable
 @Preview
 fun App() {
-    val navigationController by rememberNavigationController(Screen.DASHBOARD_SCREEN.name)
     val coroutineScope = rememberCoroutineScope()
+
+    var screen: String = Screen.DASHBOARD_SCREEN.name
+    val configState: ConfigState = loadStorageConfigStateDesktop()
+    var jwtTokens: JwtTokens?
+
+    if (configState.login.isEmpty() && configState.password.isEmpty()) {
+        screen = Screen.LOGIN_SCREEN.name
+        ReactiveLoader.setIsBlockLoad(true)
+    } else {
+        if (configState.accessToken == null && configState.refreshToken == null) {
+            runBlocking {
+                jwtTokens = AuthorizationHandler.login(configState.login, configState.password)
+                HttpClient.accessToken = jwtTokens!!.accessToken
+                HttpClient.refreshToken = jwtTokens!!.refreshToken
+            }
+        }
+    }
+
+    val navigationController by rememberNavigationController(screen)
 
     coroutineScope.launch {
         ReactiveLoader.collectLoader(

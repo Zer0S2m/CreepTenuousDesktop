@@ -20,7 +20,9 @@ object HandlerReactiveUserProfileSettings :
      * @return result
      */
     override suspend fun handler(): UserProfileSettings {
-        return HttpClient.client.get("/api/v1/user/profile").body()
+        return HttpClient.client.get("/api/v1/user/profile") {
+            header("Authorization", "Bearer ${HttpClient.accessToken}")
+        }.body()
     }
 
 }

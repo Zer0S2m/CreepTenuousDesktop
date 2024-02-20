@@ -133,7 +133,9 @@ internal fun RenderLayoutDirectories(
                         )
                     },
                     actionDelete = {
-                        directories.value = actionDelete(directories.value[index])
+                        scope.launch {
+                            directories.value = actionDelete(directories.value[index])
+                        }
                     },
                     actionSetCategory = {
                         actionSetCategory(categoryId, directories.value[index].systemName)
@@ -212,7 +214,9 @@ internal fun RenderLayoutFiles(
                         )
                     },
                     actionDelete = {
-                        files.value = actionDelete(files.value[index])
+                        scope.launch {
+                            files.value = actionDelete(files.value[index])
+                        }
                     },
                     actionSetCategory = {
                         actionSetCategory(categoryId, files.value[index].systemName)
@@ -282,7 +286,7 @@ internal fun TopPanelDashboard(
  * @param fileObject File object to be deleted.
  * @return New filtered list of file objects.
  */
-private fun actionDelete(fileObject: FileObject): MutableList<FileObject> {
+private suspend fun actionDelete(fileObject: FileObject): MutableList<FileObject> {
     val objects: MutableList<FileObject> = mutableListOf()
     objects.addAll(ReactiveFileObject.managerFileSystemObjects.objects)
 

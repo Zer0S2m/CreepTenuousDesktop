@@ -1,14 +1,38 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.v2.ScrollbarAdapter
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +60,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import com.zer0s2m.creeptenuous.desktop.ui.screens.common.DropdownMenuSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.common.InputSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.common.RenderLayoutUserCategory
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -57,6 +82,8 @@ internal fun PopupSetUserCategoryInFileObject(
     expandedState: MutableState<Boolean>,
     actionSetCategory: (ManagerFileObject) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+
     ModalPopup(
         stateModal = expandedState,
         modifierLayout = Modifier
@@ -118,12 +145,14 @@ internal fun PopupSetUserCategoryInFileObject(
                             }
                             newManagerFileObject.objects[index] = fileObject
 
-                            ReactiveLoader.executionIndependentTrigger(
-                                "managerFileSystemObjects",
-                                "setCategoryInFileObject",
-                                fileObject.systemName,
-                                fileObject.categoryId
-                            )
+                            scope.launch {
+                                ReactiveLoader.executionIndependentTrigger(
+                                    "managerFileSystemObjects",
+                                    "setCategoryInFileObject",
+                                    fileObject.systemName,
+                                    fileObject.categoryId
+                                )
+                            }
                         }
                     }
 
@@ -149,6 +178,8 @@ internal fun PopupSetUserColorInFileObject(
     expandedState: MutableState<Boolean>,
     actionSetColor: (ManagerFileObject) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+
     ModalPopup(
         stateModal = expandedState,
         modifierLayout = Modifier
@@ -231,12 +262,14 @@ internal fun PopupSetUserColorInFileObject(
                                 .get(Screen.DASHBOARD_SCREEN, "colorEditFileObject")
                             newManagerFileObject.objects[index] = fileObject
 
-                            ReactiveLoader.executionIndependentTrigger(
-                                "managerFileSystemObjects",
-                                "setColorInFileObject",
-                                fileObject.systemName,
-                                ContextScreen.get(Screen.DASHBOARD_SCREEN, "colorIdEditFileObject")
-                            )
+                            scope.launch {
+                                ReactiveLoader.executionIndependentTrigger(
+                                    "managerFileSystemObjects",
+                                    "setColorInFileObject",
+                                    fileObject.systemName,
+                                    ContextScreen.get(Screen.DASHBOARD_SCREEN, "colorIdEditFileObject")
+                                )
+                            }
                         }
                     }
 
@@ -260,6 +293,8 @@ internal fun PopupSetUserColorInFileObject(
 internal fun PopupCreateFileObjectTypeDirectory(
     expandedState: MutableState<Boolean>,
 ) {
+    val scope = rememberCoroutineScope()
+
     ModalPopup(
         stateModal = expandedState,
         modifierLayout = Modifier
@@ -354,15 +389,20 @@ internal fun PopupCreateFileObjectTypeDirectory(
                             isDirectory = true,
                             isFile = false,
                             color = colorStrState.value,
+                            colorId = if (colorIdState.value != -1) colorIdState.value else null,
                             categoryId = if (categoryId.value != -1) categoryId.value else null
                         )
 
-                        ReactiveLoader.executionIndependentTrigger(
-                            "managerFileSystemObjects",
-                            "createFileObjectOfTypeDirectory",
-                            newFileObjectDirectory,
-                            colorIdState.value
-                        )
+                        scope.launch {
+                            ReactiveLoader.executionIndependentTrigger(
+                                "managerFileSystemObjects",
+                                "createFileObjectOfTypeDirectory",
+                                newFileObjectDirectory,
+                                colorIdState.value,
+                                categoryId.value
+                            )
+                        }
+
                         ReactiveFileObject.managerFileSystemObjects.objects.add(
                             newFileObjectDirectory
                         )
@@ -387,6 +427,8 @@ internal fun PopupRenameFileObject(
     expandedState: MutableState<Boolean>,
     actionRename: (ManagerFileObject) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+
     ModalPopup(
         stateModal = expandedState,
         modifierLayout = Modifier
@@ -446,12 +488,14 @@ internal fun PopupRenameFileObject(
                                 }
                             }
 
-                            ReactiveLoader.executionIndependentTrigger(
-                                "managerFileSystemObjects",
-                                "renameFileObject",
-                                currentFileObjectSystemName,
-                                newTitle
-                            )
+                            scope.launch {
+                                ReactiveLoader.executionIndependentTrigger(
+                                    "managerFileSystemObjects",
+                                    "renameFileObject",
+                                    currentFileObjectSystemName,
+                                    newTitle
+                                )
+                            }
 
                             actionRename(ReactiveFileObject.managerFileSystemObjects)
 
@@ -491,7 +535,7 @@ internal fun PopupInteractionCommentFileObject(
         val stateForm = FormState()
         val comment: CommentFileObject = ContextScreen.get(
             Screen.DASHBOARD_SCREEN,
-            "currentFileObjectForInteractive"
+            "currentCommentFileObjectForInteractive"
         )
 
         Text(
@@ -573,12 +617,11 @@ internal fun PopupContentCommentsInFileObjectModal(
                     mapOf(
                         "isEditFileObjectForInteractive" to false,
                         "isCreateFileObjectForInteractive" to true,
-                        "currentFileObjectForInteractive" to CommentFileObject(
+                        "currentCommentFileObjectForInteractive" to CommentFileObject(
                             id = null,
                             fileSystemObject = currentFileObject,
                             comment = "",
-                            createdAt = LocalDateTime.now()
-                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                            createdAt = LocalDateTime.now().toString()
                         )
                     )
                 )
@@ -605,6 +648,8 @@ private fun LayoutCommentsInFileObject(
     comments: SnapshotStateList<CommentFileObject>,
     expandedStateModelInteractiveComment: MutableState<Boolean>
 ) {
+    val scope = rememberCoroutineScope()
+
     Box {
         val stateScroll: LazyListState = rememberLazyListState()
         val adapterScroll: ScrollbarAdapter = rememberScrollbarAdapter(scrollState = stateScroll)
@@ -625,7 +670,7 @@ private fun LayoutCommentsInFileObject(
                         ContextScreen.set(
                             Screen.DASHBOARD_SCREEN,
                             mapOf(
-                                "currentFileObjectForInteractive" to comment,
+                                "currentCommentFileObjectForInteractive" to comment,
                                 "currentIndexFileObjectForInteractive" to index,
                                 "isEditFileObjectForInteractive" to true,
                                 "isCreateFileObjectForInteractive" to false
@@ -634,7 +679,10 @@ private fun LayoutCommentsInFileObject(
                         expandedStateModelInteractiveComment.value = true
                     },
                     actionDelete = {
-                        ReactiveFileObject.commentsFileSystemObject.removeAtReactive(index)
+                        scope.launch {
+                            ReactiveFileObject.commentsFileSystemObject.removeAtReactive(index)
+                        }
+
                         comments.removeAt(index)
                     }
                 )

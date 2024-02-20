@@ -22,7 +22,9 @@ object HandlerReactiveUserCustomCategories : ReactiveHandler<ReactiveMutableList
      * @return result
      */
     override suspend fun handler(): ReactiveMutableList<UserCategory> {
-        val data: MutableCollection<UserCategory> = HttpClient.client.get("/api/v1/user/category").body()
+        val data: MutableCollection<UserCategory> = HttpClient.client.get("/api/v1/user/category") {
+            header("Authorization", "Bearer ${HttpClient.accessToken}")
+        }.body()
         return data.toReactiveMutableList(
             triggerAdd = ReactiveTriggerUserCategoryAdd(),
             triggerRemove = ReactiveTriggerUserCategoryRemove(),

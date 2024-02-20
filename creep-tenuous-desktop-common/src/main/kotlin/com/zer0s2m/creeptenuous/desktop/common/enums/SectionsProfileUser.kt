@@ -1,16 +1,16 @@
 package com.zer0s2m.creeptenuous.desktop.common.enums
 
 /**
- * The main storage of the main names of navigation blocks
+ * The main storage of the main names of navigation blocks.
  *
- * @param title Name of the sectional block
- * @param sections Basic name blocks
- * @param routes Routes to change the current state of the screen through an action
- * @param objects The name of the properties that are marked with an annotation Reactive or Lazy
+ * @param title Name of the sectional block.
+ * @param sections Basic name blocks. `Key` - title, `value` - is admin.
+ * @param routes Routes to change the current state of the screen through an action.
+ * @param objects The name of the properties that are marked with an annotation Reactive or Lazy.
  */
-enum class Sections(
+enum class SectionsProfileUser(
     val title: String,
-    val sections: List<String>,
+    val sections: Map<String, Boolean>,
     val routes: List<Screen>,
     val objects: Map<Screen, Collection<String>> = mapOf()
 ) {
@@ -20,10 +20,10 @@ enum class Sections(
      */
     MAIN_PROFILE(
         title = "Main",
-        sections = listOf(
-            "File object distribution settings",
-            "Settings",
-            "Viewing granted rights"
+        sections = mapOf(
+            "File object distribution settings" to false,
+            "Settings" to false,
+            "Viewing granted rights" to false
         ),
         routes = listOf(
             Screen.PROFILE_FILE_OBJECT_DISTRIBUTION,
@@ -45,9 +45,9 @@ enum class Sections(
      */
     USER_CONTROL(
         title = "User control",
-        sections = listOf(
-            "List of users",
-            "User management"
+        sections = mapOf(
+            "List of users" to false,
+            "User management" to true
         ),
         routes = listOf(
             Screen.PROFILE_LIST_USERS_SCREEN,
@@ -60,9 +60,9 @@ enum class Sections(
      */
     USER_CUSTOMIZATION(
         title = "Customization",
-        sections = listOf(
-            "Categories",
-            "Colors"
+        sections = mapOf(
+            "Categories" to false,
+            "Colors" to false
         ),
         routes = listOf(
             Screen.PROFILE_CATEGORY_SCREEN,

@@ -10,10 +10,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +32,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardPanelBaseFold
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 
 
 /**
@@ -281,6 +282,7 @@ class CartFileObject(
      *
      * @param content Main component block
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     private fun renderBase(content: @Composable () -> Unit) {
         val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
@@ -320,6 +322,14 @@ class CartFileObject(
                 .fillMaxWidth()
                 .height(80.dp)
                 .hoverable(interactionSource = interactionSource)
+                .onPointerEvent(
+                    eventType = PointerEventType.Press,
+                    pass = PointerEventPass.Final,
+                ) { event ->
+                    if (event.button?.isSecondary == true) {
+                        expandedMenu.value = !expandedMenu.value
+                    }
+                }
                 .pointerHoverIcon(icon = PointerIcon.Hand),
             elevation = 0.dp,
             shape = RoundedCornerShape(8.dp)
@@ -631,7 +641,7 @@ internal fun CartCommentForFileObject(
 ) {
     val localCreatedAt = DateTimeFormatter
         .ofPattern("MMMM dd, yyyy HH:mm:ss")
-        .format(LocalDateTime.parse(createdAt, dateFormatForComment))
+        .format(LocalDateTime.parse(createdAt, ISO_DATE_TIME))
 
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -661,5 +671,6 @@ internal fun CartCommentForFileObject(
  * Date format for file object comment.
  */
 @get:ReadOnlyComposable
-private val dateFormatForComment: DateTimeFormatter get() =
-    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+private val dateFormatForComment: DateTimeFormatter
+    get() =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")

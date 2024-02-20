@@ -14,9 +14,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.common.dto.LoginUserModel
-import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
-import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
@@ -89,18 +87,22 @@ class LoginUser {
                                 data["login"].toString(),
                                 data["password"].toString()
                             )
-                            println(dataClass)
 
-                            scope.launch {
-                                reactiveNavigationScreen.action(
-                                    state = mutableStateOf(navigationController),
-                                    route = Screen.DASHBOARD_SCREEN,
-                                    objects = listOf(
-                                        "managerFileSystemObjects"
-                                    ),
-                                    scope = scope
-                                )
-                            }
+//                            ReactiveLoader.setIsBlockLoad(false)
+//
+//                            scope.launch {
+//                                reactiveNavigationScreen.action(
+//                                    state = mutableStateOf(navigationController),
+//                                    route = Screen.DASHBOARD_SCREEN,
+//                                    objects = listOf(
+//                                        "managerFileSystemObjects",
+//                                        "customCategories",
+//                                        "userColors",
+//                                        "profileSettings"
+//                                    ),
+//                                    scope = scope
+//                                )
+//                            }
                         }
                     },
                     modifier = Modifier

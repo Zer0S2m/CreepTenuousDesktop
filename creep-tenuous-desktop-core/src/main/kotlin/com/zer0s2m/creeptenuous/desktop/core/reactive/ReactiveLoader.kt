@@ -124,6 +124,8 @@ object ReactiveLoader {
 
     internal val logger: Logger = logger()
 
+    private var isBlockLoad: Boolean = false
+
     /**
      * Collect a map of jet triggers.
      *
@@ -201,10 +203,13 @@ object ReactiveLoader {
         buildReactiveAndLazyClasses(classes, mapInjectionClasses)
         loadNode()
         writeLogsToConsoleForCollectObjects()
-        setReactiveValues(
-            isReactive = true,
-            isLazy = false
-        )
+
+        if (!getIsBlockLoad()) {
+            setReactiveValues(
+                isReactive = true,
+                isLazy = false
+            )
+        }
     }
 
     /**
@@ -339,6 +344,10 @@ object ReactiveLoader {
      * [Lazy] or [Reactive]
      */
     suspend fun load(nameProperty: String) {
+        if (getIsBlockLoad()) {
+            return
+        }
+
         val lazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
         if (lazyObject != null && !lazyObject.isLoad) {
             setReactiveValue(reactiveLazyObject = lazyObject)
@@ -388,7 +397,7 @@ object ReactiveLoader {
      * @param data Data.
      * @param useOldData Whether to call the trigger using the old set data.
      */
-    fun <T : Any> setReactiveValue(nameProperty: String, event: String, data: T, useOldData: Boolean = false) {
+    suspend fun <T : Any> setReactiveValue(nameProperty: String, event: String, data: T, useOldData: Boolean = false) {
         val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
         if (reactiveLazyObject != null && reactiveLazyObject.triggers.containsKey(event)) {
             val trigger: KClass<out BaseReactiveTrigger<Any>>? = reactiveLazyObject.triggers[event]
@@ -418,7 +427,7 @@ object ReactiveLoader {
      * @param event Name of the event at which the reactive trigger should be executed.
      * @param data Data.
      */
-    fun executionIndependentTrigger(nameProperty: String, event: String, vararg data: Any?) {
+    suspend fun executionIndependentTrigger(nameProperty: String, event: String, vararg data: Any?) {
         val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
         if (reactiveLazyObject != null && reactiveLazyObject.independentTriggers.containsKey(event)) {
             val trigger: KClass<out BaseReactiveIndependentTrigger>? = reactiveLazyObject.independentTriggers[event]
@@ -492,6 +501,14 @@ object ReactiveLoader {
             }
         }
         return pipelines
+    }
+
+    fun getIsBlockLoad(): Boolean {
+        return isBlockLoad
+    }
+
+    fun setIsBlockLoad(isBlockLoad: Boolean) {
+        this.isBlockLoad = isBlockLoad
     }
 
 }

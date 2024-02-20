@@ -22,7 +22,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserProfileSettings
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
-import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
+import com.zer0s2m.creeptenuous.desktop.common.enums.SectionsProfileUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreenPage
@@ -174,6 +174,17 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
     }
 
+    init {
+        ContextScreen.set(
+            Screen.DASHBOARD_SCREEN,
+            mapOf(
+                "currentLevelManagerDirectory" to 0,
+                "currentParentsManagerDirectory" to listOf<String>(),
+                "currentSystemParentsManagerDirectory" to listOf<String>()
+            )
+        )
+    }
+
     /**
      * Rendering content on the left side of the dashboard
      */
@@ -196,6 +207,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             managerFileObject_Files
         }
 
+        val scope = rememberCoroutineScope()
         val scaffoldStateProfileUser = rememberScaffoldState()
         val scaffoldStateCommentFileObject = rememberScaffoldState()
         val scaffoldStateInfoFileObject = rememberScaffoldState()
@@ -244,24 +256,29 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                         Screen.DASHBOARD_SCREEN,
                         "currentIndexFileObjectForInteractive"
                     )
-                    ReactiveFileObject.commentsFileSystemObject.setReactive(indexComment, comment)
-                    setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
+
+                    scope.launch {
+                        ReactiveFileObject.commentsFileSystemObject.setReactive(indexComment, comment)
+                        setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
+                    }
                 } else if (!isEdit && isCreate) {
-                    ReactiveFileObject.commentsFileSystemObject.addReactive(comment)
-                    setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
+                    scope.launch {
+                        ReactiveFileObject.commentsFileSystemObject.addReactive(comment)
+                        setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
+                    }
                 }
 
-                ContextScreen.clearValueByKey(Screen.DASHBOARD_SCREEN, listOf(
-                    "isEditFileObjectForInteractive",
-                    "isCreateFileObjectForInteractive",
-                    "currentFileObjectForInteractive",
-                    "currentIndexFileObjectForInteractive"
-                ))
+                ContextScreen.clearValueByKey(
+                    Screen.DASHBOARD_SCREEN, listOf(
+                        "isEditFileObjectForInteractive",
+                        "isCreateFileObjectForInteractive",
+                        "currentCommentFileObjectForInteractive",
+                        "currentIndexFileObjectForInteractive"
+                    )
+                )
             },
             onDismissRequest = { ContextScreen.clearScreen(Screen.DASHBOARD_SCREEN) }
         )
-
-        val scope = rememberCoroutineScope()
 
         val modifierDrawerInternal: Modifier = Modifier
             .fillMaxSize()
@@ -302,12 +319,13 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                 modalProfileUser.render(
                     drawerContent = {
                         ContentProfileUserModal(
-                            navigationState = navigationState
+                            navigationState = navigationState,
+                            userProfile = userProfile
                         )
                     }
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
-                        Column (
+                        Column(
                             modifier = Modifier
                                 .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
                         ) {
@@ -448,7 +466,8 @@ private fun TitleInSectionForCardsModalSheet(text: String): Unit = Text(
  */
 @Composable
 private fun ContentProfileUserModal(
-    navigationState: State<NavigationController>
+    navigationState: State<NavigationController>,
+    userProfile: MutableState<UserProfileSettings?>
 ) {
     val baseModifierCard: Modifier = Modifier
         .height(60.dp)
@@ -459,22 +478,28 @@ private fun ContentProfileUserModal(
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
     Column {
-        TitleInSectionForCardsModalSheet(Sections.MAIN_PROFILE.title)
+        TitleInSectionForCardsModalSheet(SectionsProfileUser.MAIN_PROFILE.title)
         LazyVerticalGrid(
             columns = GridCells.Fixed(5),
             content = {
-                items(Sections.MAIN_PROFILE.sections.size) { index ->
-                    CardModalSheet(
-                        modifier = baseModifierCard
-                    ) {
-                        onClickCardSheet(
-                            screen = Sections.MAIN_PROFILE.routes[index],
-                            scope = coroutineScope,
-                            sectionProfile = Sections.MAIN_PROFILE,
-                            navigationState = navigationState
-                        )
-                    }.render {
-                        TextInCardModalSheet(Sections.MAIN_PROFILE.sections[index])
+                items(SectionsProfileUser.MAIN_PROFILE.sections.entries.size) { index: Int ->
+                    val sectionInfo: Map.Entry<String, Boolean> =
+                        SectionsProfileUser.MAIN_PROFILE.sections.entries.toList()[index]
+
+                    if (!sectionInfo.value || (sectionInfo.value && userProfile.value?.role?.contains("ROLE_ADMIN") != false)) {
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ) {
+
+                            onClickCardSheet(
+                                screen = SectionsProfileUser.MAIN_PROFILE.routes[index],
+                                scope = coroutineScope,
+                                sectionProfile = SectionsProfileUser.MAIN_PROFILE,
+                                navigationState = navigationState
+                            )
+                        }.render {
+                            TextInCardModalSheet(sectionInfo.key)
+                        }
                     }
                 }
             }
@@ -487,22 +512,27 @@ private fun ContentProfileUserModal(
     )
 
     Column {
-        TitleInSectionForCardsModalSheet(Sections.USER_CONTROL.title)
+        TitleInSectionForCardsModalSheet(SectionsProfileUser.USER_CONTROL.title)
         LazyVerticalGrid(
             columns = GridCells.Fixed(5),
             content = {
-                items(Sections.USER_CONTROL.sections.size) { index ->
-                    CardModalSheet(
-                        modifier = baseModifierCard
-                    ) {
-                        onClickCardSheet(
-                            screen = Sections.USER_CONTROL.routes[index],
-                            scope = coroutineScope,
-                            sectionProfile = Sections.USER_CONTROL,
-                            navigationState = navigationState
-                        )
-                    }.render {
-                        TextInCardModalSheet(Sections.USER_CONTROL.sections[index])
+                items(SectionsProfileUser.USER_CONTROL.sections.entries.size) { index ->
+                    val sectionInfo: Map.Entry<String, Boolean> =
+                        SectionsProfileUser.USER_CONTROL.sections.entries.toList()[index]
+
+                    if (!sectionInfo.value || (sectionInfo.value && userProfile.value?.role?.contains("ROLE_ADMIN") != false)) {
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ) {
+                            onClickCardSheet(
+                                screen = SectionsProfileUser.USER_CONTROL.routes[index],
+                                scope = coroutineScope,
+                                sectionProfile = SectionsProfileUser.USER_CONTROL,
+                                navigationState = navigationState
+                            )
+                        }.render {
+                            TextInCardModalSheet(SectionsProfileUser.USER_CONTROL.sections.entries.toList()[index].key)
+                        }
                     }
                 }
             }
@@ -515,22 +545,28 @@ private fun ContentProfileUserModal(
     )
 
     Column {
-        TitleInSectionForCardsModalSheet(Sections.USER_CUSTOMIZATION.title)
+        TitleInSectionForCardsModalSheet(SectionsProfileUser.USER_CUSTOMIZATION.title)
         LazyVerticalGrid(
             columns = GridCells.Fixed(5),
             content = {
-                items(Sections.USER_CUSTOMIZATION.sections.size) { index ->
-                    CardModalSheet(
-                        modifier = baseModifierCard
-                    ) {
-                        onClickCardSheet(
-                            screen = Sections.USER_CUSTOMIZATION.routes[index],
-                            scope = coroutineScope,
-                            sectionProfile = Sections.USER_CUSTOMIZATION,
-                            navigationState = navigationState
-                        )
-                    }.render {
-                        TextInCardModalSheet(Sections.USER_CUSTOMIZATION.sections[index])
+                items(SectionsProfileUser.USER_CUSTOMIZATION.sections.entries.size) { index ->
+                    val sectionInfo: Map.Entry<String, Boolean> =
+                        SectionsProfileUser.USER_CUSTOMIZATION.sections.entries.toList()[index]
+
+                    if (!sectionInfo.value || (sectionInfo.value && userProfile.value?.role?.contains("ROLE_ADMIN") != false)) {
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ) {
+
+                            onClickCardSheet(
+                                screen = SectionsProfileUser.USER_CUSTOMIZATION.routes[index],
+                                scope = coroutineScope,
+                                sectionProfile = SectionsProfileUser.USER_CUSTOMIZATION,
+                                navigationState = navigationState
+                            )
+                        }.render {
+                            TextInCardModalSheet(SectionsProfileUser.USER_CUSTOMIZATION.sections.entries.toList()[index].key)
+                        }
                     }
                 }
             }
@@ -549,7 +585,7 @@ private fun ContentProfileUserModal(
 private fun onClickCardSheet(
     screen: Screen,
     scope: CoroutineScope,
-    sectionProfile: Sections,
+    sectionProfile: SectionsProfileUser,
     navigationState: State<NavigationController>
 ) {
     scope.launch {

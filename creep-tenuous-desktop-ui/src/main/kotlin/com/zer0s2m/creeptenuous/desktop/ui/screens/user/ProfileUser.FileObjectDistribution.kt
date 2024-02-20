@@ -26,6 +26,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.animations.setAnimateColorAsStateInSe
 import com.zer0s2m.creeptenuous.desktop.ui.animations.setHoverInSelectUser
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
+import kotlinx.coroutines.launch
 
 /**
  * Rendering part of the user profile screen [Screen.PROFILE_FILE_OBJECT_DISTRIBUTION]
@@ -85,6 +86,7 @@ private fun BaseTitle(text: String) = Text(
  */
 @Composable
 private fun Switch() {
+    val scope = rememberCoroutineScope()
     val isDeletingFilesWhenDeletingUser: Boolean =
         ReactiveUser.UserSettings.userSettingsFileObjectDistribution.isDeletingFilesWhenDeletingUser!!
     val checkedState = remember { mutableStateOf(isDeletingFilesWhenDeletingUser) }
@@ -95,14 +97,17 @@ private fun Switch() {
             .pointerHoverIcon(icon = PointerIcon.Hand),
         onCheckedChange = {
             checkedState.value = it
-            ReactiveLoader.setReactiveValue(
-                "userSettingsFileObjectDistribution",
-                "setIsDeleteFileObjects",
-                UserSettingsFileObjectDistribution(
-                    it,
-                    ReactiveUser.UserSettings.userSettingsFileObjectDistribution.passingFilesToUser
+
+            scope.launch {
+                ReactiveLoader.setReactiveValue(
+                    "userSettingsFileObjectDistribution",
+                    "setIsDeleteFileObjects",
+                    UserSettingsFileObjectDistribution(
+                        it,
+                        ReactiveUser.UserSettings.userSettingsFileObjectDistribution.passingFilesToUser
+                    )
                 )
-            )
+            }
         }
     )
 }
@@ -236,16 +241,21 @@ private fun DropdownMenuItemSelectUser(
     newUser: String,
     content: @Composable () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+
     DropdownMenuItem(
         onClick = {
-            ReactiveLoader.setReactiveValue(
-                "userSettingsFileObjectDistribution",
-                "setTransferUserFileObjects",
-                UserSettingsFileObjectDistribution(
-                    ReactiveUser.UserSettings.userSettingsFileObjectDistribution.isDeletingFilesWhenDeletingUser,
-                    newUser
+            scope.launch {
+                ReactiveLoader.setReactiveValue(
+                    "userSettingsFileObjectDistribution",
+                    "setTransferUserFileObjects",
+                    UserSettingsFileObjectDistribution(
+                        ReactiveUser.UserSettings.userSettingsFileObjectDistribution.isDeletingFilesWhenDeletingUser,
+                        newUser
+                    )
                 )
-            )
+            }
+
             selectedUserItem.value = newUser
             expandedStates.value = false
         },

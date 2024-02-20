@@ -23,12 +23,14 @@ object HandlerReactiveUserAssignedRights : ReactiveHandler<IssuedRights> {
             val data: List<IssuedRights> = HttpClient.client.get {
                 url("/api/v1/user/global/right/assigned")
                 parameter("file", currentFileObject)
+                header("Authorization", "Bearer ${HttpClient.accessToken}")
             }.body()
             data[0]
         } else {
             HttpClient.client.get {
                 url("/api/v1/user/global/right/assigned")
                 parameter("file", currentFileObject)
+                header("Authorization", "Bearer ${HttpClient.accessToken}")
             }.body()
         }
     }

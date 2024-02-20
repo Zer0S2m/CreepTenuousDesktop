@@ -33,6 +33,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.forms.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 import com.zer0s2m.creeptenuous.desktop.ui.screens.common.DropdownMenuSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.common.InputSelectColor
+import kotlinx.coroutines.launch
 
 /**
  * Set the color palette when editing or creating a custom category.
@@ -54,6 +55,7 @@ fun ProfileUser.ProfileCategories.render() {
     val listCategories: MutableList<UserCategory> = remember {
         ReactiveUser.customCategories.toMutableStateList()
     }
+    val scope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -92,14 +94,18 @@ fun ProfileUser.ProfileCategories.render() {
                             currentUserCategory.value = UserCategory(
                                 id = listCategories[index].id,
                                 title = listCategories[index].title,
-                                color = listCategories[index].color
+                                color = listCategories[index].color,
+                                colorId = listCategories[index].colorId
                             )
                             openModalCreateCategory.value = true
                             newColorForCategory.value = null
                         },
                         actionDelete = {
                             listCategories.removeAt(index)
-                            ReactiveUser.customCategories.removeAtReactive(index)
+
+                            scope.launch {
+                                ReactiveUser.customCategories.removeAtReactive(index)
+                            }
                         }
                     )
                 }
@@ -117,11 +123,15 @@ fun ProfileUser.ProfileCategories.render() {
                     val dataForm = stateForm.value.getData()
                     val newCategory = UserCategory(
                         title = dataForm["title"].toString().trim(),
-                        color = newColorForCategory.value
+                        color = newColorForCategory.value,
+                        colorId = ReactiveUser.findUserColor(newColorForCategory.value)?.id,
                     )
 
                     listCategories.add(newCategory)
-                    ReactiveUser.customCategories.addReactive(newCategory)
+
+                    scope.launch {
+                        ReactiveUser.customCategories.addReactive(newCategory)
+                    }
 
                     newColorForCategory.value = null
                 }
@@ -135,11 +145,15 @@ fun ProfileUser.ProfileCategories.render() {
                     val newCategory = UserCategory(
                         id = currentUserCategory.value.id,
                         title = dataForm["title"].toString().trim(),
-                        color = newColorForCategory.value
+                        color = newColorForCategory.value,
+                        colorId = ReactiveUser.findUserColor(newColorForCategory.value)?.id,
                     )
 
                     listCategories[currentIndexUserCategory.value] = newCategory
-                    ReactiveUser.customCategories.setReactive(currentIndexUserCategory.value, newCategory)
+
+                    scope.launch {
+                        ReactiveUser.customCategories.setReactive(currentIndexUserCategory.value, newCategory)
+                    }
 
                     currentUserCategory.value.title = ""
                     currentUserCategory.value.color = null

@@ -22,7 +22,9 @@ object HandlerReactiveUserColor : ReactiveHandler<ReactiveMutableList<UserColor>
      * @return result
      */
     override suspend fun handler(): ReactiveMutableList<UserColor> {
-        val data: MutableCollection<UserColor> = HttpClient.client.get("/api/v1/user/customization/color").body()
+        val data: MutableCollection<UserColor> = HttpClient.client.get("/api/v1/user/customization/color") {
+            header("Authorization", "Bearer ${HttpClient.accessToken}")
+        }.body()
         return data.toReactiveMutableList(
             triggerAdd = ReactiveTriggerUserColorAdd(),
             triggerRemove = ReactiveTriggerUserColorRemove(),

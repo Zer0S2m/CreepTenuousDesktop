@@ -32,6 +32,7 @@ object HandlerReactiveCommentsFileObject : ReactiveHandler<ReactiveMutableList<C
         val data: MutableCollection<CommentFileObject> = HttpClient.client.get {
             url("/api/v1/common/comment/file-system-object")
             parameter("file", currentFileObject)
+            header("Authorization", "Bearer ${HttpClient.accessToken}")
         }.body()
 
         return data.toReactiveMutableList(

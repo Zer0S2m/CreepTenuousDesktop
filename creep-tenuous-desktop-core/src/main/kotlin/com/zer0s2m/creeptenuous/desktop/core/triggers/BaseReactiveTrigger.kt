@@ -21,7 +21,7 @@ interface BaseReactiveTrigger<T> {
      *
      * @param value The new value of a property or object.
      */
-    fun execution(value: T) {}
+    suspend fun execution(value: T) {}
 
     /**
      * Trigger execution.
@@ -29,6 +29,6 @@ interface BaseReactiveTrigger<T> {
      * @param oldValue The old value of a property or object.
      * @param newValue The new value of a property or object.
      */
-    fun execution(oldValue: T, newValue: T) {}
+    suspend fun execution(oldValue: T, newValue: T) {}
 
 }

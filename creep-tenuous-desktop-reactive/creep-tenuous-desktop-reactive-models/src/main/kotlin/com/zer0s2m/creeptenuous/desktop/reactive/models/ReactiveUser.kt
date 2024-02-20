@@ -145,7 +145,7 @@ object ReactiveUser : ReactiveLazyObject {
     /**
      * Storage of issued rights to file objects.
      */
-    object AssignedRights: ReactiveLazyObject {
+    object AssignedRights : ReactiveLazyObject {
 
         /**
          * Issued rights to interact with a file object.
@@ -158,12 +158,25 @@ object ReactiveUser : ReactiveLazyObject {
 
     }
 
+    /**
+     * Storing authorization information.
+     */
+    object Authorization : ReactiveLazyObject {
+
+        var authorizationInfo: ConfigState? = null
+
+    }
+
     fun findCustomCategory(id: Int): UserCategory? {
         return customCategories.find { it.id == id }
     }
 
     fun findUserColor(id: Int): UserColor? {
         return userColors.find { it.id == id }
+    }
+
+    fun findUserColor(color: String?): UserColor? {
+        return userColors.find { it.color == color }
     }
 
 }
