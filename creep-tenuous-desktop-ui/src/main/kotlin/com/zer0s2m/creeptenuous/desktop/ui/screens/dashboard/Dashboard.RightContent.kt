@@ -29,7 +29,6 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.FieldSearch
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
-import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -177,11 +176,14 @@ internal fun RenderLayoutDirectories(
                         val directory: FileObject = directories.value[index]
 
                         val currentLevelManagerDirectory: Int = ContextScreen.get(
-                            Screen.DASHBOARD_SCREEN, "currentLevelManagerDirectory")
+                            Screen.DASHBOARD_SCREEN, "currentLevelManagerDirectory"
+                        )
                         val currentParentsManagerDirectory: MutableList<String> = ContextScreen.get(
-                            Screen.DASHBOARD_SCREEN, "currentParentsManagerDirectory")
+                            Screen.DASHBOARD_SCREEN, "currentParentsManagerDirectory"
+                        )
                         val currentSystemParentsManagerDirectory: MutableList<String> = ContextScreen.get(
-                            Screen.DASHBOARD_SCREEN, "currentSystemParentsManagerDirectory")
+                            Screen.DASHBOARD_SCREEN, "currentSystemParentsManagerDirectory"
+                        )
 
                         scope.launch {
                             currentParentsManagerDirectory.add(directory.realName)
@@ -198,12 +200,17 @@ internal fun RenderLayoutDirectories(
 
                             ReactiveLoader.resetIsLoad("managerFileSystemObjects")
                             ReactiveLoader.load("managerFileSystemObjects")
-
-                            Dashboard.setItemsBreadCrumbs(getItemsBreadCrumbs(
-                                parents = currentParentsManagerDirectory,
-                                systemParents = currentSystemParentsManagerDirectory
-                            ))
-                            Dashboard.setTitleSwitchPanelDashboard(title = currentParentsManagerDirectory.last())
+                            ReactiveLoader.runReactiveIndependentInjection(
+                                method = "setItemsBreadCrumbs",
+                                value = getItemsBreadCrumbs(
+                                    parents = currentParentsManagerDirectory,
+                                    systemParents = currentSystemParentsManagerDirectory
+                                )
+                            )
+                            ReactiveLoader.runReactiveIndependentInjection(
+                                method = "setTitleSwitchPanelDashboard",
+                                value = currentParentsManagerDirectory.last()
+                            )
                         }
                     }
                 ).render()

@@ -7,4 +7,4 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
  *
  * @param message Error message
  */
-class ReactiveLoaderException (message: String) : Exception(message)
+class ReactiveLoaderException (message: String) : ReactiveException(message)

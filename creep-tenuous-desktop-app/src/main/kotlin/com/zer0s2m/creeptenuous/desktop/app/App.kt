@@ -34,6 +34,8 @@ import kotlinx.coroutines.runBlocking
  * 2) [Dashboard.setUserProfile]
  * 3) [Dashboard.setCommentsInFileObject]
  * 4) [Dashboard.setManagerFileObjectIsLoad]
+ * 4) [Dashboard.setItemsBreadCrumbs]
+ * 4) [Dashboard.setTitleSwitchPanelDashboard]
  */
 @Composable
 @Preview
@@ -70,6 +72,9 @@ fun App() {
                 ReactiveFileObject
             ),
             injectionClasses = listOf(
+                Dashboard::class
+            ),
+            injectionIndependentClasses = listOf(
                 Dashboard::class
             )
         )

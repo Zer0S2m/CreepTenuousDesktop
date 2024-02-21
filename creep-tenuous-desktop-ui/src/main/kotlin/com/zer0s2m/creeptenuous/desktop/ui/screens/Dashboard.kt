@@ -45,6 +45,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.SectionsProfileUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreenPage
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveIndependentInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
@@ -213,12 +214,14 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
          *
          * @param itemsBreadCrumbs Breadcrumbs (navigation).
          */
+        @ReactiveIndependentInjection
         internal fun setItemsBreadCrumbs(itemsBreadCrumbs: Collection<BreadCrumbFileObject>) {
             this.itemsBreadCrumbs.value = itemsBreadCrumbs
         }
 
         private val titleSwitchPanelDashboard: MutableState<String> = mutableStateOf("Main")
 
+        @ReactiveIndependentInjection
         internal fun setTitleSwitchPanelDashboard(title: String) {
             titleSwitchPanelDashboard.value = title
         }

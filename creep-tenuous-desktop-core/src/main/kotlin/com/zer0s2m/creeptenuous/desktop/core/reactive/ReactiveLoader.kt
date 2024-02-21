@@ -2,6 +2,8 @@ package com.zer0s2m.creeptenuous.desktop.core.reactive
 
 import com.zer0s2m.creeptenuous.desktop.core.env.Environment
 import com.zer0s2m.creeptenuous.desktop.core.errors.ReactiveLoaderException
+import com.zer0s2m.creeptenuous.desktop.core.errors.ReactiveLoaderIndependentInjectionException
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveIndependentInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
@@ -40,6 +42,8 @@ private val mapNodes: MutableMap<String, MutableCollection<ReactiveLazyNode>> = 
  * Reactive pipelines map/
  */
 private val mapPipelines: MutableMap<String, InfoPipeline> = mutableMapOf()
+
+private val mapInjectionIndependent: MutableMap<KClass<out ReactiveInjectionClass>, Collection<String>> = mutableMapOf()
 
 /**
  * A class that stores information about a reactive or lazy object
@@ -169,36 +173,17 @@ object ReactiveLoader {
      * Collect all reactive classes for loading data and building an auxiliary map for loading data
      *
      * @param classes Reactive classes for collecting data
-     * @param injectionClasses Map of classes to which reactive and lazy properties will be
-     * implemented through the specified methods
-     */
-    @Deprecated("Get rid of explicitly specifying the injection method when loading a " +
-            "reactive property and specify it through an annotation")
-    suspend fun collectLoader(
-        classes: Collection<ReactiveLazyObject>,
-        injectionClasses: HashMap<KClass<out ReactiveInjectionClass>, Collection<String>> = hashMapOf()
-    ) {
-        buildReactiveAndLazyClasses(classes, injectionClasses)
-        loadNode()
-        writeLogsToConsoleForCollectObjects()
-        setReactiveValues(
-            isReactive = true,
-            isLazy = false
-        )
-    }
-
-    /**
-     * Collect all reactive classes for loading data and building an auxiliary map for loading data
-     *
-     * @param classes Reactive classes for collecting data
      * @param injectionClasses collection of classes in which static methods are marked as
      * reactive injections in which a future value will be set.
      */
     suspend fun collectLoader(
         classes: Collection<ReactiveLazyObject>,
-        injectionClasses: Iterable<KClass<out ReactiveInjectionClass>> = listOf()
+        injectionClasses: Iterable<KClass<out ReactiveInjectionClass>> = listOf(),
+        injectionIndependentClasses: Iterable<KClass<out ReactiveInjectionClass>> = listOf(),
     ) {
         val mapInjectionClasses: MutableMap<KClass<out ReactiveInjectionClass>, Collection<String>> = mutableMapOf()
+        val mapInjectionIndependentClasses: MutableMap<KClass<out ReactiveInjectionClass>, Collection<String>> =
+            mutableMapOf()
 
         injectionClasses.forEach { klass ->
             val injectionMethods = klass.companionObject?.functions?.filter {
@@ -209,7 +194,16 @@ object ReactiveLoader {
             }
         }
 
-        buildReactiveAndLazyClasses(classes, mapInjectionClasses)
+        injectionIndependentClasses.forEach { klass ->
+            val injectionMethods = klass.companionObject?.functions?.filter {
+                it.findAnnotations<ReactiveIndependentInjection>().isNotEmpty()
+            }
+            if (injectionMethods != null) {
+                mapInjectionIndependentClasses[klass] = injectionMethods.map { it.name }
+            }
+        }
+
+        buildReactiveAndLazyClasses(classes, mapInjectionClasses, mapInjectionIndependentClasses)
         loadNode()
         writeLogsToConsoleForCollectObjects()
 
@@ -230,8 +224,11 @@ object ReactiveLoader {
      */
     private fun buildReactiveAndLazyClasses(
         classes: Collection<ReactiveLazyObject>,
-        injectionClasses: Map<KClass<out ReactiveInjectionClass>, Collection<String>>
+        injectionClasses: Map<KClass<out ReactiveInjectionClass>, Collection<String>>,
+        injectionIndependentClasses: Map<KClass<out ReactiveInjectionClass>, Collection<String>>
     ) {
+        mapInjectionIndependent.putAll(injectionIndependentClasses)
+
         classes.forEach { reactiveLazyObject ->
             reactiveLazyObject::class.memberProperties.forEach { kProperty ->
                 val annotationLazy = kProperty.findAnnotation<Lazy<Any>>()
@@ -301,6 +298,8 @@ object ReactiveLoader {
                 }
             }
         }
+
+        println(mapInjectionIndependent)
 
         sortByPriority()
     }
@@ -519,6 +518,21 @@ object ReactiveLoader {
 
     fun setIsBlockLoad(isBlockLoad: Boolean) {
         this.isBlockLoad = isBlockLoad
+    }
+
+    fun runReactiveIndependentInjection(method: String, value: Any) {
+        mapInjectionIndependent.forEach { (kClass: KClass<out ReactiveInjectionClass>, methods: Collection<String>) ->
+            if (methods.contains(method)) {
+                val compObject = kClass.companionObject
+                if (compObject != null) {
+                    compObject.functions.find {
+                        it.name == method
+                    }?.call(kClass.companionObjectInstance, value)
+                }
+            } else {
+                throw ReactiveLoaderIndependentInjectionException("Method not found")
+            }
+        }
     }
 
 }
