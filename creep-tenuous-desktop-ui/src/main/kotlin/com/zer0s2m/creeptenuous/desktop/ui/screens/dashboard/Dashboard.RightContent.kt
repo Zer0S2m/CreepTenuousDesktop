@@ -24,6 +24,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsWalkingThroughDirectories
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
@@ -175,43 +176,10 @@ internal fun RenderLayoutDirectories(
                     actionDoubleClick = {
                         val directory: FileObject = directories.value[index]
 
-                        val currentLevelManagerDirectory: Int = ContextScreen.get(
-                            Screen.DASHBOARD_SCREEN, "currentLevelManagerDirectory"
+                        ActionsWalkingThroughDirectories.call(
+                            scope = scope,
+                            directory
                         )
-                        val currentParentsManagerDirectory: MutableList<String> = ContextScreen.get(
-                            Screen.DASHBOARD_SCREEN, "currentParentsManagerDirectory"
-                        )
-                        val currentSystemParentsManagerDirectory: MutableList<String> = ContextScreen.get(
-                            Screen.DASHBOARD_SCREEN, "currentSystemParentsManagerDirectory"
-                        )
-
-                        scope.launch {
-                            currentParentsManagerDirectory.add(directory.realName)
-                            currentSystemParentsManagerDirectory.add(directory.systemName)
-
-                            ContextScreen.set(
-                                Screen.DASHBOARD_SCREEN,
-                                mapOf(
-                                    "currentLevelManagerDirectory" to currentLevelManagerDirectory + 1,
-                                    "currentParentsManagerDirectory" to currentParentsManagerDirectory,
-                                    "currentSystemParentsManagerDirectory" to currentSystemParentsManagerDirectory
-                                )
-                            )
-
-                            ReactiveLoader.resetIsLoad("managerFileSystemObjects")
-                            ReactiveLoader.load("managerFileSystemObjects")
-                            ReactiveLoader.runReactiveIndependentInjection(
-                                method = "setItemsBreadCrumbs",
-                                value = getItemsBreadCrumbs(
-                                    parents = currentParentsManagerDirectory,
-                                    systemParents = currentSystemParentsManagerDirectory
-                                )
-                            )
-                            ReactiveLoader.runReactiveIndependentInjection(
-                                method = "setTitleSwitchPanelDashboard",
-                                value = currentParentsManagerDirectory.last()
-                            )
-                        }
                     }
                 ).render()
             }

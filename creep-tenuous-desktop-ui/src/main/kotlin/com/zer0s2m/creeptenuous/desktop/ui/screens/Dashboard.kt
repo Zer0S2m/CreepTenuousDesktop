@@ -49,9 +49,10 @@ import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveIndependentInject
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
-import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsSwitchBreadCrumbsThroughDirectories
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsSwitchMainThroughDirectories
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.BreadCrumbs
@@ -72,7 +73,6 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupSetUserColorIn
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLayoutFilesObject
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLeftContentDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.TopPanelDashboard
-import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.getItemsBreadCrumbs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -136,6 +136,33 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             mutableStateOf(mutableListOf())
 
         /**
+         * User profile information.
+         */
+        private val userProfile: MutableState<UserProfileSettings?> =
+            mutableStateOf(ReactiveUser.profileSettings)
+
+        /**
+         * Comments for a file object.
+         */
+        private val commentsInFileObject: SnapshotStateList<CommentFileObject> =
+            ReactiveFileObject.commentsFileSystemObject.toMutableStateList()
+
+        /**
+         * Information about whether data has been downloaded.
+         */
+        private val managerFileObjectIsLoad: MutableState<Boolean> = mutableStateOf(false)
+
+        /**
+         * Breadcrumbs (navigation).
+         */
+        private val itemsBreadCrumbs: MutableState<Collection<BreadCrumbFileObject>> = mutableStateOf(mutableListOf())
+
+        /**
+         * The name of the current directory on the top panel.
+         */
+        private val titleSwitchPanelDashboard: MutableState<String> = mutableStateOf("Main")
+
+        /**
          * Set information about file objects by nesting level.
          *
          * @param managerFileObject information about file objects by nesting level.
@@ -157,12 +184,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         }
 
         /**
-         * User profile information.
-         */
-        private val userProfile: MutableState<UserProfileSettings?> =
-            mutableStateOf(ReactiveUser.profileSettings)
-
-        /**
          * Setting user profile information.
          *
          * @param userProfile User profile information.
@@ -171,12 +192,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         internal fun setUserProfile(userProfile: UserProfileSettings) {
             this.userProfile.value = userProfile
         }
-
-        /**
-         * Comments for a file object.
-         */
-        private val commentsInFileObject: SnapshotStateList<CommentFileObject> =
-            ReactiveFileObject.commentsFileSystemObject.toMutableStateList()
 
         /**
          * Set comments for a file object.
@@ -190,11 +205,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         }
 
         /**
-         * Information about whether data has been downloaded.
-         */
-        private val managerFileObjectIsLoad: MutableState<Boolean> = mutableStateOf(false)
-
-        /**
          * Set information about whether data has been downloaded.
          *
          * @param isLoad Information about whether data has been downloaded.
@@ -203,11 +213,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         internal fun setManagerFileObjectIsLoad(isLoad: Boolean) {
             managerFileObjectIsLoad.value = isLoad
         }
-
-        /**
-         * Breadcrumbs (navigation).
-         */
-        private val itemsBreadCrumbs: MutableState<Collection<BreadCrumbFileObject>> = mutableStateOf(mutableListOf())
 
         /**
          * Install breadcrumbs (navigation).
@@ -219,8 +224,11 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             this.itemsBreadCrumbs.value = itemsBreadCrumbs
         }
 
-        private val titleSwitchPanelDashboard: MutableState<String> = mutableStateOf("Main")
-
+        /**
+         * Set the name of the current directory on the top panel.
+         *
+         * @param title Name of the current directory.
+         */
         @ReactiveIndependentInjection
         internal fun setTitleSwitchPanelDashboard(title: String) {
             titleSwitchPanelDashboard.value = title
@@ -465,24 +473,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
     private fun getMainBreadCrumb(scope: CoroutineScope): BaseBreadCrumbsItem {
         return BreadCrumbsItem(
             text = "Main",
-            action = {
-                scope.launch {
-                    ContextScreen.set(
-                        Screen.DASHBOARD_SCREEN,
-                        mapOf(
-                            "currentLevelManagerDirectory" to 0,
-                            "currentParentsManagerDirectory" to mutableListOf<String>(),
-                            "currentSystemParentsManagerDirectory" to mutableListOf<String>()
-                        )
-                    )
-
-                    setItemsBreadCrumbs(itemsBreadCrumbs = mutableListOf())
-                    setTitleSwitchPanelDashboard(title = "Main")
-
-                    ReactiveLoader.resetIsLoad("managerFileSystemObjects")
-                    ReactiveLoader.load("managerFileSystemObjects")
-                }
-            }
+            action = { ActionsSwitchMainThroughDirectories.call(scope = scope) }
         )
     }
 
@@ -493,42 +484,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         itemsBreadCrumbs.value.forEachIndexed { index: Int, breadCrumbFileObject: BreadCrumbFileObject ->
             itemsBreadCrumbsLocal.add(BreadCrumbsItem(
                 text = breadCrumbFileObject.realName,
-                action = {
-                    scope.launch {
-                        var currentParentsManagerDirectory: MutableList<String> = ContextScreen.get(
-                            Screen.DASHBOARD_SCREEN, "currentParentsManagerDirectory"
-                        )
-                        var currentSystemParentsManagerDirectory: MutableList<String> = ContextScreen.get(
-                            Screen.DASHBOARD_SCREEN, "currentSystemParentsManagerDirectory"
-                        )
-                        currentParentsManagerDirectory = currentParentsManagerDirectory
-                            .slice(0..<index + 1)
-                            .toMutableList()
-                        currentSystemParentsManagerDirectory = currentSystemParentsManagerDirectory
-                            .slice(0..<index + 1)
-                            .toMutableList()
-
-                        ContextScreen.set(
-                            Screen.DASHBOARD_SCREEN,
-                            mapOf(
-                                "currentLevelManagerDirectory" to index + 1,
-                                "currentParentsManagerDirectory" to currentParentsManagerDirectory,
-                                "currentSystemParentsManagerDirectory" to currentSystemParentsManagerDirectory
-                            )
-                        )
-
-                        setItemsBreadCrumbs(
-                            getItemsBreadCrumbs(
-                                parents = currentParentsManagerDirectory,
-                                systemParents = currentSystemParentsManagerDirectory
-                            )
-                        )
-                        setTitleSwitchPanelDashboard(title = currentParentsManagerDirectory.last())
-
-                        ReactiveLoader.resetIsLoad("managerFileSystemObjects")
-                        ReactiveLoader.load("managerFileSystemObjects")
-                    }
-                }
+                action = { ActionsSwitchBreadCrumbsThroughDirectories.call(scope = scope, index) }
             ))
         }
 
