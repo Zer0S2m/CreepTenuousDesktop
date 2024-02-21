@@ -30,5 +30,5 @@ internal fun getItemsBreadCrumbs(
             systemName = systemParent
         ))
     }
-    return itemsBreadCrumbs;
+    return itemsBreadCrumbs
 }

@@ -217,6 +217,12 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             this.itemsBreadCrumbs.value = itemsBreadCrumbs
         }
 
+        private val titleSwitchPanelDashboard: MutableState<String> = mutableStateOf("Main")
+
+        internal fun setTitleSwitchPanelDashboard(title: String) {
+            titleSwitchPanelDashboard.value = title
+        }
+
     }
 
     init {
@@ -235,7 +241,11 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     @Composable
     override fun renderLeftContent() {
+         val scope: CoroutineScope = rememberCoroutineScope()
+
         RenderLeftContentDashboard(
+            scope = scope,
+            titleSwitchPanelDashboard = titleSwitchPanelDashboard,
             systemBaseFolderForUser = baseFolderForUser
         )
     }
@@ -463,7 +473,8 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                         )
                     )
 
-                    setItemsBreadCrumbs(mutableListOf())
+                    setItemsBreadCrumbs(itemsBreadCrumbs = mutableListOf())
+                    setTitleSwitchPanelDashboard(title = "Main")
 
                     ReactiveLoader.resetIsLoad("managerFileSystemObjects")
                     ReactiveLoader.load("managerFileSystemObjects")
@@ -509,6 +520,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                                 systemParents = currentSystemParentsManagerDirectory
                             )
                         )
+                        setTitleSwitchPanelDashboard(title = currentParentsManagerDirectory.last())
 
                         ReactiveLoader.resetIsLoad("managerFileSystemObjects")
                         ReactiveLoader.load("managerFileSystemObjects")

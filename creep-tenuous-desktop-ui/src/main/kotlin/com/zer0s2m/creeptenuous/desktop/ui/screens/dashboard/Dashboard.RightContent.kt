@@ -203,6 +203,7 @@ internal fun RenderLayoutDirectories(
                                 parents = currentParentsManagerDirectory,
                                 systemParents = currentSystemParentsManagerDirectory
                             ))
+                            Dashboard.setTitleSwitchPanelDashboard(title = currentParentsManagerDirectory.last())
                         }
                     }
                 ).render()
