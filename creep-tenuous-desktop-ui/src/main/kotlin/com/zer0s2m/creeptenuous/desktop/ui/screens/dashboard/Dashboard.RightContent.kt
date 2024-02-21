@@ -29,6 +29,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.FieldSearch
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
+import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -197,6 +198,11 @@ internal fun RenderLayoutDirectories(
 
                             ReactiveLoader.resetIsLoad("managerFileSystemObjects")
                             ReactiveLoader.load("managerFileSystemObjects")
+
+                            Dashboard.setItemsBreadCrumbs(getItemsBreadCrumbs(
+                                parents = currentParentsManagerDirectory,
+                                systemParents = currentSystemParentsManagerDirectory
+                            ))
                         }
                     }
                 ).render()

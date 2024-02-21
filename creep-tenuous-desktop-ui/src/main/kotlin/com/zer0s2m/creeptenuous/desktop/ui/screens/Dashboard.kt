@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.dto.BreadCrumbFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
@@ -47,6 +48,7 @@ import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreenPage
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
@@ -55,6 +57,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.BreadCrumbs
 import com.zer0s2m.creeptenuous.desktop.ui.components.BreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseBreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
@@ -68,6 +71,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupSetUserColorIn
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLayoutFilesObject
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLeftContentDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.TopPanelDashboard
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.getItemsBreadCrumbs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -197,6 +201,20 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         @ReactiveInjection
         internal fun setManagerFileObjectIsLoad(isLoad: Boolean) {
             managerFileObjectIsLoad.value = isLoad
+        }
+
+        /**
+         * Breadcrumbs (navigation).
+         */
+        private val itemsBreadCrumbs: MutableState<Collection<BreadCrumbFileObject>> = mutableStateOf(mutableListOf())
+
+        /**
+         * Install breadcrumbs (navigation).
+         *
+         * @param itemsBreadCrumbs Breadcrumbs (navigation).
+         */
+        internal fun setItemsBreadCrumbs(itemsBreadCrumbs: Collection<BreadCrumbFileObject>) {
+            this.itemsBreadCrumbs.value = itemsBreadCrumbs
         }
 
     }
@@ -384,7 +402,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                                 )
                             }
                             Column(modifier = Modifier.fillMaxSize()) {
-                                LayoutBreadCrumbs()
+                                LayoutBreadCrumbs(scope = scope)
                             }
                         }
                     }
@@ -431,29 +449,76 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         }
     }
 
+    private fun getMainBreadCrumb(scope: CoroutineScope): BaseBreadCrumbsItem {
+        return BreadCrumbsItem(
+            text = "Main",
+            action = {
+                scope.launch {
+                    ContextScreen.set(
+                        Screen.DASHBOARD_SCREEN,
+                        mapOf(
+                            "currentLevelManagerDirectory" to 0,
+                            "currentParentsManagerDirectory" to mutableListOf<String>(),
+                            "currentSystemParentsManagerDirectory" to mutableListOf<String>()
+                        )
+                    )
+
+                    setItemsBreadCrumbs(mutableListOf())
+
+                    ReactiveLoader.resetIsLoad("managerFileSystemObjects")
+                    ReactiveLoader.load("managerFileSystemObjects")
+                }
+            }
+        )
+    }
+
     @Composable
-    private fun LayoutBreadCrumbs() {
+    private fun LayoutBreadCrumbs(scope: CoroutineScope) {
+        val itemsBreadCrumbsLocal: MutableList<BaseBreadCrumbsItem> = mutableListOf()
+        itemsBreadCrumbsLocal.add(getMainBreadCrumb(scope))
+        itemsBreadCrumbs.value.forEachIndexed { index: Int, breadCrumbFileObject: BreadCrumbFileObject ->
+            itemsBreadCrumbsLocal.add(BreadCrumbsItem(
+                text = breadCrumbFileObject.realName,
+                action = {
+                    scope.launch {
+                        var currentParentsManagerDirectory: MutableList<String> = ContextScreen.get(
+                            Screen.DASHBOARD_SCREEN, "currentParentsManagerDirectory"
+                        )
+                        var currentSystemParentsManagerDirectory: MutableList<String> = ContextScreen.get(
+                            Screen.DASHBOARD_SCREEN, "currentSystemParentsManagerDirectory"
+                        )
+                        currentParentsManagerDirectory = currentParentsManagerDirectory
+                            .slice(0..<index + 1)
+                            .toMutableList()
+                        currentSystemParentsManagerDirectory = currentSystemParentsManagerDirectory
+                            .slice(0..<index + 1)
+                            .toMutableList()
+
+                        ContextScreen.set(
+                            Screen.DASHBOARD_SCREEN,
+                            mapOf(
+                                "currentLevelManagerDirectory" to index + 1,
+                                "currentParentsManagerDirectory" to currentParentsManagerDirectory,
+                                "currentSystemParentsManagerDirectory" to currentSystemParentsManagerDirectory
+                            )
+                        )
+
+                        setItemsBreadCrumbs(
+                            getItemsBreadCrumbs(
+                                parents = currentParentsManagerDirectory,
+                                systemParents = currentSystemParentsManagerDirectory
+                            )
+                        )
+
+                        ReactiveLoader.resetIsLoad("managerFileSystemObjects")
+                        ReactiveLoader.load("managerFileSystemObjects")
+                    }
+                }
+            ))
+        }
+
         BreadCrumbs(
-            items = listOf(
-                BreadCrumbsItem(
-                    text = "Folder 1",
-                    action = {
-                        println(true)
-                    }
-                ),
-                BreadCrumbsItem(
-                    text = "Folder 2",
-                    action = {
-                        println(true)
-                    }
-                ),
-                BreadCrumbsItem(
-                    text = "Folder 3",
-                    action = {
-                        println(true)
-                    }
-                )
-            ),
+            items = itemsBreadCrumbsLocal,
             modifier = Modifier
                 .fillMaxSize()
                 .background(Colors.BREAD_CRUMBS_BASE.color)

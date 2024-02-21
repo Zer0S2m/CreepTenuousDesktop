@@ -28,11 +28,6 @@ object HandlerReactiveFileObjectManagerFileSystemObjects : ReactiveHandler<Manag
         val currentSystemParentsManagerDirectory: Collection<String> = ContextScreen.get(
             Screen.DASHBOARD_SCREEN, "currentSystemParentsManagerDirectory")
 
-        println("++++++++++++++++++++++")
-        println(currentLevelManagerDirectory)
-        println(currentParentsManagerDirectory)
-        println(currentSystemParentsManagerDirectory)
-
         return HttpClient.client.post("/api/v1/directory") {
             header("Authorization", "Bearer ${HttpClient.accessToken}")
             contentType(ContentType.Application.Json)
