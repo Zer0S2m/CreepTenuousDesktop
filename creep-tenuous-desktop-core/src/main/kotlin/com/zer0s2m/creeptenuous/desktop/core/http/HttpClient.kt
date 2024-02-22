@@ -37,6 +37,11 @@ object HttpClient {
                 }
             )
         }
+
+        install(HttpTimeout) {
+            requestTimeoutMillis = 3600_000
+        }
+
         defaultRequest {
             url("http://localhost:8080")
         }

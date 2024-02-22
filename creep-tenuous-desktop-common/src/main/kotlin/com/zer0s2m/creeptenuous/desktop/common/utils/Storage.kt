@@ -31,11 +31,36 @@ fun saveStorageConfigStateDesktop(data: ConfigState) {
     }
 }
 
+fun createDownloadFolder() {
+    checkExistsDownloadDirectory()
+    checkExistsDownloadDirectoryMain()
+}
+
 /**
  * Check for the existence of the configuration area.
  */
 private fun checkExistsDirectoryConfig() {
     val pathDirectoryConfig: Path = Path.of(Config.PATH_DIRECTORY_CONFIG.path)
+    if (!Files.exists(pathDirectoryConfig)) {
+        Files.createDirectory(pathDirectoryConfig)
+    }
+}
+
+/**
+ * Check for the existence of the download directory.
+ */
+private fun checkExistsDownloadDirectory() {
+    val pathDirectoryConfig: Path = Path.of(Config.PATH_DIRECTORY_DOWNLOAD.path)
+    if (!Files.exists(pathDirectoryConfig)) {
+        Files.createDirectory(pathDirectoryConfig)
+    }
+}
+
+/**
+ * Check for the existence of the download directory.
+ */
+private fun checkExistsDownloadDirectoryMain() {
+    val pathDirectoryConfig: Path = Path.of(Config.PATH_DIRECTORY_DOWNLOAD_MAIN.path)
     if (!Files.exists(pathDirectoryConfig)) {
         Files.createDirectory(pathDirectoryConfig)
     }

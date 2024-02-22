@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.zer0s2m.creeptenuous.desktop.common.dto.ConfigState
 import com.zer0s2m.creeptenuous.desktop.common.dto.JwtTokens
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.common.utils.createDownloadFolder
 import com.zer0s2m.creeptenuous.desktop.common.utils.loadStorageConfigStateDesktop
 import com.zer0s2m.creeptenuous.desktop.core.auth.AuthorizationHandler
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
@@ -41,6 +42,8 @@ import kotlinx.coroutines.runBlocking
 @Preview
 fun App() {
     val coroutineScope = rememberCoroutineScope()
+
+    createDownloadFolder()
 
     var screen: String = Screen.DASHBOARD_SCREEN.name
     val configState: ConfigState = loadStorageConfigStateDesktop()

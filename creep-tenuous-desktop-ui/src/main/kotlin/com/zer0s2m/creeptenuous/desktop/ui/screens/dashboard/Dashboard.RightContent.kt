@@ -24,6 +24,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionDownloadFileOrDirectory
 import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsWalkingThroughDirectories
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
@@ -180,6 +181,17 @@ internal fun RenderLayoutDirectories(
                             scope = scope,
                             directory
                         )
+                    },
+                    actionDownload = {
+                        scope.launch {
+                            ActionDownloadFileOrDirectory.call(
+                                scope = scope,
+                                directories.value[index].realName,
+                                directories.value[index].systemName,
+                                false,
+                                true
+                            )
+                        }
                     }
                 ).render()
             }
@@ -248,6 +260,17 @@ internal fun RenderLayoutFiles(
                             scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
                             systemName = files.value[index].systemName
                         )
+                    },
+                    actionDownload = {
+                        scope.launch {
+                            ActionDownloadFileOrDirectory.call(
+                                scope = scope,
+                                files.value[index].realName,
+                                files.value[index].systemName,
+                                true,
+                                false
+                            )
+                        }
                     }
                 ).render()
             }
