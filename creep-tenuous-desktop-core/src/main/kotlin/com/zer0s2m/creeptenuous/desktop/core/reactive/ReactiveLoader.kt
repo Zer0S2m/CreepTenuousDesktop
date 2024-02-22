@@ -299,8 +299,6 @@ object ReactiveLoader {
             }
         }
 
-        println(mapInjectionIndependent)
-
         sortByPriority()
     }
 

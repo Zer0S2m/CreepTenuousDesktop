@@ -27,7 +27,6 @@ fun loadStorageConfigStateDesktop(): ConfigState {
 
 fun saveStorageConfigStateDesktop(data: ConfigState) {
     PrintWriter(FileWriter(Config.PATH_CONFIG_STATE.path)).use {
-        println(Json.encodeToJsonElement(data).toString())
         it.write(Json.encodeToJsonElement(data).toString())
     }
 }

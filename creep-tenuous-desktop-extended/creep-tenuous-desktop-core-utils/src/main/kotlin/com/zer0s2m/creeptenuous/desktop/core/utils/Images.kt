@@ -17,6 +17,9 @@ import javax.imageio.ImageIO
  */
 suspend fun loadImage(url: String): Result<ImageBitmap> {
     val urlImage = URL("http://localhost:8080/${url}")
+    val urlSplit: List<String> = url.split("/")
+    val filename: String = urlSplit.last()
+    val extensionFile: String = filename.split(".").last()
 
     return try {
         val connection = withContext(Dispatchers.IO) {
@@ -34,7 +37,7 @@ suspend fun loadImage(url: String): Result<ImageBitmap> {
 
         val stream = ByteArrayOutputStream()
         withContext(Dispatchers.IO) {
-            ImageIO.write(bufferedImage, "png", stream)
+            ImageIO.write(bufferedImage, extensionFile, stream)
         }
         val byteArray = stream.toByteArray()
 
