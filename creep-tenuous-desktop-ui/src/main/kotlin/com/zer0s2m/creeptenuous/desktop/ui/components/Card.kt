@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -427,14 +428,18 @@ class CartFileObject(
                 painter = painterResource(resourcePath = Resources.ICON_FOLDER.path),
                 contentDescription = contentDescriptionFolder
             )
-            Text(
-                text = textComp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(start = 8.dp, end = 4.dp),
-                color = Colors.TEXT.color,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
-            )
+            LazyRow(modifier = Modifier.width(100.dp)) {
+                item {
+                    Text(
+                        text = textComp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(start = 8.dp, end = 4.dp),
+                        color = Colors.TEXT.color,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                }
+            }
         }
     }
 
@@ -461,14 +466,18 @@ class CartFileObject(
                 painter = painterResource(resourcePath = Resources.ICON_FILE.path),
                 contentDescription = contentDescriptionFile
             )
-            Text(
-                text = textComp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(start = 8.dp, end = 4.dp),
-                color = Colors.TEXT.color,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
-            )
+             LazyRow(modifier = Modifier.width(100.dp)) {
+                item {
+                    Text(
+                        text = textComp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(start = 8.dp, end = 4.dp),
+                        color = Colors.TEXT.color,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                }
+             }
         }
     }
 
