@@ -1,10 +1,17 @@
 package com.zer0s2m.creeptenuous.desktop.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -27,7 +34,10 @@ class SwitchPanelDashboard(
     private val modifier: Modifier = Modifier
         .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
         .fillMaxWidth()
-        .padding(8.dp, 0.dp)
+        .padding(8.dp, 0.dp),
+    private val title: MutableState<String>,
+    private val onClickLeft: () -> Unit,
+    private val onClickRight: () -> Unit
 ) : BaseComponent {
 
     /**
@@ -54,9 +64,7 @@ class SwitchPanelDashboard(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             IconButton(
-                onClick = {
-                    println(true)
-                },
+                onClick = onClickLeft,
                 modifier = Modifier
                     .padding(end = 8.dp)
                     .pointerHoverIcon(icon = PointerIcon.Hand)
@@ -69,14 +77,12 @@ class SwitchPanelDashboard(
             }
 
             Text(
-                text = "Folder 1",
+                text = title.value,
                 fontWeight = FontWeight.Medium
             )
 
             IconButton(
-                onClick = {
-                    println(true)
-                },
+                onClick = onClickRight,
                 modifier = Modifier
                     .padding(end = 8.dp)
                     .pointerHoverIcon(icon = PointerIcon.Hand)

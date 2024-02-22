@@ -4,10 +4,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsSwitchLastThroughDirectories
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.SwitchPanelDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Content on the left side of the main dashboard
@@ -16,6 +19,8 @@ import com.zer0s2m.creeptenuous.desktop.ui.misc.float
  */
 @Composable
 internal fun RenderLeftContentDashboard(
+    scope: CoroutineScope,
+    titleSwitchPanelDashboard: MutableState<String>,
     systemBaseFolderForUser: Map<String, String>
 ) {
     Column(
@@ -23,7 +28,15 @@ internal fun RenderLeftContentDashboard(
             .fillMaxHeight()
             .fillMaxWidth(com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents.LEFT_PANEL_DASHBOARD.float)
     ) {
-        SwitchPanelDashboard()
+        SwitchPanelDashboard(
+            title = titleSwitchPanelDashboard,
+            onClickLeft = {
+                ActionsSwitchLastThroughDirectories.call(scope = scope)
+            },
+            onClickRight = {
+                // TODO: Make a custom directory navigation state
+            }
+        )
             .render()
 
         Column {

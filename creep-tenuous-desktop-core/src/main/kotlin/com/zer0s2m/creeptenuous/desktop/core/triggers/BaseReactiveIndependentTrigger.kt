@@ -19,6 +19,6 @@ interface BaseReactiveIndependentTrigger {
      *
      * @param values Arbitrary number of arguments passed regardless of type
      */
-    fun execution(vararg values: Any?)
+    suspend fun execution(vararg values: Any?)
 
 }

@@ -66,6 +66,7 @@ fun runTasks() {
 
 kotlin {
     jvmToolchain(17)
+
 }
 
 java {
@@ -84,7 +85,6 @@ allprojects {
 
     project.ext.set("ktorVersion", ktorVersion)
     project.ext.set("jvmVersion", jvmVersion)
-
 }
 
 subprojects {

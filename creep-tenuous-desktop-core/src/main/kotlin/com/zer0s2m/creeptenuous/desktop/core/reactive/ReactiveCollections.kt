@@ -53,7 +53,7 @@ interface ReactiveMutableList<E> : MutableList<E> {
      * @return `true` if the element has been added, `false` if the collection does not support duplicates
      * and the element is already contained in the collection.
      */
-    fun addReactive(element: E): Boolean {
+    suspend fun addReactive(element: E): Boolean {
         val isAdded = add(element)
         if (isAdded) {
             ReactiveLoader.pipelineLaunch(pipelinesAdd, element as Any, ReactivePipelineType.BEFORE)
@@ -69,7 +69,7 @@ interface ReactiveMutableList<E> : MutableList<E> {
      *
      * @return `true` if the element has been successfully removed; `false` if it was not present in the collection.
      */
-    fun removeReactive(element: E): Boolean {
+    suspend fun removeReactive(element: E): Boolean {
         val isRemoved = remove(element)
 
         if (isRemoved) {
@@ -87,7 +87,7 @@ interface ReactiveMutableList<E> : MutableList<E> {
      *
      * @return the element that has been removed.
      */
-    fun removeAtReactive(index: Int): E {
+    suspend fun removeAtReactive(index: Int): E {
         val element = removeAt(index)
 
         ReactiveLoader.pipelineLaunch(pipelinesRemove, element as Any, ReactivePipelineType.BEFORE)
@@ -103,7 +103,7 @@ interface ReactiveMutableList<E> : MutableList<E> {
      *
      * @return the element previously at the specified position.
      */
-    fun setReactive(index: Int, element: E): E {
+    suspend fun setReactive(index: Int, element: E): E {
         val newElement = set(index, element)
         ReactiveLoader.pipelineLaunch(pipelinesSet, element as Any, ReactivePipelineType.BEFORE)
         triggerSet?.execution(element)

@@ -1,12 +1,30 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,31 +34,45 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.dto.BreadCrumbFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserProfileSettings
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
-import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
+import com.zer0s2m.creeptenuous.desktop.common.enums.SectionsProfileUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreenPage
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveIndependentInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsSwitchBreadCrumbsThroughDirectories
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsSwitchMainThroughDirectories
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.BreadCrumbs
 import com.zer0s2m.creeptenuous.desktop.ui.components.BreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
+import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseBreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
-import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.*
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupContentCommentsInFileObjectModal
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupContentInfoFileObjectModal
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupCreateFileObjectTypeDirectory
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupInteractionCommentFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupRenameFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupSetUserCategoryInFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupSetUserColorInFileObject
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLayoutFilesObject
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLeftContentDashboard
+import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.TopPanelDashboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -104,6 +136,33 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             mutableStateOf(mutableListOf())
 
         /**
+         * User profile information.
+         */
+        private val userProfile: MutableState<UserProfileSettings?> =
+            mutableStateOf(ReactiveUser.profileSettings)
+
+        /**
+         * Comments for a file object.
+         */
+        private val commentsInFileObject: SnapshotStateList<CommentFileObject> =
+            ReactiveFileObject.commentsFileSystemObject.toMutableStateList()
+
+        /**
+         * Information about whether data has been downloaded.
+         */
+        private val managerFileObjectIsLoad: MutableState<Boolean> = mutableStateOf(false)
+
+        /**
+         * Breadcrumbs (navigation).
+         */
+        private val itemsBreadCrumbs: MutableState<Collection<BreadCrumbFileObject>> = mutableStateOf(mutableListOf())
+
+        /**
+         * The name of the current directory on the top panel.
+         */
+        private val titleSwitchPanelDashboard: MutableState<String> = mutableStateOf("Main")
+
+        /**
          * Set information about file objects by nesting level.
          *
          * @param managerFileObject information about file objects by nesting level.
@@ -125,12 +184,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         }
 
         /**
-         * User profile information.
-         */
-        private val userProfile: MutableState<UserProfileSettings?> =
-            mutableStateOf(ReactiveUser.profileSettings)
-
-        /**
          * Setting user profile information.
          *
          * @param userProfile User profile information.
@@ -139,12 +192,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         internal fun setUserProfile(userProfile: UserProfileSettings) {
             this.userProfile.value = userProfile
         }
-
-        /**
-         * Comments for a file object.
-         */
-        private val commentsInFileObject: SnapshotStateList<CommentFileObject> =
-            ReactiveFileObject.commentsFileSystemObject.toMutableStateList()
 
         /**
          * Set comments for a file object.
@@ -158,11 +205,6 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         }
 
         /**
-         * Information about whether data has been downloaded.
-         */
-        private val managerFileObjectIsLoad: MutableState<Boolean> = mutableStateOf(false)
-
-        /**
          * Set information about whether data has been downloaded.
          *
          * @param isLoad Information about whether data has been downloaded.
@@ -172,6 +214,37 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             managerFileObjectIsLoad.value = isLoad
         }
 
+        /**
+         * Install breadcrumbs (navigation).
+         *
+         * @param itemsBreadCrumbs Breadcrumbs (navigation).
+         */
+        @ReactiveIndependentInjection
+        internal fun setItemsBreadCrumbs(itemsBreadCrumbs: Collection<BreadCrumbFileObject>) {
+            this.itemsBreadCrumbs.value = itemsBreadCrumbs
+        }
+
+        /**
+         * Set the name of the current directory on the top panel.
+         *
+         * @param title Name of the current directory.
+         */
+        @ReactiveIndependentInjection
+        internal fun setTitleSwitchPanelDashboard(title: String) {
+            titleSwitchPanelDashboard.value = title
+        }
+
+    }
+
+    init {
+        ContextScreen.set(
+            Screen.DASHBOARD_SCREEN,
+            mapOf(
+                "currentLevelManagerDirectory" to 0,
+                "currentParentsManagerDirectory" to listOf<String>().toMutableList(),
+                "currentSystemParentsManagerDirectory" to listOf<String>().toMutableList()
+            )
+        )
     }
 
     /**
@@ -179,7 +252,11 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
      */
     @Composable
     override fun renderLeftContent() {
+         val scope: CoroutineScope = rememberCoroutineScope()
+
         RenderLeftContentDashboard(
+            scope = scope,
+            titleSwitchPanelDashboard = titleSwitchPanelDashboard,
             systemBaseFolderForUser = baseFolderForUser
         )
     }
@@ -196,6 +273,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
             managerFileObject_Files
         }
 
+        val scope = rememberCoroutineScope()
         val scaffoldStateProfileUser = rememberScaffoldState()
         val scaffoldStateCommentFileObject = rememberScaffoldState()
         val scaffoldStateInfoFileObject = rememberScaffoldState()
@@ -244,24 +322,29 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                         Screen.DASHBOARD_SCREEN,
                         "currentIndexFileObjectForInteractive"
                     )
-                    ReactiveFileObject.commentsFileSystemObject.setReactive(indexComment, comment)
-                    setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
+
+                    scope.launch {
+                        ReactiveFileObject.commentsFileSystemObject.setReactive(indexComment, comment)
+                        setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
+                    }
                 } else if (!isEdit && isCreate) {
-                    ReactiveFileObject.commentsFileSystemObject.addReactive(comment)
-                    setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
+                    scope.launch {
+                        ReactiveFileObject.commentsFileSystemObject.addReactive(comment)
+                        setCommentsInFileObject(comments = ReactiveFileObject.commentsFileSystemObject)
+                    }
                 }
 
-                ContextScreen.clearValueByKey(Screen.DASHBOARD_SCREEN, listOf(
-                    "isEditFileObjectForInteractive",
-                    "isCreateFileObjectForInteractive",
-                    "currentFileObjectForInteractive",
-                    "currentIndexFileObjectForInteractive"
-                ))
+                ContextScreen.clearValueByKey(
+                    Screen.DASHBOARD_SCREEN, listOf(
+                        "isEditFileObjectForInteractive",
+                        "isCreateFileObjectForInteractive",
+                        "currentCommentFileObjectForInteractive",
+                        "currentIndexFileObjectForInteractive"
+                    )
+                )
             },
             onDismissRequest = { ContextScreen.clearScreen(Screen.DASHBOARD_SCREEN) }
         )
-
-        val scope = rememberCoroutineScope()
 
         val modifierDrawerInternal: Modifier = Modifier
             .fillMaxSize()
@@ -302,12 +385,13 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                 modalProfileUser.render(
                     drawerContent = {
                         ContentProfileUserModal(
-                            navigationState = navigationState
+                            navigationState = navigationState,
+                            userProfile = userProfile
                         )
                     }
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
-                        Column (
+                        Column(
                             modifier = Modifier
                                 .fillMaxHeight(SizeComponents.UPPER_BLOCK_LEFT_PANEL.float)
                         ) {
@@ -331,6 +415,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                                     .fillMaxHeight(0.94f)
                             ) {
                                 LayoutFileObjects(
+                                    scope = scope,
                                     directories = directories,
                                     files = files,
                                     scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
@@ -338,7 +423,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
                                 )
                             }
                             Column(modifier = Modifier.fillMaxSize()) {
-                                LayoutBreadCrumbs()
+                                LayoutBreadCrumbs(scope = scope)
                             }
                         }
                     }
@@ -349,6 +434,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
     @Composable
     private fun LayoutFileObjects(
+        scope: CoroutineScope,
         directories: MutableState<MutableList<FileObject>>,
         files: MutableState<MutableList<FileObject>>,
         scaffoldStateCommentFileObject: ScaffoldState,
@@ -370,6 +456,7 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
 
             else -> {
                 RenderLayoutFilesObject(
+                    scope = scope,
                     directories = directories,
                     files = files,
                     expandedStateSetCategoryPopup = expandedStateModalSetCategoryPopup,
@@ -383,29 +470,26 @@ class Dashboard(override var navigation: NavigationController) : BaseDashboard, 
         }
     }
 
+    private fun getMainBreadCrumb(scope: CoroutineScope): BaseBreadCrumbsItem {
+        return BreadCrumbsItem(
+            text = "Main",
+            action = { ActionsSwitchMainThroughDirectories.call(scope = scope) }
+        )
+    }
+
     @Composable
-    private fun LayoutBreadCrumbs() {
+    private fun LayoutBreadCrumbs(scope: CoroutineScope) {
+        val itemsBreadCrumbsLocal: MutableList<BaseBreadCrumbsItem> = mutableListOf()
+        itemsBreadCrumbsLocal.add(getMainBreadCrumb(scope))
+        itemsBreadCrumbs.value.forEachIndexed { index: Int, breadCrumbFileObject: BreadCrumbFileObject ->
+            itemsBreadCrumbsLocal.add(BreadCrumbsItem(
+                text = breadCrumbFileObject.realName,
+                action = { ActionsSwitchBreadCrumbsThroughDirectories.call(scope = scope, index) }
+            ))
+        }
+
         BreadCrumbs(
-            items = listOf(
-                BreadCrumbsItem(
-                    text = "Folder 1",
-                    action = {
-                        println(true)
-                    }
-                ),
-                BreadCrumbsItem(
-                    text = "Folder 2",
-                    action = {
-                        println(true)
-                    }
-                ),
-                BreadCrumbsItem(
-                    text = "Folder 3",
-                    action = {
-                        println(true)
-                    }
-                )
-            ),
+            items = itemsBreadCrumbsLocal,
             modifier = Modifier
                 .fillMaxSize()
                 .background(Colors.BREAD_CRUMBS_BASE.color)
@@ -448,7 +532,8 @@ private fun TitleInSectionForCardsModalSheet(text: String): Unit = Text(
  */
 @Composable
 private fun ContentProfileUserModal(
-    navigationState: State<NavigationController>
+    navigationState: State<NavigationController>,
+    userProfile: MutableState<UserProfileSettings?>
 ) {
     val baseModifierCard: Modifier = Modifier
         .height(60.dp)
@@ -459,22 +544,28 @@ private fun ContentProfileUserModal(
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
     Column {
-        TitleInSectionForCardsModalSheet(Sections.MAIN_PROFILE.title)
+        TitleInSectionForCardsModalSheet(SectionsProfileUser.MAIN_PROFILE.title)
         LazyVerticalGrid(
             columns = GridCells.Fixed(5),
             content = {
-                items(Sections.MAIN_PROFILE.sections.size) { index ->
-                    CardModalSheet(
-                        modifier = baseModifierCard
-                    ) {
-                        onClickCardSheet(
-                            screen = Sections.MAIN_PROFILE.routes[index],
-                            scope = coroutineScope,
-                            sectionProfile = Sections.MAIN_PROFILE,
-                            navigationState = navigationState
-                        )
-                    }.render {
-                        TextInCardModalSheet(Sections.MAIN_PROFILE.sections[index])
+                items(SectionsProfileUser.MAIN_PROFILE.sections.entries.size) { index: Int ->
+                    val sectionInfo: Map.Entry<String, Boolean> =
+                        SectionsProfileUser.MAIN_PROFILE.sections.entries.toList()[index]
+
+                    if (!sectionInfo.value || (sectionInfo.value && userProfile.value?.role?.contains("ROLE_ADMIN") != false)) {
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ) {
+
+                            onClickCardSheet(
+                                screen = SectionsProfileUser.MAIN_PROFILE.routes[index],
+                                scope = coroutineScope,
+                                sectionProfile = SectionsProfileUser.MAIN_PROFILE,
+                                navigationState = navigationState
+                            )
+                        }.render {
+                            TextInCardModalSheet(sectionInfo.key)
+                        }
                     }
                 }
             }
@@ -487,22 +578,27 @@ private fun ContentProfileUserModal(
     )
 
     Column {
-        TitleInSectionForCardsModalSheet(Sections.USER_CONTROL.title)
+        TitleInSectionForCardsModalSheet(SectionsProfileUser.USER_CONTROL.title)
         LazyVerticalGrid(
             columns = GridCells.Fixed(5),
             content = {
-                items(Sections.USER_CONTROL.sections.size) { index ->
-                    CardModalSheet(
-                        modifier = baseModifierCard
-                    ) {
-                        onClickCardSheet(
-                            screen = Sections.USER_CONTROL.routes[index],
-                            scope = coroutineScope,
-                            sectionProfile = Sections.USER_CONTROL,
-                            navigationState = navigationState
-                        )
-                    }.render {
-                        TextInCardModalSheet(Sections.USER_CONTROL.sections[index])
+                items(SectionsProfileUser.USER_CONTROL.sections.entries.size) { index ->
+                    val sectionInfo: Map.Entry<String, Boolean> =
+                        SectionsProfileUser.USER_CONTROL.sections.entries.toList()[index]
+
+                    if (!sectionInfo.value || (sectionInfo.value && userProfile.value?.role?.contains("ROLE_ADMIN") != false)) {
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ) {
+                            onClickCardSheet(
+                                screen = SectionsProfileUser.USER_CONTROL.routes[index],
+                                scope = coroutineScope,
+                                sectionProfile = SectionsProfileUser.USER_CONTROL,
+                                navigationState = navigationState
+                            )
+                        }.render {
+                            TextInCardModalSheet(SectionsProfileUser.USER_CONTROL.sections.entries.toList()[index].key)
+                        }
                     }
                 }
             }
@@ -515,22 +611,28 @@ private fun ContentProfileUserModal(
     )
 
     Column {
-        TitleInSectionForCardsModalSheet(Sections.USER_CUSTOMIZATION.title)
+        TitleInSectionForCardsModalSheet(SectionsProfileUser.USER_CUSTOMIZATION.title)
         LazyVerticalGrid(
             columns = GridCells.Fixed(5),
             content = {
-                items(Sections.USER_CUSTOMIZATION.sections.size) { index ->
-                    CardModalSheet(
-                        modifier = baseModifierCard
-                    ) {
-                        onClickCardSheet(
-                            screen = Sections.USER_CUSTOMIZATION.routes[index],
-                            scope = coroutineScope,
-                            sectionProfile = Sections.USER_CUSTOMIZATION,
-                            navigationState = navigationState
-                        )
-                    }.render {
-                        TextInCardModalSheet(Sections.USER_CUSTOMIZATION.sections[index])
+                items(SectionsProfileUser.USER_CUSTOMIZATION.sections.entries.size) { index ->
+                    val sectionInfo: Map.Entry<String, Boolean> =
+                        SectionsProfileUser.USER_CUSTOMIZATION.sections.entries.toList()[index]
+
+                    if (!sectionInfo.value || (sectionInfo.value && userProfile.value?.role?.contains("ROLE_ADMIN") != false)) {
+                        CardModalSheet(
+                            modifier = baseModifierCard
+                        ) {
+
+                            onClickCardSheet(
+                                screen = SectionsProfileUser.USER_CUSTOMIZATION.routes[index],
+                                scope = coroutineScope,
+                                sectionProfile = SectionsProfileUser.USER_CUSTOMIZATION,
+                                navigationState = navigationState
+                            )
+                        }.render {
+                            TextInCardModalSheet(SectionsProfileUser.USER_CUSTOMIZATION.sections.entries.toList()[index].key)
+                        }
                     }
                 }
             }
@@ -549,7 +651,7 @@ private fun ContentProfileUserModal(
 private fun onClickCardSheet(
     screen: Screen,
     scope: CoroutineScope,
-    sectionProfile: Sections,
+    sectionProfile: SectionsProfileUser,
     navigationState: State<NavigationController>
 ) {
     scope.launch {

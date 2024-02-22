@@ -2,10 +2,42 @@ package com.zer0s2m.creeptenuous.desktop.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,7 +52,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
-import com.zer0s2m.creeptenuous.desktop.common.enums.Sections
+import com.zer0s2m.creeptenuous.desktop.common.enums.SectionsProfileUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.context.BaseContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
@@ -31,7 +63,13 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.misc.float
-import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.*
+import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenProfileCategories
+import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenProfileColors
+import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenProfileFileObjectDistribution
+import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenProfileGrantedRights
+import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenProfileListUsers
+import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenProfileSettings
+import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenProfileUserControl
 import kotlinx.coroutines.launch
 
 /**
@@ -59,7 +97,7 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
         /**
          * Base section for initial user profile page
          */
-        private val baseSection: Sections = Sections.MAIN_PROFILE
+        private val baseSection: SectionsProfileUser = SectionsProfileUser.MAIN_PROFILE
 
         /**
          * The new state of the applied screen from the transition from the previous screen
@@ -69,7 +107,7 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
         /**
          * The new state of the applied screen from the transition from the previous screen
          */
-        private val appliedSectionFromTransitionFromPast: MutableState<Sections> = mutableStateOf(baseSection)
+        private val appliedSectionFromTransitionFromPast: MutableState<SectionsProfileUser> = mutableStateOf(baseSection)
 
         /**
          * Set new screen state from past transition
@@ -85,7 +123,7 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
          *
          * @param section Section
          */
-        internal fun setAppliedSectionFromTransitionFromPast(section: Sections) {
+        internal fun setAppliedSectionFromTransitionFromPast(section: SectionsProfileUser) {
             appliedSectionFromTransitionFromPast.value = section
         }
 
@@ -294,38 +332,48 @@ class ProfileUser(override var navigation: NavigationController) : BaseDashboard
      */
     @Composable
     private fun Menu() {
-        TitleSectionInMenu(text = Sections.MAIN_PROFILE.title)
-        Sections.MAIN_PROFILE.sections
-            .zip(Sections.MAIN_PROFILE.routes) { item, route ->
-                ItemSectionInMenu(
-                    text = item,
-                    navigation = internalNavigation,
-                    route = route,
-                    section = Sections.MAIN_PROFILE
-                )
-            }
+        LazyColumn {
+            item {
+                TitleSectionInMenu(text = SectionsProfileUser.MAIN_PROFILE.title)
+                SectionsProfileUser.MAIN_PROFILE.sections.entries.toList()
+                    .zip(SectionsProfileUser.MAIN_PROFILE.routes) { item, route ->
+                        if (!item.value || (item.value && ReactiveUser.profileSettings!!.role.contains("ROLE_ADMIN"))) {
+                            ItemSectionInMenu(
+                                text = item.key,
+                                navigation = internalNavigation,
+                                route = route,
+                                section = SectionsProfileUser.MAIN_PROFILE
+                            )
+                        }
+                    }
 
-        TitleSectionInMenu(text = Sections.USER_CONTROL.title)
-        Sections.USER_CONTROL.sections
-            .zip(Sections.USER_CONTROL.routes) { item, route ->
-                ItemSectionInMenu(
-                    text = item,
-                    navigation = internalNavigation,
-                    route = route,
-                    section = Sections.USER_CONTROL
-                )
-            }
+                TitleSectionInMenu(text = SectionsProfileUser.USER_CONTROL.title)
+                SectionsProfileUser.USER_CONTROL.sections.entries.toList()
+                    .zip(SectionsProfileUser.USER_CONTROL.routes) { item, route ->
+                        if (!item.value || (item.value && ReactiveUser.profileSettings!!.role.contains("ROLE_ADMIN"))) {
+                            ItemSectionInMenu(
+                                text = item.key,
+                                navigation = internalNavigation,
+                                route = route,
+                                section = SectionsProfileUser.USER_CONTROL
+                            )
+                        }
+                    }
 
-        TitleSectionInMenu(text = Sections.USER_CUSTOMIZATION.title)
-        Sections.USER_CUSTOMIZATION.sections
-            .zip(Sections.USER_CUSTOMIZATION.routes) { item, route ->
-                ItemSectionInMenu(
-                    text = item,
-                    navigation = internalNavigation,
-                    route = route,
-                    section = Sections.USER_CUSTOMIZATION
-                )
+                TitleSectionInMenu(text = SectionsProfileUser.USER_CUSTOMIZATION.title)
+                SectionsProfileUser.USER_CUSTOMIZATION.sections.entries.toList()
+                    .zip(SectionsProfileUser.USER_CUSTOMIZATION.routes) { item, route ->
+                        if (!item.value || (item.value && ReactiveUser.profileSettings!!.role.contains("ROLE_ADMIN"))) {
+                            ItemSectionInMenu(
+                                text = item.key,
+                                navigation = internalNavigation,
+                                route = route,
+                                section = SectionsProfileUser.USER_CUSTOMIZATION
+                            )
+                        }
+                    }
             }
+        }
     }
 
 }
@@ -369,7 +417,7 @@ private fun ItemSectionInMenu(
     enabled: Boolean = true,
     navigation: State<NavigationController>,
     route: Screen,
-    section: Sections
+    section: SectionsProfileUser
 ) {
     val coroutineScope = rememberCoroutineScope()
 

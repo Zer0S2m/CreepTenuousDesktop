@@ -18,7 +18,9 @@ internal object HandlerReactiveUser : ReactiveHandlerKtor {
      * @return result
      */
     override suspend fun handlerKtor(): HttpResponse {
-        return HttpClient.client.get("/api/v1/user/profile")
+        return HttpClient.client.get("/api/v1/user/profile") {
+            header("Authorization", "Bearer ${HttpClient.accessToken}")
+        }
     }
 
 }

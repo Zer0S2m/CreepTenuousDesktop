@@ -11,7 +11,7 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
  * Injected after all loading ([ReactiveLoader]) and preprocessor steps have been passed
  * through the specified [method] which is static
  */
-@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
 annotation class ReactiveInjection(

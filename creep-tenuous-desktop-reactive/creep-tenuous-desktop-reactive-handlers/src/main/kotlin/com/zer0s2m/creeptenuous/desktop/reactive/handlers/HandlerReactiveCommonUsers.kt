@@ -20,7 +20,9 @@ object HandlerReactiveCommonUsers : ReactiveHandler<ReactiveMutableList<User>> {
      * @return users
      */
     override suspend fun handler(): ReactiveMutableList<User> {
-        val users: MutableCollection<User> = HttpClient.client.get("/api/v1/user/control/list").body()
+        val users: MutableCollection<User> = HttpClient.client.get("/api/v1/user/control/list") {
+            header("Authorization", "Bearer ${HttpClient.accessToken}")
+        }.body()
         return users.toReactiveMutableList(
             triggerRemove = ReactiveTriggerReactiveSystemUserRemove()
         )

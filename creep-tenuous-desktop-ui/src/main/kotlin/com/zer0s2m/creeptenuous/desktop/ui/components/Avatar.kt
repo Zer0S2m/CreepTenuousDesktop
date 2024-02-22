@@ -91,15 +91,13 @@ class Avatar(
                 when {
                     isLoading.value -> {
                         Column(
-                            modifier = Modifier
-                                .fillMaxSize(),
+                            modifier = Modifier.fillMaxSize(),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
                             CircularProgressIndicator(
                                 color = MaterialTheme.colors.secondaryVariant,
-                                modifier = Modifier
-                                    .size(28.dp)
+                                modifier = Modifier.size(28.dp)
                             )
                         }
                     }

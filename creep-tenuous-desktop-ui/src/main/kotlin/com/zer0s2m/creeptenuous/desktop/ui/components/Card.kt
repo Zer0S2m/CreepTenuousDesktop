@@ -1,18 +1,46 @@
 package com.zer0s2m.creeptenuous.desktop.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.isSecondary
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +60,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.base.BaseCardPanelBaseFold
 import com.zer0s2m.creeptenuous.desktop.ui.misc.Colors
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 
 
 /**
@@ -205,6 +234,7 @@ class CardPanelBaseFolderUser(
  * @param actionComments Action called when comments are opened.
  * @param actionSetCategory Action called when a custom category is set on a file object
  * @param actionSetColor Action called when a custom color is set on a file object
+ * @param actionDoubleClick Action called when double-clicked.
  */
 class CartFileObject(
     override val isDirectory: Boolean,
@@ -222,6 +252,7 @@ class CartFileObject(
     override val actionComments: () -> Unit = {},
     override val actionSetCategory: () -> Unit = {},
     override val actionSetColor: () -> Unit = {},
+    override val actionDoubleClick: () -> Unit = {},
 ) : BaseCardFileObject {
 
     /**
@@ -281,6 +312,7 @@ class CartFileObject(
      *
      * @param content Main component block
      */
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
     @Composable
     private fun renderBase(content: @Composable () -> Unit) {
         val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
@@ -320,6 +352,22 @@ class CartFileObject(
                 .fillMaxWidth()
                 .height(80.dp)
                 .hoverable(interactionSource = interactionSource)
+                .onPointerEvent(
+                    eventType = PointerEventType.Press,
+                    pass = PointerEventPass.Final,
+                ) { event ->
+                    if (event.button?.isSecondary == true) {
+                        expandedMenu.value = !expandedMenu.value
+                    }
+                }
+                .combinedClickable(
+                    onClick = {  },
+                    onDoubleClick = {
+                        if (isDirectoryComp) {
+                            actionDoubleClick()
+                        }
+                    }
+                )
                 .pointerHoverIcon(icon = PointerIcon.Hand),
             elevation = 0.dp,
             shape = RoundedCornerShape(8.dp)
@@ -380,14 +428,18 @@ class CartFileObject(
                 painter = painterResource(resourcePath = Resources.ICON_FOLDER.path),
                 contentDescription = contentDescriptionFolder
             )
-            Text(
-                text = textComp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(start = 8.dp, end = 4.dp),
-                color = Colors.TEXT.color,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
-            )
+            LazyRow(modifier = Modifier.width(100.dp)) {
+                item {
+                    Text(
+                        text = textComp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(start = 8.dp, end = 4.dp),
+                        color = Colors.TEXT.color,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                }
+            }
         }
     }
 
@@ -414,14 +466,18 @@ class CartFileObject(
                 painter = painterResource(resourcePath = Resources.ICON_FILE.path),
                 contentDescription = contentDescriptionFile
             )
-            Text(
-                text = textComp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(start = 8.dp, end = 4.dp),
-                color = Colors.TEXT.color,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
-            )
+             LazyRow(modifier = Modifier.width(100.dp)) {
+                item {
+                    Text(
+                        text = textComp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(start = 8.dp, end = 4.dp),
+                        color = Colors.TEXT.color,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                }
+             }
         }
     }
 
@@ -631,7 +687,7 @@ internal fun CartCommentForFileObject(
 ) {
     val localCreatedAt = DateTimeFormatter
         .ofPattern("MMMM dd, yyyy HH:mm:ss")
-        .format(LocalDateTime.parse(createdAt, dateFormatForComment))
+        .format(LocalDateTime.parse(createdAt, ISO_DATE_TIME))
 
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -661,5 +717,6 @@ internal fun CartCommentForFileObject(
  * Date format for file object comment.
  */
 @get:ReadOnlyComposable
-private val dateFormatForComment: DateTimeFormatter get() =
-    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+private val dateFormatForComment: DateTimeFormatter
+    get() =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")

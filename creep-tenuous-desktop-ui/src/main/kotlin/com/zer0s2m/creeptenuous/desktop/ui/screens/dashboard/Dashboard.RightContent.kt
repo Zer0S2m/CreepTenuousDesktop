@@ -1,6 +1,14 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Scaffold
@@ -8,7 +16,6 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -17,6 +24,8 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionDownloadFileOrDirectory
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsWalkingThroughDirectories
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
@@ -40,6 +49,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 internal fun RenderLayoutFilesObject(
+    scope: CoroutineScope,
     directories: MutableState<MutableList<FileObject>>,
     files: MutableState<MutableList<FileObject>>,
     expandedStateSetCategoryPopup: MutableState<Boolean>,
@@ -49,8 +59,6 @@ internal fun RenderLayoutFilesObject(
     scaffoldStateCommentFileObject: ScaffoldState,
     scaffoldStateInfoFileObject: ScaffoldState
 ) {
-    val scope = rememberCoroutineScope()
-
     Column(modifier = Modifier.padding(16.dp)) {
         Column(modifier = Modifier.padding(bottom = 28.dp)) {
             RenderLayoutDirectories(
@@ -119,6 +127,7 @@ internal fun RenderLayoutDirectories(
             items(directories.value.size) { index ->
                 val categoryId: Int? = directories.value[index].categoryId
                 val color: String? = directories.value[index].color
+
                 CartFileObject(
                     isDirectory = true,
                     isFile = false,
@@ -133,7 +142,9 @@ internal fun RenderLayoutDirectories(
                         )
                     },
                     actionDelete = {
-                        directories.value = actionDelete(directories.value[index])
+                        scope.launch {
+                            directories.value = actionDelete(directories.value[index])
+                        }
                     },
                     actionSetCategory = {
                         actionSetCategory(categoryId, directories.value[index].systemName)
@@ -162,6 +173,25 @@ internal fun RenderLayoutDirectories(
                             scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
                             systemName = directories.value[index].systemName
                         )
+                    },
+                    actionDoubleClick = {
+                        val directory: FileObject = directories.value[index]
+
+                        ActionsWalkingThroughDirectories.call(
+                            scope = scope,
+                            directory
+                        )
+                    },
+                    actionDownload = {
+                        scope.launch {
+                            ActionDownloadFileOrDirectory.call(
+                                scope = scope,
+                                directories.value[index].realName,
+                                directories.value[index].systemName,
+                                false,
+                                true
+                            )
+                        }
                     }
                 ).render()
             }
@@ -212,7 +242,9 @@ internal fun RenderLayoutFiles(
                         )
                     },
                     actionDelete = {
-                        files.value = actionDelete(files.value[index])
+                        scope.launch {
+                            files.value = actionDelete(files.value[index])
+                        }
                     },
                     actionSetCategory = {
                         actionSetCategory(categoryId, files.value[index].systemName)
@@ -228,6 +260,17 @@ internal fun RenderLayoutFiles(
                             scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
                             systemName = files.value[index].systemName
                         )
+                    },
+                    actionDownload = {
+                        scope.launch {
+                            ActionDownloadFileOrDirectory.call(
+                                scope = scope,
+                                files.value[index].realName,
+                                files.value[index].systemName,
+                                true,
+                                false
+                            )
+                        }
                     }
                 ).render()
             }
@@ -282,7 +325,7 @@ internal fun TopPanelDashboard(
  * @param fileObject File object to be deleted.
  * @return New filtered list of file objects.
  */
-private fun actionDelete(fileObject: FileObject): MutableList<FileObject> {
+private suspend fun actionDelete(fileObject: FileObject): MutableList<FileObject> {
     val objects: MutableList<FileObject> = mutableListOf()
     objects.addAll(ReactiveFileObject.managerFileSystemObjects.objects)
 

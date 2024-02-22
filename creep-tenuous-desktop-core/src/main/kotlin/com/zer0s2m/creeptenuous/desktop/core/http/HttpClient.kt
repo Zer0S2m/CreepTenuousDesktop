@@ -14,6 +14,10 @@ import kotlinx.serialization.json.Json
  */
 object HttpClient {
 
+    var accessToken: String = ""
+
+    var refreshToken: String = ""
+
     val client: HttpClient = HttpClient(CIO) {
         if (Environment.IS_DEV) install(Logging) {
             logger = Logger.DEFAULT
@@ -33,8 +37,13 @@ object HttpClient {
                 }
             )
         }
+
+        install(HttpTimeout) {
+            requestTimeoutMillis = 3600_000
+        }
+
         defaultRequest {
-            url("http://localhost:3000")
+            url("http://localhost:8080")
         }
         developmentMode = true
     }

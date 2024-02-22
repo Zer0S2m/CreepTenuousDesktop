@@ -82,4 +82,9 @@ interface BaseCardFileObject : BaseComponent, BaseAnimation {
      */
     val actionSetColor: () -> Unit
 
+    /**
+     * Action called when double-clicked.
+     */
+    val actionDoubleClick: () -> Unit
+
 }

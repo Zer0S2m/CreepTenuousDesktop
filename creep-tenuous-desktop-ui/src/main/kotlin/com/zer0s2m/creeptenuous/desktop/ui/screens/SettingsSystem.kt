@@ -78,7 +78,6 @@ class SettingsSystem {
                                 data["host"].toString(),
                                 data["port"].toString().toInt()
                             )
-                            println(dataClass)
                             navigationScreen.action(
                                 state = mutableStateOf(navigationController),
                                 route = Screen.LOGIN_SCREEN,
