@@ -109,7 +109,7 @@ compose.desktop {
     application {
         mainClass = "com.zer0s2m.creeptenuous.desktop.app.MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.AppImage)
             packageName = "CreepTenuousDesktop"
             packageVersion = "1.0.0"
         }

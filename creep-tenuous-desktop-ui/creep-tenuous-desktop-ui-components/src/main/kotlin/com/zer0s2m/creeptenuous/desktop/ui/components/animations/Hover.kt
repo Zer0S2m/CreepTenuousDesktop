@@ -7,7 +7,12 @@ import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material.Card
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Colors
 
@@ -46,7 +51,7 @@ fun setHoverInDropMenuItem(
 }
 
 /**
- * Set hover event on component [BaseDropdownMenuItem] - listens for events [HoverInteraction]
+ * Set hover event on component - listens for events [HoverInteraction]
  *
  * @param interactionSource [MutableInteractionSource] that will be used to emit [HoverInteraction]
  * @param isHover Switch in the form of a state when hovering over a component

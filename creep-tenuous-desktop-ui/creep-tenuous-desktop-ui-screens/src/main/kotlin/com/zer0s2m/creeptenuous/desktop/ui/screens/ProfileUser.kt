@@ -38,6 +38,8 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.SectionsProfileUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.context.BaseContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveIndependentInjection
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
@@ -60,7 +62,7 @@ import kotlinx.coroutines.launch
  *
  * @param navigation Handler for the navigation host for changing the current screen state
  */
-class ProfileUser(var navigation: NavigationController) {
+class ProfileUser(var navigation: NavigationController) : ReactiveInjectionClass {
 
     /**
      * Text used by accessibility services to describe what this image represents
@@ -90,13 +92,15 @@ class ProfileUser(var navigation: NavigationController) {
         /**
          * The new state of the applied screen from the transition from the previous screen
          */
-        private val appliedSectionFromTransitionFromPast: MutableState<SectionsProfileUser> = mutableStateOf(baseSection)
+        private val appliedSectionFromTransitionFromPast: MutableState<SectionsProfileUser> =
+            mutableStateOf(baseSection)
 
         /**
          * Set new screen state from past transition
          *
          * @param context Context `illusion` to convey new screen state
          */
+        @ReactiveIndependentInjection
         internal fun setAppliedScreenFromTransitionFromPast(context: BaseContextScreen) {
             appliedScreenFromTransitionFromPast.value = context.screen
         }
@@ -106,6 +110,7 @@ class ProfileUser(var navigation: NavigationController) {
          *
          * @param section Section
          */
+        @ReactiveIndependentInjection
         internal fun setAppliedSectionFromTransitionFromPast(section: SectionsProfileUser) {
             appliedSectionFromTransitionFromPast.value = section
         }

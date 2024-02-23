@@ -415,12 +415,10 @@ internal fun PopupCreateFileObjectTypeDirectory(
                                 colorIdState.value,
                                 categoryId.value
                             )
-                        }
 
-                        ReactiveFileObject.managerFileSystemObjects.objects.add(
-                            newFileObjectDirectory
-                        )
-                        Dashboard.setManagerFileObject(ReactiveFileObject.managerFileSystemObjects)
+                            ReactiveLoader.resetIsLoad("managerFileSystemObjects")
+                            ReactiveLoader.load("managerFileSystemObjects")
+                        }
                     }
                 }
             ) {

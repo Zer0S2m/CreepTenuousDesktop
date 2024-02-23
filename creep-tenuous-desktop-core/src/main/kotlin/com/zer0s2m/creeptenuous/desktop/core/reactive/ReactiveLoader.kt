@@ -364,6 +364,7 @@ object ReactiveLoader {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     suspend fun <T> loadNotSet(nameProperty: String): Result<T> {
         val lazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
 
@@ -526,11 +527,12 @@ object ReactiveLoader {
                     compObject.functions.find {
                         it.name == method
                     }?.call(kClass.companionObjectInstance, value)
+                    return
                 }
-            } else {
-                throw ReactiveLoaderIndependentInjectionException("Method not found")
             }
         }
+
+        throw ReactiveLoaderIndependentInjectionException("Method not found")
     }
 
 }

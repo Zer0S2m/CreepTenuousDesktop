@@ -47,6 +47,7 @@ import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveIndependentInject
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsSwitchBreadCrumbsThroughDirectories
@@ -679,10 +680,16 @@ private fun onClickCardSheet(
     sectionProfile: SectionsProfileUser,
     navigationState: State<NavigationController>
 ) {
-    scope.launch {
-        ProfileUser.setAppliedScreenFromTransitionFromPast(context = ContextScreenPage(screen))
-        ProfileUser.setAppliedSectionFromTransitionFromPast(section = sectionProfile)
+    ReactiveLoader.runReactiveIndependentInjection(
+        method = "setAppliedScreenFromTransitionFromPast",
+        value = ContextScreenPage(screen)
+    )
+    ReactiveLoader.runReactiveIndependentInjection(
+        method = "setAppliedSectionFromTransitionFromPast",
+        value = sectionProfile
+    )
 
+    scope.launch {
         reactiveNavigationScreen.action(
             state = navigationState,
             route = Screen.PROFILE_SCREEN,
