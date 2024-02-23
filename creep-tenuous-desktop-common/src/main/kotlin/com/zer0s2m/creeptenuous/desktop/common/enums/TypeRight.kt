@@ -23,4 +23,6 @@ enum class TypeRight(val title: String) {
 
     RENAME(title = "Rename"),
 
+    ANALYSIS(title = "Show info"),
+
 }

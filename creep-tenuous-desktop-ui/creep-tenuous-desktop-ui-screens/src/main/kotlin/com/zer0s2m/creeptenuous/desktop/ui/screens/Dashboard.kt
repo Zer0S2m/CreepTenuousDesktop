@@ -17,7 +17,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -32,10 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.BreadCrumbFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.FileObject
@@ -62,6 +58,8 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.BreadCrumbs
 import com.zer0s2m.creeptenuous.desktop.ui.components.BreadCrumbsItem
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardModalSheetSectionProfileUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
+import com.zer0s2m.creeptenuous.desktop.ui.components.TextInCardModalSheet
+import com.zer0s2m.creeptenuous.desktop.ui.components.TitleInSectionForCardsModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.float
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupContentCommentsInFileObjectModal
@@ -164,6 +162,11 @@ class Dashboard(var navigation: NavigationController) : ReactiveInjectionClass {
         private val titleSwitchPanelDashboard: MutableState<String> = mutableStateOf("Main")
 
         /**
+         * Whether system names have been set for the main folders for each user.
+         */
+        private val isSetBaseFolderUser: MutableState<Boolean> = mutableStateOf(false)
+
+        /**
          * Set information about file objects by nesting level.
          *
          * @param managerFileObject information about file objects by nesting level.
@@ -182,6 +185,33 @@ class Dashboard(var navigation: NavigationController) : ReactiveInjectionClass {
 
             managerFileObject_Directories.value = folders
             managerFileObject_Files.value = files
+
+            if (!isSetBaseFolderUser.value) {
+                val systemNameFolderVideos = managerFileObject_Directories.value.find {
+                    it.realName == "Videos"
+                }?.systemName ?: ""
+                val systemNameFolderMusics = managerFileObject_Directories.value.find {
+                    it.realName == "Musics"
+                }?.systemName ?: ""
+                val systemNameFolderDocuments = managerFileObject_Directories.value.find {
+                    it.realName == "Documents"
+                }?.systemName ?: ""
+                val systemNameFolderImages = managerFileObject_Directories.value.find {
+                    it.realName == "Images"
+                }?.systemName ?: ""
+
+                isSetBaseFolderUser.value = true
+
+                ContextScreen.set(
+                    Screen.DASHBOARD_SCREEN,
+                    mapOf(
+                        "systemNameFolderUser_Videos" to systemNameFolderVideos,
+                        "systemNameFolderUser_Musics" to systemNameFolderMusics,
+                        "systemNameFolderUser_Documents" to systemNameFolderDocuments,
+                        "systemNameFolderUser_Images" to systemNameFolderImages
+                    )
+                )
+            }
         }
 
         /**
@@ -518,32 +548,6 @@ class Dashboard(var navigation: NavigationController) : ReactiveInjectionClass {
     }
 
 }
-
-/**
- * Text for user profile navigation element
- *
- * @param text The text to be displayed.
- */
-@Composable
-private fun TextInCardModalSheet(text: String) = Text(
-    text = text,
-    textAlign = TextAlign.Center,
-    fontWeight = FontWeight.Medium,
-    fontSize = 14.sp
-)
-
-/**
- * Header for profile settings section
- *
- * @param text The text to be displayed.
- */
-@Composable
-private fun TitleInSectionForCardsModalSheet(text: String): Unit = Text(
-    text = text,
-    modifier = Modifier.padding(4.dp, 0.dp),
-    color = Colors.TEXT.color,
-    fontWeight = FontWeight.Bold
-)
 
 /**
  * Renders a popup modal window to navigate to the screen state - user settings [Screen.PROFILE_SCREEN].

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsSwitchLastThroughDirectories
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsWalkingThroughDirectoriesFolderUserMain
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.SwitchPanelDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.float
@@ -47,7 +48,10 @@ internal fun RenderLeftContentDashboard(
                     isIcon = true,
                     iconPath = icon,
                     onClick = {
-                        println(folder)
+                        ActionsWalkingThroughDirectoriesFolderUserMain.call(
+                            scope = scope,
+                            folder
+                        )
                     }
                 )
             }
