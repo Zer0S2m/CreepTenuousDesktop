@@ -40,6 +40,7 @@ import kotlinx.coroutines.runBlocking
  * 6) [Dashboard.setTitleSwitchPanelDashboard]
  * 7) [ProfileUser.setAppliedScreenFromTransitionFromPast]
  * 8) [ProfileUser.setAppliedSectionFromTransitionFromPast]
+ * 9) [ProfileUser.ProfileGrantedRights.setUserProfileGrantedRightsFileObjects]
  */
 @Composable
 @Preview
@@ -78,7 +79,8 @@ fun App() {
                 ReactiveFileObject
             ),
             injectionClasses = listOf(
-                Dashboard::class
+                Dashboard::class,
+                ProfileUser.ProfileGrantedRights::class
             ),
             injectionIndependentClasses = listOf(
                 Dashboard::class,

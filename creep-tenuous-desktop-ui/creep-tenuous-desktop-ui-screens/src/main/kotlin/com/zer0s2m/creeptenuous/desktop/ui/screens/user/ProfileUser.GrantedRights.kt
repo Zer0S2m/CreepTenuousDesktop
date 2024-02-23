@@ -1,10 +1,26 @@
 package com.zer0s2m.creeptenuous.desktop.ui.screens.user
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
+import androidx.compose.material.Divider
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -17,10 +33,12 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.GrantedRightItem
 import com.zer0s2m.creeptenuous.desktop.common.dto.GrantedRightItemUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.TypeRight
-import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * Rendering part of the user profile screen [Screen.PROFILE_GRANTED_RIGHTS_SCREEN]
@@ -28,7 +46,10 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 @Composable
 @Suppress("UnusedReceiverParameter")
 fun ProfileUser.ProfileGrantedRights.render() {
-    val grantedRight: GrantedRight = ReactiveUser.GrantedRights.grantedRightsFileObjects
+    val scope: CoroutineScope = rememberCoroutineScope()
+    val grantedRight: MutableState<GrantedRight> = remember {
+        ProfileUser.ProfileGrantedRights.userProfileGrantedRightsFileObjects
+    }
 
     Column(
         modifier = Modifier
@@ -47,8 +68,8 @@ fun ProfileUser.ProfileGrantedRights.render() {
             verticalItemSpacing = 8.dp,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(grantedRight.rights.size) { index ->
-                ItemGrantedRight(item = grantedRight.rights[index])
+            items(grantedRight.value.rights.size) { index ->
+                CardGrantedRight(item = grantedRight.value.rights[index], scope = scope)
             }
         }
     }
@@ -71,8 +92,9 @@ private const val basePaddingElementRight: Int = 16
  * Basic grant card for interacting with file objects
  */
 @Composable
-private fun ItemGrantedRight(
-    item: GrantedRightItem
+private fun CardGrantedRight(
+    item: GrantedRightItem,
+    scope: CoroutineScope
 ) {
     val stateModal: MutableState<Boolean> = remember { mutableStateOf(false) }
     val maxCountTypeRights: MutableState<Int> = remember { mutableStateOf(0) }
@@ -95,7 +117,7 @@ private fun ItemGrantedRight(
                 item.rights.forEachIndexed { index, right ->
                     Column(
                         modifier = if (index == item.rights.size - 1) Modifier
-                                   else Modifier.padding(bottom = 6.dp)
+                        else Modifier.padding(bottom = 6.dp)
                     ) {
                         Text(
                             text = "User: ${right.user}",
@@ -147,12 +169,30 @@ private fun ItemGrantedRight(
         })
     }
 
+    // TODO: Increase the height of a popup when removing rights
+    // TODO: Place it in a separate component
     PopupDeleteRight(
         stateModal = stateModal,
         height = 148 + maxCountTypeRights.value * baseHeightPopupItemDeleteRight,
         width = if (item.rights.size == 1) maxCountRights.value * baseWidthElementRight + 32
-                else (maxCountRights.value * baseWidthElementRight + 32)
-                     + ((item.rights.size - 1) * basePaddingElementRight)
+        else (maxCountRights.value * baseWidthElementRight + 32)
+                + ((item.rights.size - 1) * basePaddingElementRight),
+        onClickDelete = { selectedDeleteRights ->
+            stateModal.value = false
+
+            if (selectedDeleteRights.isNotEmpty()) {
+                scope.launch {
+                    ReactiveLoader.executionIndependentTrigger(
+                        nameProperty = "grantedRightsFileObjects",
+                        event = "deleteUserGrantedRight",
+                        selectedDeleteRights.values,
+                        item.systemName
+                    )
+                    ReactiveLoader.resetIsLoad(nameProperty = "grantedRightsFileObjects")
+                    ReactiveLoader.load(nameProperty = "grantedRightsFileObjects")
+                }
+            }
+        }
     )
 }
 
@@ -167,8 +207,11 @@ private fun ItemGrantedRight(
 private fun PopupDeleteRight(
     stateModal: MutableState<Boolean>,
     height: Int,
-    width: Int
+    width: Int,
+    onClickDelete: (selectedDeleteRights: Map<String, GrantedRightItemUser>) -> Unit
 ) {
+    val selectedDeleteRights: MutableMap<String, GrantedRightItemUser> = mutableMapOf()
+
     ModalPopup(
         stateModal = stateModal,
         modifierLayout = Modifier
@@ -197,7 +240,43 @@ private fun PopupDeleteRight(
                             text = block.user
                         )
                         block.rights.forEach { typeRight ->
-                            ItemDeleteRight(typeRight)
+                            ItemDeleteRight(
+                                typeRight = typeRight,
+                                onCheckedChange = { typeRightChecked: TypeRight, checkedState: Boolean ->
+                                    if (!selectedDeleteRights.containsKey(block.user) && checkedState) {
+                                        selectedDeleteRights[block.user] = GrantedRightItemUser(
+                                            user = block.user,
+                                            rights = mutableListOf(typeRightChecked)
+                                        )
+                                    } else if (selectedDeleteRights.containsKey(block.user) && checkedState) {
+                                        val rights: MutableList<TypeRight> = mutableListOf()
+                                        rights.addAll(selectedDeleteRights[block.user]!!.rights)
+                                        rights.add(typeRightChecked)
+
+                                        selectedDeleteRights[block.user] = GrantedRightItemUser(
+                                            user = block.user,
+                                            rights = rights
+                                        )
+                                    } else if (selectedDeleteRights.containsKey(block.user) && !checkedState) {
+                                        var rights: MutableList<TypeRight> = mutableListOf()
+                                        rights.addAll(selectedDeleteRights[block.user]!!.rights)
+
+                                        rights = rights
+                                            .stream()
+                                            .filter { it != typeRightChecked }
+                                            .toList()
+
+                                        if (rights.isEmpty()) {
+                                            selectedDeleteRights.remove(block.user)
+                                        } else {
+                                            selectedDeleteRights[block.user] = GrantedRightItemUser(
+                                                user = block.user,
+                                                rights = rights
+                                            )
+                                        }
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -208,7 +287,10 @@ private fun PopupDeleteRight(
                 .fillMaxWidth()
                 .pointerHoverIcon(PointerIcon.Hand)
                 .padding(top = 8.dp),
-            onClick = {}
+            onClick = {
+                onClickDelete(selectedDeleteRights.toMap())
+                selectedDeleteRights.clear()
+            }
         ) {
             Text("Delete")
         }
@@ -221,7 +303,10 @@ private fun PopupDeleteRight(
  * @param typeRight Type of right to delete
  */
 @Composable
-private fun ItemDeleteRight(typeRight: TypeRight) {
+private fun ItemDeleteRight(
+    typeRight: TypeRight,
+    onCheckedChange: (typeRight: TypeRight, checkedState: Boolean) -> Unit
+) {
     val checkedState: MutableState<Boolean> = remember { mutableStateOf(false) }
 
     Surface(
@@ -244,7 +329,10 @@ private fun ItemDeleteRight(typeRight: TypeRight) {
                 checked = checkedState.value,
                 modifier = Modifier
                     .pointerHoverIcon(PointerIcon.Hand),
-                onCheckedChange = { checkedState.value = it }
+                onCheckedChange = {
+                    checkedState.value = it
+                    onCheckedChange(typeRight, checkedState.value)
+                }
             )
         }
     }

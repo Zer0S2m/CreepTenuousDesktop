@@ -14,6 +14,7 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.Lazy
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Node
 import com.zer0s2m.creeptenuous.desktop.core.reactive.NodeType
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveIndependentTrigger
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazyObject
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveTrigger
@@ -35,6 +36,7 @@ import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCat
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorAdd
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorRemove
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorSet
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserGrantedRightDelete
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserSettingsSetIsDeleteFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserSettingsSetTransferUser
 
@@ -165,7 +167,16 @@ object ReactiveUser : ReactiveLazyObject {
          */
         @Lazy<GrantedRight>(
             event = "Go to the user profile in the section - Viewing granted rights",
-            handler = HandlerReactiveUserGrantedRights::class
+            handler = HandlerReactiveUserGrantedRights::class,
+            independentTriggers = [
+                ReactiveIndependentTrigger(
+                    event = "deleteUserGrantedRight",
+                    trigger = ReactiveTriggerUserGrantedRightDelete::class
+                )
+            ],
+            injection = ReactiveInjection(
+                method = "setUserProfileGrantedRightsFileObjects"
+            ),
         )
         var grantedRightsFileObjects: GrantedRight = GrantedRight()
 

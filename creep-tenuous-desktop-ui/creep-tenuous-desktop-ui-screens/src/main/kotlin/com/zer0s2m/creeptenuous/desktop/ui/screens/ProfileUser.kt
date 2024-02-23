@@ -32,6 +32,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.zer0s2m.creeptenuous.desktop.common.dto.GrantedRight
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.SectionsProfileUser
@@ -39,6 +40,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.context.BaseContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveIndependentInjection
+import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjectionClass
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
@@ -238,7 +240,21 @@ class ProfileUser(var navigation: NavigationController) : ReactiveInjectionClass
     /**
      * [Screen.PROFILE_GRANTED_RIGHTS_SCREEN]
      */
-    class ProfileGrantedRights
+    class ProfileGrantedRights : ReactiveInjectionClass {
+
+        companion object {
+
+            internal val userProfileGrantedRightsFileObjects: MutableState<GrantedRight> =
+                mutableStateOf(GrantedRight())
+
+            @ReactiveInjection
+            internal fun setUserProfileGrantedRightsFileObjects(grantedRight: GrantedRight) {
+                userProfileGrantedRightsFileObjects.value = grantedRight
+            }
+
+        }
+
+    }
 
     /**
      * [Screen.PROFILE_LIST_USERS_SCREEN]
