@@ -3,10 +3,10 @@ package com.zer0s2m.creeptenuous.desktop.reactive.models
 import com.zer0s2m.creeptenuous.desktop.common.dto.User
 import com.zer0s2m.creeptenuous.desktop.core.reactive.*
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveCommonUsers
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.common.ReactiveTriggerReactiveSystemUserBlockCompletely
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.common.ReactiveTriggerReactiveSystemUserBlockTemporary
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.common.ReactiveTriggerReactiveSystemUserRemove
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.common.ReactiveTriggerReactiveSystemUserUnblock
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveSystemUserBlockCompletely
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveSystemUserBlockTemporary
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveSystemUserRemove
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveSystemUserUnblock
 
 /**
  * General data of reactive behavior of the system

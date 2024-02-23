@@ -4,11 +4,25 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.InfoFileObject
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
-import com.zer0s2m.creeptenuous.desktop.core.reactive.*
+import com.zer0s2m.creeptenuous.desktop.core.reactive.Lazy
+import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveIndependentTrigger
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazyObject
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveSendIsLoad
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveTrigger
+import com.zer0s2m.creeptenuous.desktop.core.reactive.mutableReactiveListOf
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveCommentsFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveFileObjectManagerFileSystemObjects
 import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveInfoFileObject
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.io.*
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectCreateCommentFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectCreateDirectory
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectDeleteFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectEditCommentFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectRemoveCommentFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectRenameFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectSetCategoryInFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectSetColorInFileObject
 
 /**
  * Reactive file object data model

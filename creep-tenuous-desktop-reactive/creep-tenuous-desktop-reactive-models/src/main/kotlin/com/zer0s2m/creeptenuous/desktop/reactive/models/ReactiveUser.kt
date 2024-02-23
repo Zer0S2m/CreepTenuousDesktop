@@ -1,13 +1,42 @@
 package com.zer0s2m.creeptenuous.desktop.reactive.models
 
-import com.zer0s2m.creeptenuous.desktop.common.dto.*
+import com.zer0s2m.creeptenuous.desktop.common.dto.ConfigState
+import com.zer0s2m.creeptenuous.desktop.common.dto.GrantedRight
+import com.zer0s2m.creeptenuous.desktop.common.dto.IssuedRights
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserCategory
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserColor
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserProfileSettings
+import com.zer0s2m.creeptenuous.desktop.common.dto.UserSettingsFileObjectDistribution
 import com.zer0s2m.creeptenuous.desktop.core.injection.ReactiveInjection
 import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipeline
 import com.zer0s2m.creeptenuous.desktop.core.pipeline.ReactivePipelineType
-import com.zer0s2m.creeptenuous.desktop.core.reactive.*
-import com.zer0s2m.creeptenuous.desktop.reactive.handlers.*
-import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.*
-import com.zer0s2m.creeptenuous.desktop.reactive.triggers.user.*
+import com.zer0s2m.creeptenuous.desktop.core.reactive.Lazy
+import com.zer0s2m.creeptenuous.desktop.core.reactive.Node
+import com.zer0s2m.creeptenuous.desktop.core.reactive.NodeType
+import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazyObject
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveTrigger
+import com.zer0s2m.creeptenuous.desktop.core.reactive.mutableReactiveListOf
+import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveUserAssignedRights
+import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveUserColor
+import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveUserCustomCategories
+import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveUserGrantedRights
+import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerReactiveUserProfileSettings
+import com.zer0s2m.creeptenuous.desktop.reactive.handlers.HandlerUserSettingsFileObjectDistribution
+import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserCategoryCleanInFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserColorCleanInFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerDeleteUserColorCleanInUserCategory
+import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerUpdateUserColorSetNewColorInFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.pipelines.ReactivePipelineHandlerUpdateUserColorSetNewColorInUserCategory
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategoryAdd
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategoryRemove
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategorySet
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorAdd
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorRemove
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserColorSet
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserSettingsSetIsDeleteFileObject
+import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserSettingsSetTransferUser
 
 /**
  * `Reactive` behavior user model
