@@ -18,12 +18,12 @@ import com.zer0s2m.creeptenuous.desktop.navigation.runtime.rememberNavigationCon
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
-import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenDashboard
-import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenLoginUser
-import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenProfileUser
-import com.zer0s2m.creeptenuous.desktop.ui.navigation.graphs.CollectScreenSettingsSystem
+import com.zer0s2m.creeptenuous.desktop.ui.screens.graphs.CollectScreenDashboard
+import com.zer0s2m.creeptenuous.desktop.ui.screens.graphs.CollectScreenLoginUser
+import com.zer0s2m.creeptenuous.desktop.ui.screens.graphs.CollectScreenProfileUser
+import com.zer0s2m.creeptenuous.desktop.ui.screens.graphs.CollectScreenSettingsSystem
 import com.zer0s2m.creeptenuous.desktop.ui.screens.Dashboard
-import com.zer0s2m.creeptenuous.desktop.ui.theme.darkColors
+import com.zer0s2m.creeptenuous.desktop.ui.screens.theme.darkColors
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 

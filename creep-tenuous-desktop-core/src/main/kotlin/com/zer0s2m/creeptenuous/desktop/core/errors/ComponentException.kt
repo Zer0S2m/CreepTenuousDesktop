@@ -1,8 +1,8 @@
 package com.zer0s2m.creeptenuous.desktop.core.errors
 
 /**
- * Exceptions for Building Components
+ * Exception for interaction with system components.
  *
- * @param message Error message
+ * @param message Error message.
  */
-class ComponentException(message: String) : Exception(message)
+abstract class ComponentException(message: String) : Exception(message)
