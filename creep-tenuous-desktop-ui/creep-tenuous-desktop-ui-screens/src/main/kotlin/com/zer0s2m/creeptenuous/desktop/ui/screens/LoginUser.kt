@@ -27,13 +27,13 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.zer0s2m.creeptenuous.desktop.common.dto.LoginUserModel
+import com.zer0s2m.creeptenuous.desktop.common.data.DataLoginUser
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
-import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
 import com.zer0s2m.creeptenuous.desktop.ui.components.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.FormState
+import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.dp
 import kotlinx.coroutines.launch
 
@@ -97,7 +97,7 @@ class LoginUser {
                             }
                         } else {
                             val data = stateForm.getData()
-                            val dataClass = LoginUserModel(
+                            val dataClass = DataLoginUser(
                                 data["login"].toString(),
                                 data["password"].toString()
                             )

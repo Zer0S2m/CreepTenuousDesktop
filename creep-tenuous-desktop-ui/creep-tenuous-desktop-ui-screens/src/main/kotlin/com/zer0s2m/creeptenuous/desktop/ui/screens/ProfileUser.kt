@@ -118,7 +118,7 @@ class ProfileUser(var navigation: NavigationController) : ReactiveInjectionClass
         }
 
         /**
-         * Transition to a new screen state of a non-child parent screen [Screen.PROFILE_SCREEN.childs]
+         * Transition to a new screen state of a non-child parent screen.
          */
         internal val isFromPastScreen: MutableState<Boolean> = mutableStateOf(true)
 

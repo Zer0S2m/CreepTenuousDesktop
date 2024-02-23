@@ -60,22 +60,4 @@ enum class Screen {
      */
     PROFILE_LIST_USERS_SCREEN;
 
-    /**
-     * List of child elements of parent
-     */
-    val childs: Set<Screen>
-        get() = when (this) {
-            PROFILE_SCREEN -> setOf(
-                PROFILE_CATEGORY_SCREEN,
-                PROFILE_GRANTED_RIGHTS_SCREEN,
-                PROFILE_USER_MANAGEMENT_SCREEN,
-                PROFILE_FILE_OBJECT_DISTRIBUTION,
-                PROFILE_COLORS_SCREEN,
-                PROFILE_SETTINGS_SCREEN,
-                PROFILE_LIST_USERS_SCREEN
-            )
-
-            else -> { setOf() }
-        }
-
 }

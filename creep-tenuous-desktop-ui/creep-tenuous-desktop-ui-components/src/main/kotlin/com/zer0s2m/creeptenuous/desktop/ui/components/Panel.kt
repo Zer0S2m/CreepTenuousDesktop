@@ -21,14 +21,6 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.float
 
 /**
- * Optional Modifier for this [Icon].
- */
-private val baseModifierIcon: Modifier = Modifier
-    .padding(0.dp)
-    .width(28.dp)
-    .height(28.dp)
-
-/**
  * Autonomous component - directory tree state switch.
  *
  * @param title The text to be displayed.
@@ -56,7 +48,7 @@ fun SwitchPanelDashboard(
             modifier = Modifier
                 .padding(end = 8.dp)
                 .pointerHoverIcon(icon = PointerIcon.Hand),
-            modifierIcon = baseModifierIcon
+            modifierIcon = CommonPanel.baseModifierIcon
         )
 
         Text(
@@ -69,7 +61,19 @@ fun SwitchPanelDashboard(
             modifier = Modifier
                 .padding(end = 8.dp)
                 .pointerHoverIcon(icon = PointerIcon.Hand),
-            modifierIcon = baseModifierIcon
+            modifierIcon = CommonPanel.baseModifierIcon
         )
     }
+}
+
+private object CommonPanel {
+
+    /**
+     * Optional Modifier for this [Icon].
+     */
+    val baseModifierIcon: Modifier = Modifier
+        .padding(0.dp)
+        .width(28.dp)
+        .height(28.dp)
+
 }

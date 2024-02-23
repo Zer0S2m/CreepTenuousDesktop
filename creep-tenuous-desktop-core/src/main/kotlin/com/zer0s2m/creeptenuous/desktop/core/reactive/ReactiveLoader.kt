@@ -15,7 +15,6 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.backend.Ktor
 import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveIndependentTrigger
 import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
 import org.slf4j.Logger
-import java.lang.reflect.Field
 import kotlin.reflect.KClass
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.companionObject
@@ -44,43 +43,6 @@ private val mapNodes: MutableMap<String, MutableCollection<ReactiveLazyNode>> = 
 private val mapPipelines: MutableMap<String, InfoPipeline> = mutableMapOf()
 
 private val mapInjectionIndependent: MutableMap<KClass<out ReactiveInjectionClass>, Collection<String>> = mutableMapOf()
-
-/**
- * A class that stores information about a reactive or lazy object
- */
-internal data class ReactiveLazy(
-
-    val isLazy: Boolean,
-
-    val isReactive: Boolean,
-
-    val priority: Int = 1,
-
-    val field: Field,
-
-    val reactiveLazyObject: ReactiveLazyObject,
-
-    val handler: KClass<out ReactiveHandler<Any>>,
-
-    val handlerAfter: KClass<out ReactiveHandlerAfter>,
-
-    val triggers: MutableMap<String, KClass<out BaseReactiveTrigger<Any>>> = mutableMapOf(),
-
-    val independentTriggers: MutableMap<String, KClass<out BaseReactiveIndependentTrigger>> = mutableMapOf(),
-
-    val injectionClass: KClass<out ReactiveInjectionClass>? = null,
-
-    val injectionMethod: String = "",
-
-    var isLoad: Boolean = false,
-
-    var sendIsLoad: Boolean,
-
-    val sendIsLoadInjectionClass: KClass<out ReactiveInjectionClass>? = null,
-
-    val sendIsLoadInjectionMethod: String = ""
-
-)
 
 /**
  * The main class for storing information about the [Node]
@@ -511,14 +473,30 @@ object ReactiveLoader {
         return pipelines
     }
 
+    /**
+     * Get reactive bootloader locked.
+     *
+     * @return Is blocked.
+     */
     fun getIsBlockLoad(): Boolean {
         return isBlockLoad
     }
 
+    /**
+     * Determine whether the reactive bootloader is private.
+     *
+     * @param isBlockLoad Is blocked.
+     */
     fun setIsBlockLoad(isBlockLoad: Boolean) {
         this.isBlockLoad = isBlockLoad
     }
 
+    /**
+     * Run independent injection settings based on the method name and argument type.
+     *
+     * @param method The name of the method where the injection will be applied.
+     * @param value Embedded data.
+     */
     fun runReactiveIndependentInjection(method: String, value: Any) {
         mapInjectionIndependent.forEach { (kClass: KClass<out ReactiveInjectionClass>, methods: Collection<String>) ->
             if (methods.contains(method)) {

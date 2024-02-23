@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -71,34 +72,6 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.animations.setHoverInCard
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Colors
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
-/**
- * Text used by accessibility services to describe what this image represents
- */
-private val contentDescriptionIconBaseFolderUser: String get() = "Icon displayed meaning directory"
-
-/**
- * Text used by accessibility services to describe what this image represents
- */
-@get:ReadOnlyComposable
-private val contentDescriptionUnblock: String get() = "User unlock icon"
-
-/**
- * Date format for file object comment.
- */
-@get:ReadOnlyComposable
-private val dateFormatForComment: DateTimeFormatter
-    get() =
-        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
-
-/**
- * optional [Modifier] for this [Icon].
- */
-@Stable
-private val baseModifierIcon: Modifier
-    get() = Modifier
-        .size(24.dp)
-        .pointerHoverIcon(icon = PointerIcon.Hand)
 
 /**
  * Autonomous component - a card for navigating through the user profile.
@@ -214,7 +187,7 @@ fun CardPanelBaseFolderUser(
                     iconPath?.let { painterResource(resourcePath = it) }?.let {
                         Image(
                             painter = it,
-                            contentDescription = contentDescriptionIconBaseFolderUser,
+                            contentDescription = CommonCard.contentDescriptionIconBaseFolderUser,
                             modifier = Modifier
                                 .height(24.dp)
                                 .width(24.dp)
@@ -399,14 +372,14 @@ fun CardUserControl(
                 TooltipAreaMain(text = "User blocking") {
                     IconButtonBlock(
                         onClick = actionBlock,
-                        modifierIcon = baseModifierIcon
+                        modifierIcon = CommonCard.baseModifierIcon
                     )
                 }
             } else {
                 TooltipAreaMain(text = "User unblocking") {
                     IconButtonUnblock(
                         onClick = actionUnblock,
-                        modifierIcon = baseModifierIcon
+                        modifierIcon = CommonCard.baseModifierIcon
                     )
                 }
             }
@@ -414,7 +387,7 @@ fun CardUserControl(
             TooltipAreaMain(text = "Deleting a user") {
                 IconButtonRemove(
                     onClick = { actionDelete(loginUser) },
-                    contentDescription = contentDescriptionUnblock,
+                    contentDescription = CommonCard.contentDescriptionUnblock,
                 )
             }
         }
@@ -879,6 +852,19 @@ class CartFileObject(
                 }
             )
             DropdownMenuItemAdvanced(
+                text = "Comments",
+                colorText = Color.Black,
+                modifier = modifierMenu,
+                onClick = {
+                    expandedMenu.value = false
+                    actionComments()
+                }
+            )
+            Divider(modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+                .background(color = Color.Gray))
+            DropdownMenuItemAdvanced(
                 text = "Download",
                 colorText = Color.Black,
                 modifier = modifierMenu,
@@ -923,15 +909,10 @@ class CartFileObject(
                     actionDelete()
                 }
             )
-            DropdownMenuItemAdvanced(
-                text = "Comments",
-                colorText = Color.Black,
-                modifier = modifierMenu,
-                onClick = {
-                    expandedMenu.value = false
-                    actionComments()
-                }
-            )
+            Divider(modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+                .background(color = Color.Gray))
             DropdownMenuItemAdvanced(
                 text = "Set category",
                 colorText = Color.Black,
@@ -954,5 +935,37 @@ class CartFileObject(
             }
         }
     }
+
+}
+
+private object CommonCard {
+
+    /**
+     * Text used by accessibility services to describe what this image represents
+     */
+    val contentDescriptionIconBaseFolderUser: String get() = "Icon displayed meaning directory"
+
+    /**
+     * Text used by accessibility services to describe what this image represents
+     */
+    @get:ReadOnlyComposable
+    val contentDescriptionUnblock: String get() = "User unlock icon"
+
+    /**
+     * Date format for file object comment.
+     */
+    @get:ReadOnlyComposable
+    val dateFormatForComment: DateTimeFormatter
+        get() =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+
+    /**
+     * optional [Modifier] for this [Icon].
+     */
+    @Stable
+    val baseModifierIcon: Modifier
+        get() = Modifier
+            .size(24.dp)
+            .pointerHoverIcon(icon = PointerIcon.Hand)
 
 }

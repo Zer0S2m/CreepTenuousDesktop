@@ -48,7 +48,6 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonRemove
 import com.zer0s2m.creeptenuous.desktop.ui.components.InputSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
-import com.zer0s2m.creeptenuous.desktop.ui.components.DropdownMenuSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 import kotlinx.coroutines.launch
 
@@ -328,9 +327,12 @@ private fun SelectColorForCategory(stateUserCategory: MutableState<UserCategory>
     }
 
     InputSelectColor(
+        expandedStateDropdown = expandedState,
+        modifierDropdownMenu = Modifier
+            .width(baseWidthColumnSelectColor),
         isSetColor = isSetColor,
         currentColor = currentColor,
-        actionDelete = {
+        onClickDelete = {
             stateUserCategory.value = UserCategory(
                 id = stateUserCategory.value.id,
                 color = null,
@@ -340,15 +342,10 @@ private fun SelectColorForCategory(stateUserCategory: MutableState<UserCategory>
             isSetColor.value = false
             newColorForCategory.value = null
         },
-        action = {
+        onClick = {
             expandedState.value = true
-        }
-    )
-    DropdownMenuSelectColor(
-        expandedState = expandedState,
-        modifier = Modifier
-            .width(baseWidthColumnSelectColor),
-        action = { colorStr, color, _ ->
+        },
+        onClickDropdownMenuItem = { colorStr: String, color: Color, _: Int? ->
             expandedState.value = false
             currentColor.value = color
             isSetColor.value = true

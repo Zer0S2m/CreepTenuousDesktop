@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -35,20 +36,16 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.zer0s2m.creeptenuous.desktop.common.dto.ConverterColor
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
+import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
-
-/**
- * Width of category selection area from list
- */
-@get:ReadOnlyComposable
-private val baseWidthColumnSelectItem: Dp get() = 328.dp
 
 /**
  * Component for rendering a component that will subsequently call a drop-down list.
  *
  * @param isDelete Whether to show the delete object button.
- * @param actionDelete The lambda to be invoked when this icon is pressed.
+ * @param onClickDelete The lambda to be invoked when this icon is pressed.
  * @param onClick Configure component to receive clicks.
  * @param content Content layout.
  */
@@ -56,7 +53,7 @@ private val baseWidthColumnSelectItem: Dp get() = 328.dp
 @OptIn(ExperimentalFoundationApi::class)
 fun InputSelect(
     isDelete: Boolean = true,
-    actionDelete: () -> Unit = {},
+    onClickDelete: () -> Unit = {},
     onClick: () -> Unit,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -82,7 +79,7 @@ fun InputSelect(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (isDelete) {
-                    IconButtonRemove(onClick = actionDelete)
+                    IconButtonRemove(onClick = onClickDelete)
                     Spacer(modifier = Modifier.width(8.dp))
                 }
                 Icon(
@@ -100,38 +97,94 @@ fun InputSelect(
 /**
  * The component responsible for displaying the selected color palette from the component [DropdownMenuSelectColor].
  *
+ * @param modifierDropdownMenu [Modifier] to be applied to the menu's content.
+ * @param expandedStateDropdown Whether the menu is expanded or not.
  * @param isSetColor Status: Is any color palette installed.
  * @param currentColor Current set color.
- * @param isDelete Whether to show the delete object button.
- * @param action Configure component to receive clicks [Row].
- * @param actionDelete Configure component to receive clicks [Icon] (action delete).
+ * @param onClick Configure component to receive clicks [Row].
+ * @param onClickDelete Configure component to receive clicks [Icon] (action delete).
+ * @param onClickDropdownMenuItem Configure component to receive clicks [Row].
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InputSelectColor(
+    modifierDropdownMenu: Modifier = Modifier,
+    expandedStateDropdown: MutableState<Boolean>,
     isSetColor: MutableState<Boolean>,
     currentColor: MutableState<Color?>,
-    isDelete: Boolean = true,
-    action: () -> Unit,
-    actionDelete: () -> Unit = {}
+    onClick: () -> Unit,
+    onClickDelete: () -> Unit = {},
+    onClickDropdownMenuItem: (colorStr: String, color: Color, colorId: Int?) -> Unit
 ) {
-    InputSelect(
-        onClick = action,
-        isDelete = isDelete,
-        actionDelete = actionDelete
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .onClick {
+               onClick()
+            }
+            .border(0.5.dp, MaterialTheme.colors.secondary, RoundedCornerShape(4.dp))
+            .pointerHoverIcon(PointerIcon.Hand)
     ) {
-        if (!isSetColor.value) {
-            Text(
-                text = "Color...",
-                color = Color(255, 255, 255, 160),
+        Row(
+            modifier = Modifier
+                .pointerHoverIcon(PointerIcon.Hand)
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            if (!isSetColor.value) {
+                Text(
+                    text = "Color...",
+                    color = Color(255, 255, 255, 160),
+                )
+            } else {
+                val baseModifier = Modifier
+                    .width(120.dp)
+                    .height(24.dp)
+                Box(
+                    modifier = if (currentColor.value == null) baseModifier
+                    else baseModifier.background(currentColor.value!!, RoundedCornerShape(4.dp))
+                )
+            }
+
+            LayoutDeleteAndOpenInputSelect(
+                actionDelete = onClickDelete
             )
-        } else {
-            val baseModifier = Modifier
-                .width(120.dp)
-                .height(24.dp)
-            Box(
-                modifier = if (currentColor.value == null) baseModifier
-                else baseModifier.background(currentColor.value!!, RoundedCornerShape(4.dp))
-            )
+        }
+
+        DropdownMenu(
+            expanded = expandedStateDropdown.value,
+            onDismissRequest = {
+                expandedStateDropdown.value = false
+            },
+            modifier = modifierDropdownMenu
+        ) {
+            ReactiveUser.userColors.forEach {
+                val convertedColor: ConverterColor = colorConvertHexToRgb(it.color)
+                val color = Color(
+                    red = convertedColor.red,
+                    green = convertedColor.green,
+                    blue = convertedColor.blue
+                )
+
+                DropdownMenuItem(
+                    onClick = {
+                        onClickDropdownMenuItem(it.color, color, it.id)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .pointerHoverIcon(PointerIcon.Hand),
+                    contentPadding = PaddingValues(12.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color, RoundedCornerShape(4.dp))
+                            .padding(16.dp)
+                    )
+                }
+            }
         }
     }
 }
@@ -193,7 +246,7 @@ fun InputSelectCategory(
             onDismissRequest = {
                 expandedState.value = false
             },
-            modifier = Modifier.width(baseWidthColumnSelectItem)
+            modifier = Modifier.width(CommonInput.baseWidthColumnSelectItem)
         ) {
             ReactiveUser.customCategories.forEach {
                 DropdownMenuItem(
@@ -211,4 +264,14 @@ fun InputSelectCategory(
             }
         }
     }
+}
+
+private object CommonInput {
+
+    /**
+     * Width of category selection area from list
+     */
+    @get:ReadOnlyComposable
+    val baseWidthColumnSelectItem: Dp get() = 328.dp
+
 }

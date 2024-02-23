@@ -61,7 +61,6 @@ import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.BaseFormState
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardCommentForFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.DropdownMenuSelectColor
 import com.zer0s2m.creeptenuous.desktop.ui.components.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.FormState
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
@@ -225,22 +224,20 @@ internal fun PopupSetUserColorInFileObject(
         Spacer(modifier = Modifier.height(20.dp))
         Column {
             InputSelectColor(
+                modifierDropdownMenu = Modifier.width(baseWidthColumnSelectItem),
+                expandedStateDropdown = expandedStateDropDownMenu,
                 isSetColor = isSetColor,
                 currentColor = currentColor,
-                action = {
+                onClick = {
                     expandedStateDropDownMenu.value = true
                 },
-                actionDelete = {
+                onClickDelete = {
                     currentColor.value = null
                     isSetColor.value = false
                     ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorEditFileObject", null)
                     ContextScreen.set(Screen.DASHBOARD_SCREEN, "colorIdEditFileObject", null)
-                }
-            )
-            DropdownMenuSelectColor(
-                expandedState = expandedStateDropDownMenu,
-                modifier = Modifier.width(baseWidthColumnSelectItem),
-                action = { colorStr, color, colorId ->
+                },
+                onClickDropdownMenuItem = { colorStr: String, color: Color, colorId: Int? ->
                     expandedStateDropDownMenu.value = false
                     currentColor.value = color
                     isSetColor.value = true
@@ -362,22 +359,20 @@ internal fun PopupCreateFileObjectTypeDirectory(
         Spacer(modifier = Modifier.padding(top = 16.dp))
         Column {
             InputSelectColor(
+                modifierDropdownMenu = Modifier.width(baseWidthColumnSelectItem),
+                expandedStateDropdown = expandedStateSelectColor,
                 isSetColor = isSetColor,
                 currentColor = currentColor,
-                action = {
+                onClick = {
                     expandedStateSelectColor.value = true
                 },
-                actionDelete = {
+                onClickDelete = {
                     isSetColor.value = false
                     currentColor.value = Color(0, 0, 0)
                     colorStrState.value = null
                     colorIdState.value = null
-                }
-            )
-            DropdownMenuSelectColor(
-                expandedState = expandedStateSelectColor,
-                modifier = Modifier.width(baseWidthColumnSelectItem),
-                action = { colorStr, color, colorId ->
+                },
+                onClickDropdownMenuItem = { colorStr: String, color: Color, colorId: Int? ->
                     expandedStateSelectColor.value = false
                     isSetColor.value = true
                     currentColor.value = color

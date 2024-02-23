@@ -17,7 +17,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -75,18 +74,6 @@ fun ProfileUser.ProfileGrantedRights.render() {
     }
 
 }
-
-/**
- * Selected right for later deletion
- */
-@Stable
-private var contextSelectDeleteRight: MutableList<GrantedRightItemUser> = mutableListOf()
-
-private const val baseHeightPopupItemDeleteRight: Int = 50
-
-private const val baseWidthElementRight: Int = 180
-
-private const val basePaddingElementRight: Int = 16
 
 /**
  * Basic grant card for interacting with file objects
@@ -151,8 +138,8 @@ private fun CardGrantedRight(
 
         IconButtonRemove(onClick = {
             stateModal.value = true
-            contextSelectDeleteRight.clear()
-            contextSelectDeleteRight.addAll(item.rights)
+            CommonProfileGrantedRights.contextSelectDeleteRight.clear()
+            CommonProfileGrantedRights.contextSelectDeleteRight.addAll(item.rights)
 
             // Looks for max size type rights to set max height and width for modal window
             item.rights.forEach {
@@ -173,10 +160,10 @@ private fun CardGrantedRight(
     // TODO: Place it in a separate component
     PopupDeleteRight(
         stateModal = stateModal,
-        height = 148 + maxCountTypeRights.value * baseHeightPopupItemDeleteRight,
-        width = if (item.rights.size == 1) maxCountRights.value * baseWidthElementRight + 32
-        else (maxCountRights.value * baseWidthElementRight + 32)
-                + ((item.rights.size - 1) * basePaddingElementRight),
+        height = 148 + maxCountTypeRights.value * CommonProfileGrantedRights.baseHeightPopupItemDeleteRight,
+        width = if (item.rights.size == 1) maxCountRights.value * CommonProfileGrantedRights.baseWidthElementRight + 32
+        else (maxCountRights.value * CommonProfileGrantedRights.baseWidthElementRight + 32)
+                + ((item.rights.size - 1) * CommonProfileGrantedRights.basePaddingElementRight),
         onClickDelete = { selectedDeleteRights ->
             stateModal.value = false
 
@@ -232,9 +219,9 @@ private fun PopupDeleteRight(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                contextSelectDeleteRight.forEach { block ->
+                CommonProfileGrantedRights.contextSelectDeleteRight.forEach { block ->
                     Column(
-                        modifier = Modifier.width(baseWidthElementRight.dp)
+                        modifier = Modifier.width(CommonProfileGrantedRights.baseWidthElementRight.dp)
                     ) {
                         Text(
                             text = block.user
@@ -316,7 +303,7 @@ private fun ItemDeleteRight(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(baseHeightPopupItemDeleteRight.dp),
+                .height(CommonProfileGrantedRights.baseHeightPopupItemDeleteRight.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -338,4 +325,19 @@ private fun ItemDeleteRight(
     }
 
     Divider(thickness = 1.dp)
+}
+
+private object CommonProfileGrantedRights {
+
+    /**
+     * Selected right for later deletion
+     */
+    var contextSelectDeleteRight: MutableList<GrantedRightItemUser> = mutableListOf()
+
+    const val baseHeightPopupItemDeleteRight: Int = 50
+
+    const val baseWidthElementRight: Int = 180
+
+    const val basePaddingElementRight: Int = 16
+
 }
