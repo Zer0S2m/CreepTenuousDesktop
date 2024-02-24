@@ -6,7 +6,7 @@ import com.zer0s2m.creeptenuous.desktop.core.actions.Action
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import kotlinx.coroutines.CoroutineScope
 
-object ActionsWalkingThroughDirectoriesFolderUserMain : Action {
+object ActionWalkingThroughDirectoriesFolderUserMain : Action {
 
     /**
      * Call action.
@@ -69,7 +69,7 @@ object ActionsWalkingThroughDirectoriesFolderUserMain : Action {
                 )
             )
 
-            ActionsWalkingThroughDirectories.call(
+            ActionWalkingThroughDirectories.call(
                 scope = scope,
                 FileObject(
                     realName = realName!!,

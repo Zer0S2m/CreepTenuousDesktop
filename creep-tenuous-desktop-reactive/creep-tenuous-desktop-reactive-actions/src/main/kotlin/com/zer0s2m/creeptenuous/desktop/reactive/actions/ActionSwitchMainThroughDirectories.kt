@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 /**
  * Action to traverse the directory tree to the home page.
  */
-object ActionsSwitchMainThroughDirectories : Action {
+object ActionSwitchMainThroughDirectories : Action {
 
     /**
      * Call action.

@@ -27,22 +27,29 @@ import kotlin.reflect.full.functions
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 
-/**
- * The main storage of values that will be loaded or will be loaded
- */
-internal val mapReactiveLazyObjects: MutableMap<String, ReactiveLazy> = mutableMapOf()
+private object ReactiveLoaderStorage {
 
-/**
- * Core node storage for reactive and lazy properties
- */
-private val mapNodes: MutableMap<String, MutableCollection<ReactiveLazyNode>> = mutableMapOf()
+    /**
+     * The main storage of values that will be loaded or will be loaded
+     */
+    val mapReactiveLazyObjects: MutableMap<String, ReactiveLazy> = mutableMapOf()
 
-/**
- * Reactive pipelines map/
- */
-private val mapPipelines: MutableMap<String, InfoPipeline> = mutableMapOf()
+    /**
+     * Core node storage for reactive and lazy properties
+     */
+    val mapNodes: MutableMap<String, MutableCollection<ReactiveLazyNode>> = mutableMapOf()
 
-private val mapInjectionIndependent: MutableMap<KClass<out ReactiveInjectionClass>, Collection<String>> = mutableMapOf()
+    /**
+     * Reactive pipelines map.
+     */
+    val mapPipelines: MutableMap<String, InfoPipeline> = mutableMapOf()
+
+    /**
+     * Independent objects for managing injection into classes for mounting data.
+     */
+    val mapInjectionIndependent: MutableMap<KClass<out ReactiveInjectionClass>, Collection<String>> = mutableMapOf()
+
+}
 
 /**
  * The main class for storing information about the [Node]
@@ -81,16 +88,6 @@ private data class InfoInjectionClass(
     val injectionClass: KClass<out ReactiveInjectionClass>? = null
 
 )
-
-/**
- * The name of the method for inverting a reactive property. [ReactiveHandler.handler]
- */
-internal const val HANDLER_NAME = "handler"
-
-/**
- * The name of the method for inverting a reactive property. [ReactiveHandlerAfter.action]
- */
-internal const val HANDLER_AFTER_NAME = "action"
 
 /**
  * Main class for regulating reactive and lazy properties.
@@ -189,7 +186,7 @@ object ReactiveLoader {
         injectionClasses: Map<KClass<out ReactiveInjectionClass>, Collection<String>>,
         injectionIndependentClasses: Map<KClass<out ReactiveInjectionClass>, Collection<String>>
     ) {
-        mapInjectionIndependent.putAll(injectionIndependentClasses)
+        ReactiveLoaderStorage.mapInjectionIndependent.putAll(injectionIndependentClasses)
 
         classes.forEach { reactiveLazyObject ->
             reactiveLazyObject::class.memberProperties.forEach { kProperty ->
@@ -217,7 +214,7 @@ object ReactiveLoader {
                         sendIsLoadInjectionClass = injectionIsLoad.injectionClass,
                         sendIsLoadInjectionMethod = injectionIsLoad.method
                     )
-                    mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
+                    ReactiveLoaderStorage.mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
                     if (propertyNode.type != NodeType.NONE) {
                         collectNodes(propertyNode, reactiveLazyObject)
                     }
@@ -229,7 +226,8 @@ object ReactiveLoader {
 
                     val injectionData = setReactiveInjection(annotationReactive.injection, injectionClasses)
                     val injectionIsLoad = setReactiveInjection(
-                        annotationReactive.sendIsLoad.injection, injectionClasses)
+                        annotationReactive.sendIsLoad.injection, injectionClasses
+                    )
 
                     @Suppress("NAME_SHADOWING")
                     val reactiveLazyObject = ReactiveLazy(
@@ -248,7 +246,7 @@ object ReactiveLoader {
                         sendIsLoadInjectionClass = injectionIsLoad.injectionClass,
                         sendIsLoadInjectionMethod = injectionIsLoad.method
                     )
-                    mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
+                    ReactiveLoaderStorage.mapReactiveLazyObjects[kProperty.name] = reactiveLazyObject
                     if (propertyNode.type != NodeType.NONE) {
                         collectNodes(propertyNode, reactiveLazyObject)
                     }
@@ -270,14 +268,14 @@ object ReactiveLoader {
     private fun sortByPriority() {
         val newMap: MutableMap<String, ReactiveLazy> = mutableMapOf()
 
-        mapReactiveLazyObjects.entries
+        ReactiveLoaderStorage.mapReactiveLazyObjects.entries
             .sortedWith(compareByDescending { it.value.priority })
             .map {
                 newMap.put(it.key, it.value)
             }
 
-        mapReactiveLazyObjects.clear()
-        mapReactiveLazyObjects.putAll(newMap)
+        ReactiveLoaderStorage.mapReactiveLazyObjects.clear()
+        ReactiveLoaderStorage.mapReactiveLazyObjects.putAll(newMap)
     }
 
     /**
@@ -316,19 +314,21 @@ object ReactiveLoader {
             return
         }
 
-        val lazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
+        val lazyObject: ReactiveLazy? = ReactiveLoaderStorage.mapReactiveLazyObjects[nameProperty]
         if (lazyObject != null && !lazyObject.isLoad) {
             setReactiveValue(reactiveLazyObject = lazyObject)
             lazyObject.isLoad = true
 
-            logger.infoDev("Loading a lazy o reactive property:\n\t[" +
-                    "${lazyObject.reactiveLazyObject.javaClass.canonicalName}] [$nameProperty]")
+            logger.infoDev(
+                "Loading a lazy o reactive property:\n\t[" +
+                        "${lazyObject.reactiveLazyObject.javaClass.canonicalName}] [$nameProperty]"
+            )
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     suspend fun <T> loadNotSet(nameProperty: String): Result<T> {
-        val lazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
+        val lazyObject: ReactiveLazy? = ReactiveLoaderStorage.mapReactiveLazyObjects[nameProperty]
 
         if (lazyObject != null) {
             val loadedData: Any? = setReactiveValue(reactiveLazyObject = lazyObject, isSetData = false)
@@ -347,13 +347,15 @@ object ReactiveLoader {
      * [Lazy] or [Reactive]
      */
     fun resetIsLoad(nameProperty: String) {
-        val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
+        val reactiveLazyObject: ReactiveLazy? = ReactiveLoaderStorage.mapReactiveLazyObjects[nameProperty]
         if (reactiveLazyObject != null) {
             reactiveLazyObject.isLoad = false
             sendIsLoadData(reactiveLazyObject, false)
 
-            logger.infoDev("Reactive property purification:\n\t[" +
-                    "${reactiveLazyObject.reactiveLazyObject.javaClass.canonicalName}] [$nameProperty]")
+            logger.infoDev(
+                "Reactive property purification:\n\t[" +
+                        "${reactiveLazyObject.reactiveLazyObject.javaClass.canonicalName}] [$nameProperty]"
+            )
         }
     }
 
@@ -368,7 +370,7 @@ object ReactiveLoader {
      * @param useOldData Whether to call the trigger using the old set data.
      */
     suspend fun <T : Any> setReactiveValue(nameProperty: String, event: String, data: T, useOldData: Boolean = false) {
-        val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
+        val reactiveLazyObject: ReactiveLazy? = ReactiveLoaderStorage.mapReactiveLazyObjects[nameProperty]
         if (reactiveLazyObject != null && reactiveLazyObject.triggers.containsKey(event)) {
             val trigger: KClass<out BaseReactiveTrigger<Any>>? = reactiveLazyObject.triggers[event]
 
@@ -381,7 +383,8 @@ object ReactiveLoader {
                 trigger?.createInstance()?.execution(data)
             } else {
                 trigger?.createInstance()?.execution(
-                    reactiveLazyObject.field.get(reactiveLazyObject.reactiveLazyObject), data)
+                    reactiveLazyObject.field.get(reactiveLazyObject.reactiveLazyObject), data
+                )
                 reactiveLazyObject.field.set(reactiveLazyObject.reactiveLazyObject, data)
             }
 
@@ -398,7 +401,7 @@ object ReactiveLoader {
      * @param data Data.
      */
     suspend fun executionIndependentTrigger(nameProperty: String, event: String, vararg data: Any?) {
-        val reactiveLazyObject: ReactiveLazy? = mapReactiveLazyObjects[nameProperty]
+        val reactiveLazyObject: ReactiveLazy? = ReactiveLoaderStorage.mapReactiveLazyObjects[nameProperty]
         if (reactiveLazyObject != null && reactiveLazyObject.independentTriggers.containsKey(event)) {
             val trigger: KClass<out BaseReactiveIndependentTrigger>? = reactiveLazyObject.independentTriggers[event]
 
@@ -417,7 +420,7 @@ object ReactiveLoader {
      * @param value The transmitted value specified in [ReactivePipelineHandler.launch].
      */
     fun pipelineLaunch(pipeline: String, value: Any) {
-        val infoPipeline = mapPipelines[pipeline]
+        val infoPipeline = ReactiveLoaderStorage.mapPipelines[pipeline]
         infoPipeline?.handler?.createInstance()?.launch(value)
     }
 
@@ -429,7 +432,7 @@ object ReactiveLoader {
      */
     fun pipelineLaunch(pipeline: Iterable<String>, value: Any) {
         pipeline.forEach {
-            val infoPipeline = mapPipelines[it]
+            val infoPipeline = ReactiveLoaderStorage.mapPipelines[it]
             infoPipeline?.handler?.createInstance()?.launch(value)
         }
     }
@@ -443,7 +446,7 @@ object ReactiveLoader {
      */
     fun pipelineLaunch(pipeline: Iterable<String>, value: Any, type: ReactivePipelineType) {
         pipeline.forEach {
-            val infoPipeline = mapPipelines[it]
+            val infoPipeline = ReactiveLoaderStorage.mapPipelines[it]
             if (infoPipeline != null && infoPipeline.type == type) {
                 infoPipeline.handler.createInstance().launch(value)
             }
@@ -457,15 +460,15 @@ object ReactiveLoader {
      * @param type Pipeline type.
      */
     internal fun checkTypePipeline(pipeline: String, type: ReactivePipelineType): Boolean {
-        if (mapPipelines.containsKey(pipeline)) {
-            return mapPipelines[pipeline]?.type == type
+        if (ReactiveLoaderStorage.mapPipelines.containsKey(pipeline)) {
+            return ReactiveLoaderStorage.mapPipelines[pipeline]?.type == type
         }
         return false
     }
 
     private fun gePipelinesByNameProperty(property: String): Iterable<String> {
         val pipelines: MutableList<String> = mutableListOf()
-        mapPipelines.forEach { (title, info) ->
+        ReactiveLoaderStorage.mapPipelines.forEach { (title, info) ->
             if (info.namePropertyReactiveLazy == property) {
                 pipelines.add(title)
             }
@@ -498,7 +501,8 @@ object ReactiveLoader {
      * @param value Embedded data.
      */
     fun runReactiveIndependentInjection(method: String, value: Any) {
-        mapInjectionIndependent.forEach { (kClass: KClass<out ReactiveInjectionClass>, methods: Collection<String>) ->
+        ReactiveLoaderStorage.mapInjectionIndependent.forEach { (kClass: KClass<out ReactiveInjectionClass>,
+                                                                    methods: Collection<String>) ->
             if (methods.contains(method)) {
                 val compObject = kClass.companionObject
                 if (compObject != null) {
@@ -525,10 +529,10 @@ private fun collectNodes(node: Node, reactiveLazyObject: ReactiveLazy) {
         reactiveLazyObject = reactiveLazyObject,
         handler = reactiveLazyObject.handler.objectInstance
     )
-    if (!mapNodes.containsKey(node.unit)) {
-        mapNodes[node.unit] = mutableListOf(reactiveLazyNodeObject)
+    if (!ReactiveLoaderStorage.mapNodes.containsKey(node.unit)) {
+        ReactiveLoaderStorage.mapNodes[node.unit] = mutableListOf(reactiveLazyNodeObject)
     } else {
-        mapNodes[node.unit]?.add(reactiveLazyNodeObject)
+        ReactiveLoaderStorage.mapNodes[node.unit]?.add(reactiveLazyNodeObject)
     }
 }
 
@@ -537,7 +541,7 @@ private fun collectNodes(node: Node, reactiveLazyObject: ReactiveLazy) {
  */
 private fun collectPipelines(pipelines: Array<ReactivePipeline<Any>>, namePropertyReactiveLazy: String) {
     pipelines.forEach {
-        mapPipelines[it.title] = InfoPipeline(
+        ReactiveLoaderStorage.mapPipelines[it.title] = InfoPipeline(
             type = it.type,
             handler = it.pipeline,
             namePropertyReactiveLazy = namePropertyReactiveLazy
@@ -546,7 +550,7 @@ private fun collectPipelines(pipelines: Array<ReactivePipeline<Any>>, nameProper
 }
 
 private suspend fun loadNode() {
-    mapNodes.forEach { (_, nodes) ->
+    ReactiveLoaderStorage.mapNodes.forEach { (_, nodes) ->
         val nodesTypeKtor: MutableList<ReactiveLazyNode> = findNodes(nodes = nodes, type = NodeType.KTOR)
         val reactiveLazyObject: MutableList<ReactiveLazy> = mutableListOf()
 
@@ -590,7 +594,7 @@ private fun findNodes(
  * Set reactive values via map
  */
 private suspend fun setReactiveValues(isReactive: Boolean, isLazy: Boolean) {
-    mapReactiveLazyObjects.forEach { (_, value) ->
+    ReactiveLoaderStorage.mapReactiveLazyObjects.forEach { (_, value) ->
         if (isReactive && value.isReactive && !value.isLoad) {
             setReactiveValue(reactiveLazyObject = value)
         }
@@ -609,10 +613,10 @@ private suspend fun setReactiveValue(
 ): Any? {
     val field = reactiveLazyObject.field
     val methodHandler = reactiveLazyObject.handler.declaredMemberFunctions.find {
-        it.name == HANDLER_NAME
+        it.name == HandlerTarget.HANDLER_NAME.method
     }
     val methodHandlerAfter = reactiveLazyObject.handlerAfter.declaredMemberFunctions.find {
-        it.name == HANDLER_AFTER_NAME
+        it.name == HandlerTarget.HANDLER_AFTER_NAME.method
     }
 
     if (methodHandler != null) {
@@ -626,7 +630,8 @@ private suspend fun setReactiveValue(
             reactiveLazyObject.isLoad = true
 
             if (methodHandlerAfter != null
-                && reactiveLazyObject.handlerAfter.objectInstance != null) {
+                && reactiveLazyObject.handlerAfter.objectInstance != null
+            ) {
                 methodHandlerAfter.callSuspend(reactiveLazyObject.handlerAfter.objectInstance)
             }
 
@@ -655,7 +660,8 @@ internal fun runInjectionMethod(reactiveLazyObject: ReactiveLazy, objectFromHand
 internal fun sendIsLoadData(reactiveLazyObject: ReactiveLazy, isLoad: Boolean = true) {
     if (reactiveLazyObject.sendIsLoadInjectionClass != null
         && reactiveLazyObject.sendIsLoadInjectionMethod.isNotEmpty()
-        && reactiveLazyObject.sendIsLoad) {
+        && reactiveLazyObject.sendIsLoad
+    ) {
         val compObject = reactiveLazyObject.sendIsLoadInjectionClass.companionObject
         if (compObject != null) {
             compObject.functions.find {
@@ -669,7 +675,7 @@ private fun writeLogsToConsoleForCollectObjects() {
     if (Environment.IS_DEV) {
         // Classes
         var log = "Assembly of reactive and lazy objects:\n"
-        mapReactiveLazyObjects.forEach { (property, clazz) ->
+        ReactiveLoaderStorage.mapReactiveLazyObjects.forEach { (property, clazz) ->
             val isType: String = if (clazz.isReactive) "Reactive" else "Lazy"
             log += "\t[${clazz.reactiveLazyObject.javaClass.canonicalName}] [$property] - $isType\n"
         }
@@ -677,7 +683,7 @@ private fun writeLogsToConsoleForCollectObjects() {
 
         // Nodes
         log = "Assembly of nodes for reactive and lazy objects:\n"
-        mapNodes.forEach { (property, clazz) ->
+        ReactiveLoaderStorage.mapNodes.forEach { (property, clazz) ->
             log += "\t[node: $property] classes:\n"
             clazz.forEach {
                 val className: String = it.reactiveLazyObject.reactiveLazyObject.javaClass.canonicalName
@@ -689,7 +695,7 @@ private fun writeLogsToConsoleForCollectObjects() {
 
         // Pipelines
         log = "Jet piping assembly:\n"
-        mapPipelines.forEach { (title, info) ->
+        ReactiveLoaderStorage.mapPipelines.forEach { (title, info) ->
             log += "\t[pipeline: $title] \n\t    [handler: ${info.handler}]\n\t    [property: " +
                     info.namePropertyReactiveLazy + "]\n"
         }

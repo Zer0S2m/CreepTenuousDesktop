@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
-import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsSwitchLastThroughDirectories
-import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsWalkingThroughDirectoriesFolderUserMain
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionSwitchLastThroughDirectories
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionWalkingThroughDirectoriesFolderUserMain
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.SwitchPanelDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.float
@@ -34,7 +34,7 @@ internal fun RenderLeftContentDashboard(
         SwitchPanelDashboard(
             title = titleSwitchPanelDashboard,
             onClickLeft = {
-                ActionsSwitchLastThroughDirectories.call(scope = scope)
+                ActionSwitchLastThroughDirectories.call(scope = scope)
             },
             onClickRight = {
 
@@ -48,7 +48,7 @@ internal fun RenderLeftContentDashboard(
                     isIcon = true,
                     iconPath = icon,
                     onClick = {
-                        ActionsWalkingThroughDirectoriesFolderUserMain.call(
+                        ActionWalkingThroughDirectoriesFolderUserMain.call(
                             scope = scope,
                             folder
                         )

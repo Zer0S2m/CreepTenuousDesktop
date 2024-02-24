@@ -4,9 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -15,7 +12,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,11 +21,9 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionDownloadFileOrDirectory
-import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsWalkingThroughDirectories
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionWalkingThroughDirectories
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.Avatar
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
-import com.zer0s2m.creeptenuous.desktop.ui.components.FieldSearch
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
 import com.zer0s2m.creeptenuous.desktop.ui.components.TitleCategoryFileObject
 import kotlinx.coroutines.CoroutineScope
@@ -178,21 +172,19 @@ internal fun RenderLayoutDirectories(
                     actionDoubleClick = {
                         val directory: FileObject = directories.value[index]
 
-                        ActionsWalkingThroughDirectories.call(
+                        ActionWalkingThroughDirectories.call(
                             scope = scope,
                             directory
                         )
                     },
                     actionDownload = {
-                        scope.launch {
-                            ActionDownloadFileOrDirectory.call(
-                                scope = scope,
-                                directories.value[index].realName,
-                                directories.value[index].systemName,
-                                false,
-                                true
-                            )
-                        }
+                        ActionDownloadFileOrDirectory.call(
+                            scope = scope,
+                            directories.value[index].realName,
+                            directories.value[index].systemName,
+                            false,
+                            true
+                        )
                     }
                 ).render()
             }
@@ -263,63 +255,16 @@ internal fun RenderLayoutFiles(
                         )
                     },
                     actionDownload = {
-                        scope.launch {
-                            ActionDownloadFileOrDirectory.call(
-                                scope = scope,
-                                files.value[index].realName,
-                                files.value[index].systemName,
-                                true,
-                                false
-                            )
-                        }
+                        ActionDownloadFileOrDirectory.call(
+                            scope = scope,
+                            files.value[index].realName,
+                            files.value[index].systemName,
+                            true,
+                            false
+                        )
                     }
                 ).render()
             }
-        }
-    }
-}
-
-/**
- * Top panel render - search for file objects and avatar to open profile menu
- *
- * @param scaffoldState State for [Scaffold] composable component.
- * @param scope Defines a scope for new coroutines.
- * @param avatar User avatar URL.
- */
-@Composable
-internal fun TopPanelDashboard(
-    scaffoldState: ScaffoldState,
-    scope: CoroutineScope,
-    avatar: MutableState<String?> = mutableStateOf(null)
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(0.94f)
-                .padding(0.dp, 12.dp, 12.dp, 12.dp)
-        ) {
-            FieldSearch(
-                onClick = {
-                    println("SEARCH")
-                }
-            ).render()
-        }
-        Column(
-            modifier = Modifier
-                .height(40.dp)
-                .width(52.dp)
-                .padding(end = 12.dp)
-        ) {
-            Avatar(
-                stateScaffold = scaffoldState,
-                scope = scope,
-                avatar = avatar.value
-            ).render()
         }
     }
 }

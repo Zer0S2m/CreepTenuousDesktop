@@ -6,8 +6,8 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:${project.ext.get("ktorVersion")}")
     implementation("io.ktor:ktor-serialization-kotlinx-json:${project.ext.get("ktorVersion")}")
     implementation("io.ktor:ktor-client-logging:${project.ext.get("ktorVersion")}")
+    implementation("io.ktor:ktor-client-logging-jvm:${project.ext.get("ktorVersion")}")
 
-    implementation("org.slf4j:slf4j-api:2.0.7")
-    implementation("org.slf4j:slf4j-simple:2.0.7")
-    implementation("io.ktor:ktor-client-logging-jvm:2.3.2")
+    implementation("org.slf4j:slf4j-api:${project.ext.get("slf4jVersion")}")
+    implementation("org.slf4j:slf4j-simple:${project.ext.get("slf4jVersion")}")
 }

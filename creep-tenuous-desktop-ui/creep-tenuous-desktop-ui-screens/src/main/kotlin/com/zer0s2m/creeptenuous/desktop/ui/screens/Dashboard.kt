@@ -50,8 +50,8 @@ import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigati
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
-import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsSwitchBreadCrumbsThroughDirectories
-import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionsSwitchMainThroughDirectories
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionSwitchBreadCrumbsThroughDirectories
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionSwitchMainThroughDirectories
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.BaseBreadCrumbsItem
@@ -61,6 +61,7 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.CardModalSheetSectionProfi
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalRightSheetLayout
 import com.zer0s2m.creeptenuous.desktop.ui.components.TextInCardModalSheet
 import com.zer0s2m.creeptenuous.desktop.ui.components.TitleInSectionForCardsModalSheet
+import com.zer0s2m.creeptenuous.desktop.ui.components.TopPanelDashboard
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.float
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupContentCommentsInFileObjectModal
@@ -72,7 +73,6 @@ import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupSetUserCategor
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.PopupSetUserColorInFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLayoutFilesObject
 import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.RenderLeftContentDashboard
-import com.zer0s2m.creeptenuous.desktop.ui.screens.dashboard.TopPanelDashboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -524,7 +524,7 @@ class Dashboard(var navigation: NavigationController) : ReactiveInjectionClass {
     private fun getMainBreadCrumb(scope: CoroutineScope): BaseBreadCrumbsItem {
         return BreadCrumbsItem(
             text = "Main",
-            onClick = { ActionsSwitchMainThroughDirectories.call(scope = scope) }
+            onClick = { ActionSwitchMainThroughDirectories.call(scope = scope) }
         )
     }
 
@@ -535,7 +535,7 @@ class Dashboard(var navigation: NavigationController) : ReactiveInjectionClass {
         itemsBreadCrumbs.value.forEachIndexed { index: Int, breadCrumbFileObject: BreadCrumbFileObject ->
             itemsBreadCrumbsLocal.add(BreadCrumbsItem(
                 text = breadCrumbFileObject.realName,
-                onClick = { ActionsSwitchBreadCrumbsThroughDirectories.call(scope = scope, index) }
+                onClick = { ActionSwitchBreadCrumbsThroughDirectories.call(scope = scope, index) }
             ))
         }
 

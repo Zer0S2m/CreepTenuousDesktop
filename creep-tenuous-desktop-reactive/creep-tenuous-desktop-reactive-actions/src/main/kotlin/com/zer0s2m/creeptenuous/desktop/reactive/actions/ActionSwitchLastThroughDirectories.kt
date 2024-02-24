@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
  * - currentParentsManagerDirectory
  * - currentSystemParentsManagerDirectory
  */
-object ActionsSwitchLastThroughDirectories : Action {
+object ActionSwitchLastThroughDirectories : Action {
 
     /**
      * Call action.

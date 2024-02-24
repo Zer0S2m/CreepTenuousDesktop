@@ -2,8 +2,10 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.3.2"
+val ktorVersion = "2.3.8"
 val jvmVersion = "1.9.0"
+val slf4jVersion = "2.0.9"
+val kotlinxSerializationJsonVersion = "1.6.2"
 
 plugins {
     kotlin("jvm") version "1.9.0"
@@ -81,10 +83,12 @@ allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     group = "com.zer0s2m.creeptenuous.desktop"
-    version = "0.0.1-SNAPSHOT"
+    version = "1.0.0-SNAPSHOT"
 
     project.ext.set("ktorVersion", ktorVersion)
     project.ext.set("jvmVersion", jvmVersion)
+    project.ext.set("slf4jVersion", slf4jVersion)
+    project.ext.set("kotlinxSerializationJsonVersion", kotlinxSerializationJsonVersion)
 }
 
 subprojects {

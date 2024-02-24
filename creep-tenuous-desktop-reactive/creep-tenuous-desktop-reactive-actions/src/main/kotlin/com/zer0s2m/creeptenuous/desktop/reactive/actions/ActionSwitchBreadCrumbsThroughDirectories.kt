@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
  * - currentParentsManagerDirectory
  * - currentSystemParentsManagerDirectory
  */
-object ActionsSwitchBreadCrumbsThroughDirectories : Action {
+object ActionSwitchBreadCrumbsThroughDirectories : Action {
 
     /**
      * Call action.

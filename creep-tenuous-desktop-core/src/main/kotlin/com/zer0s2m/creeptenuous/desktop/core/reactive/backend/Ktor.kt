@@ -1,6 +1,10 @@
 package com.zer0s2m.creeptenuous.desktop.core.reactive.backend
 
-import com.zer0s2m.creeptenuous.desktop.core.reactive.*
+import com.zer0s2m.creeptenuous.desktop.core.reactive.HandlerTarget
+import com.zer0s2m.creeptenuous.desktop.core.reactive.NodeType
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandlerKtor
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLazy
+import com.zer0s2m.creeptenuous.desktop.core.reactive.runInjectionMethod
 import io.ktor.client.statement.*
 import io.ktor.util.reflect.*
 import kotlin.reflect.KType
@@ -29,7 +33,7 @@ internal object Ktor {
         if (response != null) {
             reactiveLazyObject.forEach {
                 val method = it.handler.declaredMemberFunctions.find { function ->
-                    function.name == HANDLER_NAME
+                    function.name == HandlerTarget.HANDLER_NAME.method
                 }
                 if (method != null) {
                     val returnType: KType = method.returnType
