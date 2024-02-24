@@ -461,9 +461,7 @@ class Dashboard(var navigation: NavigationController) : ReactiveInjectionClass {
                             verticalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .fillMaxHeight(0.94f)
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 LayoutFileObjects(
                                     scope = scope,
@@ -473,7 +471,9 @@ class Dashboard(var navigation: NavigationController) : ReactiveInjectionClass {
                                     scaffoldStateInfoFileObject = scaffoldStateInfoFileObject
                                 )
                             }
-                            Column(modifier = Modifier.fillMaxSize()) {
+                            Column(modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)) {
                                 LayoutBreadCrumbs(scope = scope)
                             }
                         }

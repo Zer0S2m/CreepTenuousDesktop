@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -60,7 +61,7 @@ internal fun RenderLayoutFilesObject(
     scaffoldStateInfoFileObject: ScaffoldState
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        Column(modifier = Modifier.padding(bottom = 28.dp)) {
+        Column {
             RenderLayoutDirectories(
                 scope = scope,
                 directories = directories,
@@ -71,6 +72,7 @@ internal fun RenderLayoutFilesObject(
                 scaffoldStateCommentFileObject = scaffoldStateCommentFileObject,
                 scaffoldStateInfoFileObject = scaffoldStateInfoFileObject
             )
+            Spacer(modifier = Modifier.height(28.dp))
             RenderLayoutFiles(
                 scope = scope,
                 files = files,
@@ -107,7 +109,7 @@ internal fun RenderLayoutDirectories(
     scaffoldStateCommentFileObject: ScaffoldState,
     scaffoldStateInfoFileObject: ScaffoldState
 ) {
-    Column(modifier = Modifier.padding(bottom = 28.dp)) {
+    Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             TitleCategoryFileObject("Folders", directories.value.size)
             Spacer(modifier = Modifier.width(12.dp))
