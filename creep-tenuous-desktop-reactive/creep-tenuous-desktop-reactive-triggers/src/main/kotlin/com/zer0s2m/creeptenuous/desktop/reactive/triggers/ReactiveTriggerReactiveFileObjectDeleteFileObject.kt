@@ -1,6 +1,7 @@
 package com.zer0s2m.creeptenuous.desktop.reactive.triggers
 
 import com.zer0s2m.creeptenuous.desktop.common.data.DataDeleteFileSystemObjectDirectory
+import com.zer0s2m.creeptenuous.desktop.common.data.DataDeleteFileSystemObjectFile
 import com.zer0s2m.creeptenuous.desktop.common.dto.ManagerFileObject
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
@@ -38,6 +39,20 @@ class ReactiveTriggerReactiveFileObjectDeleteFileObject : BaseReactiveTrigger<Ma
 
         if (deletedFileObject[0].isFile) {
             logger.infoDev("Delete a file\nDATA: ${deletedFileObject[0]}")
+
+            HttpClient.client.delete {
+                url("/api/v1/file/delete")
+                header("Authorization", "Bearer ${HttpClient.accessToken}")
+                contentType(ContentType.Application.Json)
+                setBody(
+                    DataDeleteFileSystemObjectFile(
+                        parents = currentParentsManagerDirectory,
+                        systemParents = currentSystemParentsManagerDirectory,
+                        fileName = deletedFileObject[0].realName,
+                        systemFileName = deletedFileObject[0].systemName,
+                    )
+                )
+            }
         } else {
             logger.infoDev("Delete a directory\nDATA: ${deletedFileObject[0]}")
 
