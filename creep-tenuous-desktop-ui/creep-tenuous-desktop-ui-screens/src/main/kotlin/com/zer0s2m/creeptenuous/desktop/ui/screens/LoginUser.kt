@@ -28,7 +28,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.zer0s2m.creeptenuous.desktop.common.data.DataLoginUser
+import com.zer0s2m.creeptenuous.desktop.common.dto.ConfigState
+import com.zer0s2m.creeptenuous.desktop.common.dto.JwtTokens
+import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
+import com.zer0s2m.creeptenuous.desktop.common.utils.saveStorageConfigStateDesktop
+import com.zer0s2m.creeptenuous.desktop.core.auth.AuthorizationHandler
+import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.reactiveNavigationScreen
+import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
 import com.zer0s2m.creeptenuous.desktop.ui.components.Form
@@ -102,22 +110,46 @@ class LoginUser {
                                 data["password"].toString()
                             )
 
-                            // TODO: Authorization if there is no saved state
-//                            ReactiveLoader.setIsBlockLoad(false)
-//
-//                            scope.launch {
-//                                reactiveNavigationScreen.action(
-//                                    state = mutableStateOf(navigationController),
-//                                    route = Screen.DASHBOARD_SCREEN,
-//                                    objects = listOf(
-//                                        "managerFileSystemObjects",
-//                                        "customCategories",
-//                                        "userColors",
-//                                        "profileSettings"
-//                                    ),
-//                                    scope = scope
-//                                )
-//                            }
+                            scope.launch {
+                                try {
+                                    val tokens: JwtTokens = AuthorizationHandler.login(
+                                        login = dataClass.login,
+                                        password = dataClass.password
+                                    )
+
+                                    SystemSettings.accessToken = tokens.accessToken
+                                    SystemSettings.refreshToken = tokens.refreshToken
+
+                                    saveStorageConfigStateDesktop(
+                                        data = ConfigState(
+                                            host = SystemSettings.host,
+                                            port = SystemSettings.port,
+                                            login = dataClass.login,
+                                            password = dataClass.password,
+                                            accessToken = null,
+                                            refreshToken = null
+                                        )
+                                    )
+
+                                    ReactiveLoader.setIsBlockLoad(false)
+
+                                    reactiveNavigationScreen.action(
+                                        state = mutableStateOf(navigationController),
+                                        route = Screen.DASHBOARD_SCREEN,
+                                        objects = listOf(
+                                            "managerFileSystemObjects",
+                                            "customCategories",
+                                            "userColors",
+                                            "profileSettings",
+                                            "systemUsers"
+                                        ),
+                                        scope = scope
+                                    )
+                                } catch (e: Exception) {
+                                    scaffoldState.snackbarHostState
+                                        .showSnackbar("Unauthorized")
+                                }
+                            }
                         }
                     },
                     modifier = Modifier

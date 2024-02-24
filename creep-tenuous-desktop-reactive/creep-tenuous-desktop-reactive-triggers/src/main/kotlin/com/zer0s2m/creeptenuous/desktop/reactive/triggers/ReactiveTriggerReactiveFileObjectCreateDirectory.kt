@@ -8,6 +8,7 @@ import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
 import com.zer0s2m.creeptenuous.desktop.core.logging.logger
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveIndependentTrigger
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -56,8 +57,8 @@ class ReactiveTriggerReactiveFileObjectCreateDirectory
 
         if (fileObject != null) {
             val createdDirectory: CreatedDirectory = HttpClient.client.post {
-                url("/api/v1/directory/create")
-                header("Authorization", "Bearer ${HttpClient.accessToken}")
+                url("${SystemSettings.host}:${SystemSettings.port}/api/v1/directory/create")
+                header("Authorization", "Bearer ${SystemSettings.accessToken}")
                 contentType(ContentType.Application.Json)
                 setBody(
                     DataCreateFileSystemObjectDirectory(

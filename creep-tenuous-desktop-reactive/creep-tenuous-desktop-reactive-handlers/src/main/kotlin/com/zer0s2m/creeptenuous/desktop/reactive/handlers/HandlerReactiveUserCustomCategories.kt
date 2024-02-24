@@ -5,6 +5,7 @@ import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandler
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.core.reactive.toReactiveMutableList
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategoryAdd
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategoryRemove
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerUserCategorySet
@@ -22,9 +23,10 @@ object HandlerReactiveUserCustomCategories : ReactiveHandler<ReactiveMutableList
      * @return result
      */
     override suspend fun handler(): ReactiveMutableList<UserCategory> {
-        val data: MutableCollection<UserCategory> = HttpClient.client.get("/api/v1/user/category") {
-            header("Authorization", "Bearer ${HttpClient.accessToken}")
-        }.body()
+        val data: MutableCollection<UserCategory> =
+            HttpClient.client.get("${SystemSettings.host}:${SystemSettings.port}/api/v1/user/category") {
+                header("Authorization", "Bearer ${SystemSettings.accessToken}")
+            }.body()
         return data.toReactiveMutableList(
             triggerAdd = ReactiveTriggerUserCategoryAdd(),
             triggerRemove = ReactiveTriggerUserCategoryRemove(),

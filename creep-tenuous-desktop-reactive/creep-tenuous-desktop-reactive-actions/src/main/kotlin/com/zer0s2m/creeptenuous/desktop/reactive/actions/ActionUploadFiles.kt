@@ -5,6 +5,7 @@ import com.zer0s2m.creeptenuous.desktop.core.actions.Action
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
@@ -38,7 +39,7 @@ object ActionUploadFiles : Action {
             )
 
             HttpClient.client.submitFormWithBinaryData(
-                url = "/api/v1/file/upload",
+                url = "${SystemSettings.host}:${SystemSettings.port}/api/v1/file/upload",
                 formData = formData {
                     files.forEach { file ->
                         append("files", file.readBytes(), Headers.build {
@@ -47,7 +48,7 @@ object ActionUploadFiles : Action {
                     }
                 }
             ) {
-                header("Authorization", "Bearer ${HttpClient.accessToken}")
+                header("Authorization", "Bearer ${SystemSettings.accessToken}")
                 parameter("parents", currentParentsManagerDirectory.joinToString(","))
                 parameter("systemParents", currentSystemParentsManagerDirectory.joinToString(","))
             }

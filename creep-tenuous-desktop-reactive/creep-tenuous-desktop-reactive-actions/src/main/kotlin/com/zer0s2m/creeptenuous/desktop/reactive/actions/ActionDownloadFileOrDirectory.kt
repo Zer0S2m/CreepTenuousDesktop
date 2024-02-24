@@ -8,6 +8,7 @@ import com.zer0s2m.creeptenuous.desktop.core.actions.Action
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.env.Environment
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -47,9 +48,9 @@ object ActionDownloadFileOrDirectory : Action {
                 .toFile()
 
             if (isFile && !isDirectory) {
-                url = "/api/v1/file/download"
+                url = "${SystemSettings.host}:${SystemSettings.port}/api/v1/file/download"
                 request = HttpClient.client.preparePost(url) {
-                    header("Authorization", "Bearer ${HttpClient.accessToken}")
+                    header("Authorization", "Bearer ${SystemSettings.accessToken}")
                     contentType(ContentType.Application.Json)
                     setBody(
                         DataDownloadFile(
@@ -61,9 +62,9 @@ object ActionDownloadFileOrDirectory : Action {
                     )
                 }
             } else if (!isFile && isDirectory) {
-                url = "/api/v1/directory/download"
+                url = "${SystemSettings.host}:${SystemSettings.port}/api/v1/directory/download"
                 request = HttpClient.client.preparePost(url) {
-                    header("Authorization", "Bearer ${HttpClient.accessToken}")
+                    header("Authorization", "Bearer ${SystemSettings.accessToken}")
                     contentType(ContentType.Application.Json)
                     setBody(
                         DataDownloadDirectory(

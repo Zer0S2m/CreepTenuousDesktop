@@ -22,18 +22,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import com.zer0s2m.creeptenuous.desktop.common.dto.ConfigState
 import com.zer0s2m.creeptenuous.desktop.common.dto.SettingsSystemModel
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents
+import com.zer0s2m.creeptenuous.desktop.common.utils.saveStorageConfigStateDesktop
+import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.navigation.actions.navigationScreen
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import com.zer0s2m.creeptenuous.desktop.core.validation.MaxNumberValidator
 import com.zer0s2m.creeptenuous.desktop.core.validation.NotEmptyValidator
 import com.zer0s2m.creeptenuous.desktop.core.validation.PositiveNumberValidator
 import com.zer0s2m.creeptenuous.desktop.navigation.NavigationController
-import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
-import com.zer0s2m.creeptenuous.desktop.ui.components.misc.dp
 import com.zer0s2m.creeptenuous.desktop.ui.components.Form
 import com.zer0s2m.creeptenuous.desktop.ui.components.FormState
+import com.zer0s2m.creeptenuous.desktop.ui.components.TextFieldAdvanced
+import com.zer0s2m.creeptenuous.desktop.ui.components.misc.dp
 import kotlinx.coroutines.launch
 
 /**
@@ -93,11 +97,36 @@ fun SettingsSystem(
                             data["host"].toString(),
                             data["port"].toString().toInt()
                         )
-                        navigationScreen.action(
-                            state = mutableStateOf(navigationController),
-                            route = Screen.LOGIN_SCREEN,
-                            scope = scope
-                        )
+                        scope.launch {
+                            val isEnableSystem: Boolean = HttpClient.checkSystemSettings(
+                                host = dataClass.host,
+                                port = dataClass.port
+                            )
+                            if (!isEnableSystem) {
+                                scaffoldState.snackbarHostState
+                                    .showSnackbar("System not found")
+                            } else {
+                                SystemSettings.host = dataClass.host
+                                SystemSettings.port = dataClass.port
+
+                                saveStorageConfigStateDesktop(
+                                    data = ConfigState(
+                                        host = SystemSettings.host,
+                                        port = SystemSettings.port,
+                                        login = "",
+                                        password = "",
+                                        accessToken = null,
+                                        refreshToken = null
+                                    )
+                                )
+
+                                navigationScreen.action(
+                                    state = mutableStateOf(navigationController),
+                                    route = Screen.LOGIN_SCREEN,
+                                    scope = scope
+                                )
+                            }
+                        }
                     }
                 },
                 modifier = Modifier

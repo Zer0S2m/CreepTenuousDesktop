@@ -5,6 +5,7 @@ import com.zer0s2m.creeptenuous.desktop.core.reactive.Lazy
 import com.zer0s2m.creeptenuous.desktop.core.reactive.NodeType
 import com.zer0s2m.creeptenuous.desktop.core.reactive.Reactive
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandlerKtor
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 
@@ -18,8 +19,8 @@ internal object HandlerReactiveUser : ReactiveHandlerKtor {
      * @return result
      */
     override suspend fun handlerKtor(): HttpResponse {
-        return HttpClient.client.get("/api/v1/user/profile") {
-            header("Authorization", "Bearer ${HttpClient.accessToken}")
+        return HttpClient.client.get("${SystemSettings.host}:${SystemSettings.port}/api/v1/user/profile") {
+            header("Authorization", "Bearer ${SystemSettings.accessToken}")
         }
     }
 

@@ -983,7 +983,6 @@ private fun PopupContentInfoFileObjectModalBlockGrantedRights(
             ReactiveLoader.loadNotSet<GrantedRight?>("grantedRightsFileObjects")
                 .onSuccess {
                     data.value = it
-                    println(it)
                 }
                 .onFailure {
                     data.value = null
@@ -1046,7 +1045,6 @@ private fun PopupContentInfoFileObjectModalBlockAssignedRights(
             ReactiveLoader.loadNotSet<IssuedRights?>("assignedRightsFileObjects")
                 .onSuccess {
                     data.value = it
-                    println(it)
                 }
                 .onFailure {
                     data.value = null

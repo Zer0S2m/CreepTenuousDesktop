@@ -78,6 +78,8 @@ private fun checkExistsFileDBDTO(path: String) {
     if (!Files.exists(pathDBFile)) {
         Files.createFile(pathDBFile)
         saveStorageConfigStateDesktop(ConfigState(
+            host = "",
+            port = 0,
             login = "",
             password = "",
             accessToken = null,

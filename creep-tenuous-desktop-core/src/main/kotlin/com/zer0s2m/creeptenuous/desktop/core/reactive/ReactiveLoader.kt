@@ -163,10 +163,10 @@ object ReactiveLoader {
         }
 
         buildReactiveAndLazyClasses(classes, mapInjectionClasses, mapInjectionIndependentClasses)
-        loadNode()
         writeLogsToConsoleForCollectObjects()
 
         if (!getIsBlockLoad()) {
+            loadNode()
             setReactiveValues(
                 isReactive = true,
                 isLazy = false

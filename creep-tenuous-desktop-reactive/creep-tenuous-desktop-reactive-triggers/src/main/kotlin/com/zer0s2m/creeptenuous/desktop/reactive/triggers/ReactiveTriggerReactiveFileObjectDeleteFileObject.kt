@@ -8,6 +8,7 @@ import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
 import com.zer0s2m.creeptenuous.desktop.core.logging.logger
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -41,8 +42,8 @@ class ReactiveTriggerReactiveFileObjectDeleteFileObject : BaseReactiveTrigger<Ma
             logger.infoDev("Delete a file\nDATA: ${deletedFileObject[0]}")
 
             HttpClient.client.delete {
-                url("/api/v1/file/delete")
-                header("Authorization", "Bearer ${HttpClient.accessToken}")
+                url("${SystemSettings.host}:${SystemSettings.port}/api/v1/file/delete")
+                header("Authorization", "Bearer ${SystemSettings.accessToken}")
                 contentType(ContentType.Application.Json)
                 setBody(
                     DataDeleteFileSystemObjectFile(
@@ -57,8 +58,8 @@ class ReactiveTriggerReactiveFileObjectDeleteFileObject : BaseReactiveTrigger<Ma
             logger.infoDev("Delete a directory\nDATA: ${deletedFileObject[0]}")
 
             HttpClient.client.delete {
-                url("/api/v1/directory/delete")
-                header("Authorization", "Bearer ${HttpClient.accessToken}")
+                url("${SystemSettings.host}:${SystemSettings.port}/api/v1/directory/delete")
+                header("Authorization", "Bearer ${SystemSettings.accessToken}")
                 contentType(ContentType.Application.Json)
                 setBody(
                     DataDeleteFileSystemObjectDirectory(

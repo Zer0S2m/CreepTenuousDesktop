@@ -7,6 +7,7 @@ import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveHandler
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveMutableList
 import com.zer0s2m.creeptenuous.desktop.core.reactive.toReactiveMutableList
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectCreateCommentFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectEditCommentFileObject
 import com.zer0s2m.creeptenuous.desktop.reactive.triggers.ReactiveTriggerReactiveFileObjectRemoveCommentFileObject
@@ -30,9 +31,9 @@ object HandlerReactiveCommentsFileObject : ReactiveHandler<ReactiveMutableList<C
         )
 
         val data: MutableCollection<CommentFileObject> = HttpClient.client.get {
-            url("/api/v1/common/comment/file-system-object")
+            url("${SystemSettings.host}:${SystemSettings.port}/api/v1/common/comment/file-system-object")
             parameter("file", currentFileObject)
-            header("Authorization", "Bearer ${HttpClient.accessToken}")
+            header("Authorization", "Bearer ${SystemSettings.accessToken}")
         }.body()
 
         return data.toReactiveMutableList(

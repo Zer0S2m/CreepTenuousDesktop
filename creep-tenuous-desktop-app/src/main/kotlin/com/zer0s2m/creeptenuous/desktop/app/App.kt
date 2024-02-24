@@ -12,8 +12,8 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.common.utils.createDownloadFolder
 import com.zer0s2m.creeptenuous.desktop.common.utils.loadStorageConfigStateDesktop
 import com.zer0s2m.creeptenuous.desktop.core.auth.AuthorizationHandler
-import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import com.zer0s2m.creeptenuous.desktop.navigation.runtime.rememberNavigationController
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
@@ -45,6 +45,8 @@ import kotlinx.coroutines.runBlocking
 @Composable
 @Preview
 fun App() {
+    // TODO: Connecting the server by host and port
+
     val coroutineScope = rememberCoroutineScope()
 
     createDownloadFolder()
@@ -52,16 +54,28 @@ fun App() {
     var screen: String = Screen.DASHBOARD_SCREEN.name
     val configState: ConfigState = loadStorageConfigStateDesktop()
     var jwtTokens: JwtTokens?
+    var isFullSettings = true
 
-    if (configState.login.isEmpty() && configState.password.isEmpty()) {
+    if (configState.host.isEmpty() && configState.port == 0) {
+        screen = Screen.SETTINGS_SYSTEM_SCREEN.name
+        isFullSettings = false
+        ReactiveLoader.setIsBlockLoad(true)
+    }
+
+    if (configState.login.isEmpty() && configState.password.isEmpty() && isFullSettings) {
+        SystemSettings.host = configState.host
+        SystemSettings.port = configState.port
         screen = Screen.LOGIN_SCREEN.name
         ReactiveLoader.setIsBlockLoad(true)
-    } else {
+    } else if (configState.login.isNotEmpty() && configState.password.isNotEmpty() && isFullSettings) {
         if (configState.accessToken == null && configState.refreshToken == null) {
+            SystemSettings.host = configState.host
+            SystemSettings.port = configState.port
+
             runBlocking {
                 jwtTokens = AuthorizationHandler.login(configState.login, configState.password)
-                HttpClient.accessToken = jwtTokens!!.accessToken
-                HttpClient.refreshToken = jwtTokens!!.refreshToken
+                SystemSettings.accessToken = jwtTokens!!.accessToken
+                SystemSettings.refreshToken = jwtTokens!!.refreshToken
             }
         }
     }

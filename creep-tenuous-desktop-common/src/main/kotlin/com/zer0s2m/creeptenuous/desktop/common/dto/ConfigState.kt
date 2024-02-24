@@ -5,6 +5,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ConfigState(
 
+    val host: String,
+
+    val port: Int,
+
     val login: String,
 
     val password: String,

@@ -4,6 +4,7 @@ import com.zer0s2m.creeptenuous.desktop.common.data.DataRenameFileObject
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
 import com.zer0s2m.creeptenuous.desktop.core.logging.logger
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveIndependentTrigger
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -29,8 +30,8 @@ class ReactiveTriggerReactiveFileObjectRenameFileObject : BaseReactiveIndependen
         logger.infoDev("Rename file object\nDATA: [$systemName, $newTitle]")
 
         HttpClient.client.put {
-            url("/api/v1/file-system-object/rename")
-            header("Authorization", "Bearer ${HttpClient.accessToken}")
+            url("${SystemSettings.host}:${SystemSettings.port}/api/v1/file-system-object/rename")
+            header("Authorization", "Bearer ${SystemSettings.accessToken}")
             contentType(ContentType.Application.Json)
             setBody(DataRenameFileObject(systemName!!, newTitle!!))
         }

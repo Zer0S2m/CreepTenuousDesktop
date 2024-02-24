@@ -5,6 +5,7 @@ import com.zer0s2m.creeptenuous.desktop.common.dto.CommentFileObject
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
 import com.zer0s2m.creeptenuous.desktop.core.logging.logger
+import com.zer0s2m.creeptenuous.desktop.core.state.SystemSettings
 import com.zer0s2m.creeptenuous.desktop.core.triggers.BaseReactiveTrigger
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -28,8 +29,8 @@ class ReactiveTriggerReactiveFileObjectCreateCommentFileObject : BaseReactiveTri
         logger.infoDev("Create a comment for file object\nDATA: $value")
 
         HttpClient.client.post {
-            url("/api/v1/common/comment/file-system-object")
-            header("Authorization", "Bearer ${HttpClient.accessToken}")
+            url("${SystemSettings.host}:${SystemSettings.port}/api/v1/common/comment/file-system-object")
+            header("Authorization", "Bearer ${SystemSettings.accessToken}")
             contentType(ContentType.Application.Json)
             setBody(DataCreateCommentFileSystemObject(value.comment, value.fileSystemObject))
         }
