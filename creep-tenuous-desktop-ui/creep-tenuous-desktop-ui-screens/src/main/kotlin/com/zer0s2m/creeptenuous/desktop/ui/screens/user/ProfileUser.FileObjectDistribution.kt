@@ -13,13 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
@@ -34,21 +32,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserSettingsFileObjectDistribution
-import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
+import com.zer0s2m.creeptenuous.desktop.ui.components.LayoutDeleteAndOpenInputSelect
 import com.zer0s2m.creeptenuous.desktop.ui.components.animations.setAnimateColorAsStateInSelectUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.animations.setHoverInSelectUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.misc.Colors
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 /**
@@ -140,14 +138,16 @@ private fun Switch() {
  */
 @Composable
 internal fun SelectUserDropMenu() {
-    val selectedUserItem: MutableState<String?> = remember { mutableStateOf(
-        ReactiveUser.UserSettings.userSettingsFileObjectDistribution.passingFilesToUser
-    ) }
+    val selectedUserItem: MutableState<String?> = remember {
+        mutableStateOf(
+            ReactiveUser.UserSettings.userSettingsFileObjectDistribution.passingFilesToUser
+        )
+    }
     val textState: MutableState<String> = remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
-            .width(baseWidthColumnSelectUser)
+            .width(ProfileFileObjectDistribution.baseWidthColumnSelectUser)
             .padding(top = 12.dp)
     ) {
         textState.value = ReactiveCommon.systemUsers.find {
@@ -170,7 +170,7 @@ private fun UserLoginTextField(
     selectedUserItem: MutableState<String?>
 ) {
     val expandedStates: MutableState<Boolean> = remember { mutableStateOf(false) }
-
+    val scope: CoroutineScope = rememberCoroutineScope()
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isHover: MutableState<Boolean> = remember { mutableStateOf(false) }
     val animatedCardColor = setAnimateColorAsStateInSelectUser(
@@ -207,16 +207,29 @@ private fun UserLoginTextField(
                 color = Colors.TEXT.color
             )
 
-            Icon(
-                painter = painterResource(resourcePath = Resources.ICON_ARROW.path),
-                contentDescription = contentDescriptionIconArrow,
-                tint = MaterialTheme.colors.secondaryVariant,
-                modifier = Modifier
-                    .size(16.dp)
+            LayoutDeleteAndOpenInputSelect(
+                actionDelete = {
+                    scope.launch {
+                        ReactiveLoader.setReactiveValue(
+                            "userSettingsFileObjectDistribution",
+                            "setTransferUserFileObjects",
+                            UserSettingsFileObjectDistribution(
+                                ReactiveUser.UserSettings.userSettingsFileObjectDistribution.isDeletingFilesWhenDeletingUser,
+                                null
+                            )
+                        )
+                    }
+
+                    selectedUserItem.value = null
+                }
             )
         }
 
-        DropdownMenuSelectUser(expandedStates = expandedStates, selectedUserItem = selectedUserItem)
+        DropdownMenuSelectUser(
+            expandedStates = expandedStates,
+            selectedUserItem = selectedUserItem,
+            scope = scope
+        )
     }
 }
 
@@ -230,6 +243,7 @@ private fun UserLoginTextField(
 private fun DropdownMenuSelectUser(
     expandedStates: MutableState<Boolean>,
     selectedUserItem: MutableState<String?>,
+    scope: CoroutineScope
 ) {
     DropdownMenu(
         expanded = expandedStates.value,
@@ -237,67 +251,49 @@ private fun DropdownMenuSelectUser(
             expandedStates.value = false
         },
         modifier = Modifier
-            .width(baseWidthColumnSelectUser)
+            .width(ProfileFileObjectDistribution.baseWidthColumnSelectUser)
             .padding(0.dp)
             .background(Colors.SECONDARY_VARIANT.color)
     ) {
         ReactiveCommon.systemUsers.forEach { user ->
-            DropdownMenuItemSelectUser(expandedStates, selectedUserItem, user.login) {
+            DropdownMenuItem(
+                onClick = {
+                    scope.launch {
+                        ReactiveLoader.setReactiveValue(
+                            "userSettingsFileObjectDistribution",
+                            "setTransferUserFileObjects",
+                            UserSettingsFileObjectDistribution(
+                                ReactiveUser.UserSettings.userSettingsFileObjectDistribution.isDeletingFilesWhenDeletingUser,
+                                user.login
+                            )
+                        )
+                    }
+
+                    selectedUserItem.value = user.login
+                    expandedStates.value = false
+                },
+                modifier = Modifier
+                    .pointerHoverIcon(PointerIcon.Hand),
+                contentPadding = PaddingValues(12.dp)
+            ) {
                 Text(user.name, color = Color.White)
             }
         }
     }
 }
 
-/**
- * The base element for selecting a user from a drop-down list
- *
- * @param expandedStates Whether the menu is currently open and visible to the user
- * @param selectedUserItem State of the selected user from the list by his login
- * @param newUser The new selected user. His login from [ReactiveCommon.systemUsers]
- * @param content Internal block content
- */
-@Composable
-private fun DropdownMenuItemSelectUser(
-    expandedStates: MutableState<Boolean>,
-    selectedUserItem: MutableState<String?>,
-    newUser: String,
-    content: @Composable () -> Unit
-) {
-    val scope = rememberCoroutineScope()
+private object ProfileFileObjectDistribution {
 
-    DropdownMenuItem(
-        onClick = {
-            scope.launch {
-                ReactiveLoader.setReactiveValue(
-                    "userSettingsFileObjectDistribution",
-                    "setTransferUserFileObjects",
-                    UserSettingsFileObjectDistribution(
-                        ReactiveUser.UserSettings.userSettingsFileObjectDistribution.isDeletingFilesWhenDeletingUser,
-                        newUser
-                    )
-                )
-            }
+    /**
+     * Text used by accessibility services to describe what this image represents
+     */
+    @get:ReadOnlyComposable
+    val contentDescriptionIconArrow: String get() = "Open user list"
 
-            selectedUserItem.value = newUser
-            expandedStates.value = false
-        },
-        modifier = Modifier
-            .pointerHoverIcon(PointerIcon.Hand),
-        contentPadding = PaddingValues(12.dp)
-    ) {
-        content()
-    }
+    /**
+     * Width of user selection area from list
+     */
+    @get:ReadOnlyComposable
+    val baseWidthColumnSelectUser: Dp get() = 200.dp
+
 }
-
-/**
- * Text used by accessibility services to describe what this image represents
- */
-@get:ReadOnlyComposable
-private val contentDescriptionIconArrow: String get() = "Open user list"
-
-/**
- * Width of user selection area from list
- */
-@get:ReadOnlyComposable
-private val baseWidthColumnSelectUser: Dp get() = 200.dp

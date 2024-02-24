@@ -10,6 +10,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DataControlUser(
 
-    val login: String
+    val login: String?
 
 )

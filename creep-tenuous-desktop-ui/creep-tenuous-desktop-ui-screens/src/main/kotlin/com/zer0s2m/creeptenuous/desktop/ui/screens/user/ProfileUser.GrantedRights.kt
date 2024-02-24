@@ -17,6 +17,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -334,10 +335,13 @@ private object CommonProfileGrantedRights {
      */
     var contextSelectDeleteRight: MutableList<GrantedRightItemUser> = mutableListOf()
 
-    const val baseHeightPopupItemDeleteRight: Int = 50
+    @get:ReadOnlyComposable
+    val baseHeightPopupItemDeleteRight: Int get() = 50
 
-    const val baseWidthElementRight: Int = 180
+    @get:ReadOnlyComposable
+    val baseWidthElementRight: Int get() = 180
 
-    const val basePaddingElementRight: Int = 16
+    @get:ReadOnlyComposable
+    val basePaddingElementRight: Int get() = 16
 
 }

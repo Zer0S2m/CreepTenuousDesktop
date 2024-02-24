@@ -1,6 +1,6 @@
 package com.zer0s2m.creeptenuous.desktop.reactive.triggers
 
-import com.zer0s2m.creeptenuous.desktop.common.data.DataSettingIsDeleteFileObject
+import com.zer0s2m.creeptenuous.desktop.common.data.DataControlUser
 import com.zer0s2m.creeptenuous.desktop.common.dto.UserSettingsFileObjectDistribution
 import com.zer0s2m.creeptenuous.desktop.core.http.HttpClient
 import com.zer0s2m.creeptenuous.desktop.core.logging.infoDev
@@ -31,7 +31,7 @@ class ReactiveTriggerUserSettingsSetTransferUser : BaseReactiveTrigger<UserSetti
             url("/api/v1/user/profile/settings/set-transfer-user")
             header("Authorization", "Bearer ${HttpClient.accessToken}")
             contentType(ContentType.Application.Json)
-            setBody(value.isDeletingFilesWhenDeletingUser?.let { DataSettingIsDeleteFileObject(it) })
+            setBody(DataControlUser(value.passingFilesToUser))
         }
     }
 
