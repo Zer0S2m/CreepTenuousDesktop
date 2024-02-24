@@ -184,8 +184,8 @@ class Dashboard(var navigation: NavigationController) : ReactiveInjectionClass {
                 else if (it.isFile) files.add(it)
             }
 
-            managerFileObject_Directories.value = folders
-            managerFileObject_Files.value = files
+            managerFileObject_Directories.value = folders.sortedBy { it.realName }.toMutableList()
+            managerFileObject_Files.value = files.sortedBy { it.realName }.toMutableList()
 
             if (!isSetBaseFolderUser.value) {
                 val systemNameFolderVideos = managerFileObject_Directories.value.find {

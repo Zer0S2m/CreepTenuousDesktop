@@ -39,6 +39,8 @@ enum class Resources(val path: String) {
 
     ICON_ADD("drawable/add.png"),
 
-    ICON_DATE("drawable/date.png")
+    ICON_DATE("drawable/date.png"),
+
+    ICON_UPLOAD("drawable/upload.svg")
 
 }

@@ -56,6 +56,38 @@ fun IconButtonAdd(
 }
 
 /**
+ * IconButton is a clickable icon, used to represent actions. Event - upload.
+ *
+ * @param onClick The lambda to be invoked when this icon is pressed.
+ * @param modifier Modifier to be applied to the button.
+ * @param contentDescription Text used by accessibility services to describe what this image represents.
+ */
+@Composable
+fun IconButtonUpload(
+    onClick: () -> Unit,
+    modifier: Modifier = CommonButtons.baseComponentForButton,
+    contentDescription: String? = CommonButtons.contentDescriptionIconUpload
+) {
+    OutlinedButton(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.medium,
+        onClick = onClick,
+        contentPadding = PaddingValues(4.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            backgroundColor = MaterialTheme.colors.secondary
+        )
+    ) {
+        Icon(
+            painter = painterResource(resourcePath = Resources.ICON_UPLOAD.path),
+            contentDescription = contentDescription,
+            modifier = Modifier
+                .fillMaxSize(),
+            tint = Color.White
+        )
+    }
+}
+
+/**
  * IconButton is a clickable icon, used to represent actions. Event - edit.
  *
  * @param onClick The lambda to be invoked when this icon is pressed.
@@ -66,7 +98,7 @@ fun IconButtonAdd(
 fun IconButtonEdit(
     onClick: () -> Unit,
     modifier: Modifier = CommonButtons.baseComponentForButton,
-    contentDescription: String? = CommonButtons.contentDescriptionIconAdd
+    contentDescription: String? = CommonButtons.contentDescriptionIconUpload
 ) {
     OutlinedButton(
         modifier = modifier,
@@ -324,6 +356,12 @@ private object CommonButtons {
      */
     @get:ReadOnlyComposable
     val contentDescriptionIconUnblock: String get() = "Unlock icon"
+
+    /**
+     * Text used by accessibility services to describe what this image represents.
+     */
+    @get:ReadOnlyComposable
+    val contentDescriptionIconUpload: String get() = "Upload item"
 
     @get:ReadOnlyComposable
     val baseComponentForButton: Modifier

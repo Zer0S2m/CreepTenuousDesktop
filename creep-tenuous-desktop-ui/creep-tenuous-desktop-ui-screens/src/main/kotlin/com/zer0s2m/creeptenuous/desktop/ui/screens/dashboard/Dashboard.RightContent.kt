@@ -21,13 +21,18 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionDownloadFileOrDirectory
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionUploadFiles
 import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionWalkingThroughDirectories
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.CartFileObject
 import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonAdd
+import com.zer0s2m.creeptenuous.desktop.ui.components.IconButtonUpload
 import com.zer0s2m.creeptenuous.desktop.ui.components.TitleCategoryFileObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.File
+import javax.swing.JFileChooser
+
 
 /**
  * Content on the right side of the main dashboard
@@ -111,6 +116,12 @@ internal fun RenderLayoutDirectories(
                     expandedStateCreateFileObjectTypeDirectory.value = true
                 },
                 contentDescription = "Add file object"
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            IconButtonUpload(
+                onClick = {
+                    println("UPLOAD")
+                }
             )
         }
         LazyVerticalGrid(
@@ -213,7 +224,27 @@ internal fun RenderLayoutFiles(
     scaffoldStateInfoFileObject: ScaffoldState
 ) {
     Column {
-        TitleCategoryFileObject("Files", files.value.size)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TitleCategoryFileObject("Files", files.value.size)
+            Spacer(modifier = Modifier.width(12.dp))
+            IconButtonUpload(
+                onClick = {
+                    val fileChooser = JFileChooser()
+                    fileChooser.isMultiSelectionEnabled = true
+                    fileChooser.dialogTitle = "Selection of files"
+                    fileChooser.showSaveDialog(null)
+
+                    val selectedFiles: List<File> = fileChooser.selectedFiles.toList()
+                    if (selectedFiles.isNotEmpty()) {
+                        ActionUploadFiles.call(
+                            scope = scope,
+                            selectedFiles
+                        )
+                    }
+                }
+            )
+        }
+
         LazyVerticalGrid(
             columns = GridCells.Adaptive(160.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
