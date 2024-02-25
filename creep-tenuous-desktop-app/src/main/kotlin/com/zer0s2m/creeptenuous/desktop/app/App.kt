@@ -45,8 +45,6 @@ import kotlinx.coroutines.runBlocking
 @Composable
 @Preview
 fun App() {
-    // TODO: Connecting the server by host and port
-
     val coroutineScope = rememberCoroutineScope()
 
     createDownloadFolder()

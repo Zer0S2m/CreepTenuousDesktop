@@ -62,6 +62,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zer0s2m.creeptenuous.desktop.common.enums.BaseCatalogs
 import com.zer0s2m.creeptenuous.desktop.common.enums.Resources
 import com.zer0s2m.creeptenuous.desktop.common.utils.colorConvertHexToRgb
 import com.zer0s2m.creeptenuous.desktop.common.utils.manipulateColor
@@ -873,15 +874,17 @@ class CartFileObject(
                     actionDownload()
                 }
             )
-            DropdownMenuItemAdvanced(
-                text = "Rename",
-                colorText = Color.Black,
-                modifier = modifierMenu,
-                onClick = {
-                    expandedMenu.value = false
-                    actionRename()
-                }
-            )
+            if (!BaseCatalogs.list().contains(text)) {
+                DropdownMenuItemAdvanced(
+                    text = "Rename",
+                    colorText = Color.Black,
+                    modifier = modifierMenu,
+                    onClick = {
+                        expandedMenu.value = false
+                        actionRename()
+                    }
+                )
+            }
             DropdownMenuItemAdvanced(
                 text = "Copy",
                 colorText = Color.Black,
@@ -891,24 +894,28 @@ class CartFileObject(
                     actionCopy()
                 }
             )
-            DropdownMenuItemAdvanced(
-                text = "Move",
-                colorText = Color.Black,
-                modifier = modifierMenu,
-                onClick = {
-                    expandedMenu.value = false
-                    actionMove()
-                }
-            )
-            DropdownMenuItemAdvanced(
-                text = "Delete",
-                colorText = Color.Black,
-                modifier = modifierMenu,
-                onClick = {
-                    expandedMenu.value = false
-                    actionDelete()
-                }
-            )
+            if (!BaseCatalogs.list().contains(text)) {
+                DropdownMenuItemAdvanced(
+                    text = "Move",
+                    colorText = Color.Black,
+                    modifier = modifierMenu,
+                    onClick = {
+                        expandedMenu.value = false
+                        actionMove()
+                    }
+                )
+            }
+            if (!BaseCatalogs.list().contains(text)) {
+                DropdownMenuItemAdvanced(
+                    text = "Delete",
+                    colorText = Color.Black,
+                    modifier = modifierMenu,
+                    onClick = {
+                        expandedMenu.value = false
+                        actionDelete()
+                    }
+                )
+            }
             Divider(modifier = Modifier
                 .height(1.dp)
                 .fillMaxWidth()
