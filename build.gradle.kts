@@ -2,14 +2,11 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.3.8"
-val jvmVersion = "1.9.0"
 val slf4jVersion = "2.0.9"
-val kotlinxSerializationJsonVersion = "1.6.2"
 
 plugins {
     kotlin("jvm") version "1.9.0"
-    id("org.jetbrains.compose") version "1.5.0"
+    alias(libs.plugins.compose)
 }
 
 group = "com.zer0s2m.creeptenuous.desktop"
@@ -83,12 +80,9 @@ allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     group = "com.zer0s2m.creeptenuous.desktop"
-    version = "1.0.0-SNAPSHOT"
+    version = "1.0.0"
 
-    project.ext.set("ktorVersion", ktorVersion)
-    project.ext.set("jvmVersion", jvmVersion)
     project.ext.set("slf4jVersion", slf4jVersion)
-    project.ext.set("kotlinxSerializationJsonVersion", kotlinxSerializationJsonVersion)
 }
 
 subprojects {
@@ -103,8 +97,8 @@ subprojects {
     }
 
     dependencies {
-        if (!project.name.contains("creep-tenuous-desktop-common")) {
-            implementation(project(":creep-tenuous-desktop-common"))
+        if (!project.name.contains("common")) {
+            implementation(project(":common"))
         }
     }
 }
@@ -121,11 +115,11 @@ compose.desktop {
 }
 
 dependencies {
-    implementation(project(":creep-tenuous-desktop-common"))
-    implementation(project(":creep-tenuous-desktop-core"))
-    implementation(project(":creep-tenuous-desktop-reactive"))
-    implementation(project(":creep-tenuous-desktop-ui"))
-    implementation(project(":creep-tenuous-desktop-app"))
+    implementation(project(":common"))
+    implementation(project(":core"))
+    implementation(project(":reactive"))
+    implementation(project(":ui"))
+    implementation(project(":app"))
 
     implementation(compose.desktop.currentOs)
 }

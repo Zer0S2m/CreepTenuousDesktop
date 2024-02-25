@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.compose")
+    alias(libs.plugins.compose)
 }
 
 dependencies {

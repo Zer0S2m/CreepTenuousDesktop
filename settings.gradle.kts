@@ -6,18 +6,18 @@ pluginManagement {
 }
 
 include(
-    "creep-tenuous-desktop-common",
-    "creep-tenuous-desktop-core",
-    "creep-tenuous-desktop-ui:creep-tenuous-desktop-ui-components",
-    "creep-tenuous-desktop-ui:creep-tenuous-desktop-ui-screens",
-    "creep-tenuous-desktop-app",
-    "creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-actions",
-    "creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-models",
-    "creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-handlers",
-    "creep-tenuous-desktop-reactive:creep-tenuous-desktop-reactive-triggers",
-    "creep-tenuous-desktop-extended:creep-tenuous-desktop-navigation",
-    "creep-tenuous-desktop-extended:creep-tenuous-desktop-core-navigation",
-    "creep-tenuous-desktop-extended:creep-tenuous-desktop-core-utils"
+    "common",
+    "core",
+    "ui:components",
+    "ui:screens",
+    "app",
+    "reactive:actions",
+    "reactive:models",
+    "reactive:handlers",
+    "reactive:triggers",
+    "extended:navigation",
+    "extended:core-navigation",
+    "extended:core-utils"
 )
 
 rootProject.name = "CreepTenuousDesktop"
