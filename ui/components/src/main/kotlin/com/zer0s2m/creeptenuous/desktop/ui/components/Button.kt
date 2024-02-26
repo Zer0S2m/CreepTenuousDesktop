@@ -187,6 +187,7 @@ fun IconButtonSearch(
 /**
  * A standalone component is an arrow button. Left arrow.
  *
+ * @param enabled Whether this IconButton will handle input events and appear enabled for semantics purposes.
  * @param onClick The lambda to be invoked when this icon is pressed.
  * @param modifier Optional [Modifier] for this [IconButton].
  * @param modifierIcon optional [Modifier] for this [Icon].
@@ -194,12 +195,14 @@ fun IconButtonSearch(
  */
 @Composable
 fun IconButtonArrowLeft(
+    enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     modifierIcon: Modifier = Modifier,
     contentDescription: String = CommonButtons.contentDescriptionIconArrow
 ) {
     IconButtonArrow(
+        enabled = enabled,
         onClick = onClick,
         modifier = modifier,
         modifierIcon = modifierIcon,
@@ -211,6 +214,7 @@ fun IconButtonArrowLeft(
 /**
  * A standalone component is an arrow button. Right arrow.
  *
+ * @param enabled Whether this IconButton will handle input events and appear enabled for semantics purposes..
  * @param onClick The lambda to be invoked when this icon is pressed.
  * @param modifier Optional [Modifier] for this [IconButton].
  * @param modifierIcon optional [Modifier] for this [Icon].
@@ -218,12 +222,14 @@ fun IconButtonArrowLeft(
  */
 @Composable
 fun IconButtonArrowRight(
+    enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     modifierIcon: Modifier = Modifier,
     contentDescription: String = CommonButtons.contentDescriptionIconArrow
 ) {
     IconButtonArrow(
+        enabled = enabled,
         onClick = onClick,
         modifier = modifier,
         modifierIcon = modifierIcon,
@@ -235,6 +241,7 @@ fun IconButtonArrowRight(
 /**
  * A standalone component is an arrow button.
  *
+ * @param enabled Whether this IconButton will handle input events and appear enabled for semantics purposes.
  * @param onClick The lambda to be invoked when this icon is pressed.
  * @param modifier Optional [Modifier] for this [IconButton].
  * @param modifierIcon optional [Modifier] for this [Icon].
@@ -243,6 +250,7 @@ fun IconButtonArrowRight(
  */
 @Composable
 private fun IconButtonArrow(
+    enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     modifierIcon: Modifier = Modifier,
@@ -250,6 +258,7 @@ private fun IconButtonArrow(
     contentDescription: String
 ) {
     IconButton(
+        enabled = enabled,
         onClick = onClick,
         modifier = modifier
     ) {

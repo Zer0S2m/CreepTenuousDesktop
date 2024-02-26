@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
-import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionSwitchLastThroughDirectories
 import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionWalkingThroughDirectoriesFolderUserMain
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.SwitchPanelDashboard
@@ -16,6 +15,8 @@ import kotlinx.coroutines.CoroutineScope
 /**
  * Content on the left side of the main dashboard
  *
+ * @param scope Defines a scope for new coroutines.
+ * @param titleSwitchPanelDashboard The text to be displayed (Switch).
  * @param systemBaseFolderForUser Base directories that are created as soon as a new user appears in the system
  */
 @Composable
@@ -29,16 +30,8 @@ internal fun RenderLeftContentDashboard(
             .fillMaxHeight()
             .fillMaxWidth(com.zer0s2m.creeptenuous.desktop.common.enums.SizeComponents.LEFT_PANEL_DASHBOARD.float)
     ) {
-        // TODO: Make a custom directory navigation state
-
         SwitchPanelDashboard(
             title = titleSwitchPanelDashboard,
-            onClickLeft = {
-                ActionSwitchLastThroughDirectories.call(scope = scope)
-            },
-            onClickRight = {
-
-            }
         )
 
         Column {

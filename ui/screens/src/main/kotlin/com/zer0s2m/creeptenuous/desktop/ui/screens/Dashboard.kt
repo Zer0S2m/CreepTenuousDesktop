@@ -121,6 +121,16 @@ class Dashboard(var navigation: NavigationController) : ReactiveInjectionClass {
     private val expandedStateModalInteractionCommentFileObject: MutableState<Boolean> =
         mutableStateOf(false)
 
+    /**
+     * General condition of the desktop. Includes the following:
+     *
+     * 1) File objects of type - file.
+     * 2) File objects of type - directory.
+     * 3) User profile.
+     * 4) Name of the current directory.
+     * 5) Comments on a file object (lazy loading).
+     * 6) Bread crumbs.
+     */
     internal companion object {
 
         /**

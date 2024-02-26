@@ -736,6 +736,8 @@ internal fun PopupContentInfoFileObjectModal(
                 }
             isLoading.value = false
         }
+    } else {
+        isLoading.value = true
     }
 
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
