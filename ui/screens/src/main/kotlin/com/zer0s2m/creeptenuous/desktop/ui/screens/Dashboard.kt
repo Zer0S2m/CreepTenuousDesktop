@@ -481,9 +481,11 @@ class Dashboard(var navigation: NavigationController) : ReactiveInjectionClass {
                                     scaffoldStateInfoFileObject = scaffoldStateInfoFileObject
                                 )
                             }
-                            Column(modifier = Modifier
-                                .fillMaxWidth()
-                                .height(40.dp)) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(40.dp)
+                            ) {
                                 LayoutBreadCrumbs(scope = scope)
                             }
                         }

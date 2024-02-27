@@ -54,9 +54,9 @@ object ActionSwitchBreadCrumbsThroughDirectories : Action {
             currentParentsManagerDirectory.zip(currentSystemParentsManagerDirectory) { parent, systemParent ->
                 itemsBreadCrumbs.add(
                     BreadCrumbFileObject(
-                    realName = parent,
-                    systemName = systemParent
-                )
+                        realName = parent,
+                        systemName = systemParent
+                    )
                 )
             }
 

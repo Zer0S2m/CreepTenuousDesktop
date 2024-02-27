@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
+import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
+import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionWalkingThroughDirectoriesFolderUserMain
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardPanelBaseFolderUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.SwitchPanelDashboard
@@ -41,10 +43,22 @@ internal fun RenderLeftContentDashboard(
                     isIcon = true,
                     iconPath = icon,
                     onClick = {
-                        ActionWalkingThroughDirectoriesFolderUserMain.call(
-                            scope = scope,
-                            folder
-                        )
+                        if (ContextScreen.containsValueByKey(
+                                Screen.DASHBOARD_SCREEN,
+                                "systemNameFolderUser_$folder"
+                            )
+                        ) {
+                            if (ContextScreen.get<String>(
+                                    Screen.DASHBOARD_SCREEN,
+                                    "systemNameFolderUser_$folder"
+                                ).isNotEmpty()
+                            ) {
+                                ActionWalkingThroughDirectoriesFolderUserMain.call(
+                                    scope = scope,
+                                    folder
+                                )
+                            }
+                        }
                     }
                 )
             }
