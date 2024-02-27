@@ -22,6 +22,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionDownloadFileOrDirectory
+import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionUploadDirectory
 import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionUploadFiles
 import com.zer0s2m.creeptenuous.desktop.reactive.actions.ActionWalkingThroughDirectories
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveFileObject
@@ -32,7 +33,9 @@ import com.zer0s2m.creeptenuous.desktop.ui.components.TitleCategoryFileObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.*
 import javax.swing.JFileChooser
+import javax.swing.filechooser.FileFilter
 
 
 /**
@@ -122,7 +125,18 @@ internal fun RenderLayoutDirectories(
             Spacer(modifier = Modifier.width(6.dp))
             IconButtonUpload(
                 onClick = {
-                    println("UPLOAD")
+                    val fileChooser = JFileChooser()
+                    fileChooser.dialogTitle = "Selection of zip archive"
+                    fileChooser.fileFilter = FileFilterZipArchive()
+                    fileChooser.showSaveDialog(null)
+
+                    val selectedFile: File? = fileChooser.selectedFile
+                    if (selectedFile != null) {
+                        ActionUploadDirectory.call(
+                            scope = scope,
+                            selectedFile
+                        )
+                    }
                 }
             )
         }
@@ -415,4 +429,21 @@ private fun actionInfo(
             scaffoldStateInfoFileObject.drawerState.open()
         }
     }
+}
+
+private class FileFilterZipArchive : FileFilter() {
+
+    override fun getDescription(): String {
+        return "ZIP Archive (*.zip)"
+    }
+
+    override fun accept(file: File): Boolean {
+        return if (file.isDirectory) {
+            true
+        } else {
+            val filename: String = file.name.lowercase(Locale.getDefault())
+            filename.endsWith(".zip")
+        }
+    }
+
 }
