@@ -49,6 +49,7 @@ import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.core.context.ContextScreen
 import com.zer0s2m.creeptenuous.desktop.core.reactive.ReactiveLoader
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardUserControl
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalPopup
 import com.zer0s2m.creeptenuous.desktop.ui.components.ModalSelectDate
@@ -88,28 +89,30 @@ fun ProfileUser.ProfileUserControl.render() {
 
             // TODO: Bug - fix changing the button to block or unlock the user
 
-            CardUserControl(
-                nameUser = user.name,
-                loginUser = user.login,
-                roleUser = user.role[0].title,
-                isBlocked = isBLocked,
-                avatar = user.avatar,
-                actionDelete = { _ ->
-                    openDialogDeleteUser.value = true
-                    currentUser.value = user
-                    currentIndexUser.value = index
-                },
-                actionBlock = {
-                    openDialogBlockUser.value = true
-                    currentUser.value = user
-                    currentIndexUser.value = index
-                },
-                actionUnblock = {
-                    openDialogUnblockUser.value = true
-                    currentUser.value = user
-                    currentIndexUser.value = index
-                }
-            )
+            if (ReactiveUser.profileSettings!!.login != user.login) {
+                CardUserControl(
+                    nameUser = user.name,
+                    loginUser = user.login,
+                    roleUser = user.role[0].title,
+                    isBlocked = isBLocked,
+                    avatar = user.avatar,
+                    actionDelete = { _ ->
+                        openDialogDeleteUser.value = true
+                        currentUser.value = user
+                        currentIndexUser.value = index
+                    },
+                    actionBlock = {
+                        openDialogBlockUser.value = true
+                        currentUser.value = user
+                        currentIndexUser.value = index
+                    },
+                    actionUnblock = {
+                        openDialogUnblockUser.value = true
+                        currentUser.value = user
+                        currentIndexUser.value = index
+                    }
+                )
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import com.zer0s2m.creeptenuous.desktop.common.dto.User
 import com.zer0s2m.creeptenuous.desktop.common.enums.Screen
 import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveCommon
+import com.zer0s2m.creeptenuous.desktop.reactive.models.ReactiveUser
 import com.zer0s2m.creeptenuous.desktop.ui.components.CardUserCommon
 import com.zer0s2m.creeptenuous.desktop.ui.screens.ProfileUser
 
@@ -21,12 +22,14 @@ fun ProfileUser.ProfileListUsers.render() {
         modifier = Modifier.fillMaxSize()
     ) {
         items(ReactiveCommon.systemUsers) { user: User ->
-            CardUserCommon(
-                nameUser = user.name,
-                loginUser = user.login,
-                roleUser = user.role[0].title,
-                avatar = user.avatar
-            )
+            if (ReactiveUser.profileSettings!!.login != user.login) {
+                CardUserCommon(
+                    nameUser = user.name,
+                    loginUser = user.login,
+                    roleUser = user.role[0].title,
+                    avatar = user.avatar
+                )
+            }
         }
     }
 }
